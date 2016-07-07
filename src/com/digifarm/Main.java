@@ -1,6 +1,10 @@
 package com.digifarm;
 
 import com.digifarm.DBConnection.ConnectionDB;
+import com.digifarm.Graph.Node;
+import com.digifarm.Graph.Utility;
+
+import java.util.ArrayList;
 
 /**
  * Created by marco on 7/6/16.
@@ -26,11 +30,19 @@ public class Main {
 
         try {
 
-            ConnectionDB conn = new ConnectionDB("marco", "", "localhost", "5432", "imdb");
+            ConnectionDB conn = new ConnectionDB("nihilus", "", "localhost", "5432", "mondial");
+            ArrayList<Node> set = Utility.createGraph(conn);
+            /*for (Node n: set) {
+                System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
+            }*/
+            ArrayList<Node> interestSet = Utility.createInterestSet(conn, set, "Peru");
+            for (Node n: interestSet) {
+                System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
+            }
             System.out.println("Connected");
 
         } catch (Exception e) {
-
+            e.printStackTrace();
             System.out.println("Error");
         }
 

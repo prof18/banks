@@ -29,7 +29,7 @@ public class Utility {
             ResultSet tuple;
             ResultSet table = stmn.executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='mondial'");
             String tableName;
-            System.out.println("Creating graph from DB. Please Wait...\n-----------------" );
+            System.out.println("\nCreating graph from DB. Please Wait...\n-----------------" );
             while(table.next()) {
                 tableName = table.getString(1);
                 if(!tableName.startsWith("pg_") && !tableName.startsWith("sql_")) {
@@ -55,7 +55,7 @@ public class Utility {
             ResultSet columns = null;
             ResultSetMetaData meta = null;
             //check if a Node contains the match string
-            System.out.println("Creating Interest Set. Please Wait...\n-----------------" );
+            System.out.println("\nCreating Interest Set from \"" + match + "\". Please Wait...\n-----------------" );
             for(Node n: set) {
                 //extract all columns from this tuple
                 columns = stmn.executeQuery("SELECT * FROM " + n.getTableName() + " WHERE __search_id = " + n.getSearchID());

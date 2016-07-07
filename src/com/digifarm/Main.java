@@ -49,16 +49,21 @@ public class Main {
                 System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
             }*/
 
-            System.out.println("Enter keyword (comma as separator):");
-            //TODO String for testing. Use Buffer o come cazzo si chiama
+            System.out.println("Enter keyword (comma as separator without spaces):");
+
             String keyword = in.nextLine();
+            String[] temp;
+            temp = keyword.split(",");
+            for (int i = 0; i < temp.length; i++) {
 
-            ArrayList<Node> interestSet = Utility.createInterestSet(conn, set, keyword);
-            for (Node n: interestSet) {
-                System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
+
+                ArrayList<Node> interestSet = Utility.createInterestSet(conn, set, temp[i]);
+                for (Node n : interestSet) {
+                    System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
+                }
             }
-
             in.close();
+
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();

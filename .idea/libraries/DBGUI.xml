@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="DBGUI">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../homework/DBGUI.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

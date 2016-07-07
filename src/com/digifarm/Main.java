@@ -1,10 +1,12 @@
 package com.digifarm;
 
+import com.digifarm.DBConnection.ConnectionDB;
+
 /**
  * Created by marco on 7/6/16.
  */
 /*
-	BANKS implementation.
+	Banks implementation.
 
 	TO DO:
 
@@ -19,10 +21,18 @@ package com.digifarm;
 
 */
 
-public class BANKS {
+public class Main {
     public static void main(String[] args) {
 
-        System.out.println("Hello World");
+        try {
+
+            ConnectionDB conn = new ConnectionDB("marco", "", "localhost", "5432", "imdb");
+            System.out.println("Connected");
+
+        } catch (Exception e) {
+
+            System.out.println("Error");
+        }
 
     }
 }

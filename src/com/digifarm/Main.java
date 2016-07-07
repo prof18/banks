@@ -4,7 +4,10 @@ import com.digifarm.DBConnection.ConnectionDB;
 import com.digifarm.Graph.Node;
 import com.digifarm.Graph.Utility;
 
+import java.nio.channels.Pipe;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Created by marco on 7/6/16.
@@ -30,20 +33,39 @@ public class Main {
 
         try {
 
-            ConnectionDB conn = new ConnectionDB("nihilus", "", "localhost", "5432", "mondial");
+            Scanner in = new Scanner(System.in);
+            //ask database username
+            System.out.println("Enter Username:");
+            String username = in.nextLine();
+            //ask database name
+            System.out.println("Entern database name: ");
+            String database = in.nextLine();
+            //connect to database
+            ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
+            System.out.println("Connected\n-----------------");
+
             ArrayList<Node> set = Utility.createGraph(conn);
             /*for (Node n: set) {
                 System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
             }*/
-            ArrayList<Node> interestSet = Utility.createInterestSet(conn, set, "Peru");
+
+            System.out.println("Enter keyword (comma as separator):");
+            //TODO String for testing. Use Buffer o come cazzo si chiama
+            String keyword = in.nextLine();
+
+            ArrayList<Node> interestSet = Utility.createInterestSet(conn, set, keyword);
             for (Node n: interestSet) {
                 System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
             }
-            System.out.println("Connected");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error");
+            in.close();
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+
+        } catch (ClassNotFoundException ce) {
+            System.out.println("Unable to find Driver Class");
+            ce.printStackTrace();
         }
 
     }

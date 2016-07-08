@@ -49,19 +49,20 @@ public class Main {
                 System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
             }*/
 
+            //ask for keyboard
             System.out.println("Enter keyword (comma as separator without spaces):");
-
             String keyword = in.nextLine();
             String[] temp;
             temp = keyword.split(",");
-            for (int i = 0; i < temp.length; i++) {
 
+            for (String s : temp) {
 
-                ArrayList<Node> interestSet = Utility.createInterestSet(conn, set, temp[i]);
+                ArrayList<Node> interestSet = Utility.createInterestSet(conn, set, s);
                 for (Node n : interestSet) {
                     System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
                 }
             }
+
             in.close();
 
 

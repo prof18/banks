@@ -12,6 +12,7 @@ public class ConnectionDB {
     private String JDBC_DRV = "org.postgresql.Driver", DB_URL;
     private Connection conn = null;
 
+
     public ConnectionDB(String user, String pass, String addr, String port, String name) throws SQLException, ClassNotFoundException {
 
         //url for db connection

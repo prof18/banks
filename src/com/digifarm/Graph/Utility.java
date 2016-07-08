@@ -47,6 +47,13 @@ public class Utility {
         return set;
     }
 
+    /**
+     *
+     * @param dbConn
+     * @param set
+     * @param match
+     * @return
+     */
     public static ArrayList<Node> createInterestSet(ConnectionDB dbConn, ArrayList<Node> set, String match) {
         ArrayList<Node> interestSet = new ArrayList<Node>();
         Connection conn = dbConn.getDBConnection();

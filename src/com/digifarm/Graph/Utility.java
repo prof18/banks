@@ -18,7 +18,8 @@ public class Utility {
      *  @see ConnectionDB
      *
      **/
-    public static ArrayList<Node> createGraph(ConnectionDB dbConn) {
+
+    public static ArrayList<Node> createGraph(ConnectionDB dbConn, String databaseName) {
         ArrayList<Node> set = new ArrayList<Node>();
         //query the database to know tables names
         Connection conn = dbConn.getDBConnection();
@@ -27,7 +28,8 @@ public class Utility {
             stmn = conn.createStatement();
             stmn2 = conn.createStatement();
             ResultSet tuple;
-            ResultSet table = stmn.executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='mondial'");
+            ResultSet table = stmn.executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = " +
+                    "'BASE TABLE' AND TABLE_CATALOG='" + databaseName + "'");
             String tableName;
             System.out.println("\nCreating graph from DB. Please Wait...\n-----------------" );
             while(table.next()) {

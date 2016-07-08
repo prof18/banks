@@ -44,7 +44,7 @@ public class Main {
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
 
-            ArrayList<Node> set = Utility.createGraph(conn);
+            ArrayList<Node> set = Utility.createGraph(conn,database);
             /*for (Node n: set) {
                 System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
             }*/

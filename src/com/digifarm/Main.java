@@ -38,13 +38,14 @@ public class Main {
             System.out.println("Enter Username:");
             String username = in.nextLine();
             //ask database name
-            System.out.println("Entern database name: ");
+            System.out.println("Enter database name: ");
             String database = in.nextLine();
             //connect to database
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
 
             ArrayList<Node> set = Utility.createGraph(conn);
+            Utility.connectNodes(conn, set);
             /*for (Node n: set) {
                 System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
             }*/

@@ -10,7 +10,8 @@ public class Edge {
     private int weight;
     private Node from;
     private Node to;
-  
+
+
     /**
      * Build a new Edge between two Node.
      *
@@ -23,7 +24,6 @@ public class Edge {
         this.from = from;
         this.to = to;
         this.weight = weight;
-
 
     }
 
@@ -42,4 +42,6 @@ public class Edge {
     public Node getTo() {
         return to;
     }
+
+
 }

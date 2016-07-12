@@ -38,7 +38,7 @@ public class Main {
             System.out.println("Enter Username:");
             String username = in.nextLine();
             //ask database name
-            System.out.println("Entern database name: ");
+            System.out.println("Enter database name: ");
             String database = in.nextLine();
             //connect to database
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);

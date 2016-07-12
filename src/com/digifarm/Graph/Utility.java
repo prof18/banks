@@ -32,6 +32,7 @@ public class Utility {
                     "'BASE TABLE' AND TABLE_CATALOG='" + databaseName + "'");
             String tableName;
             System.out.println("\nCreating graph from DB. Please Wait...\n-----------------" );
+            long after = System.currentTimeMillis();
             while(table.next()) {
                 tableName = table.getString(1);
                 if(!tableName.startsWith("pg_") && !tableName.startsWith("sql_")) {
@@ -43,6 +44,9 @@ public class Utility {
                     }
                 }
             }
+            long before = System.currentTimeMillis();
+            long time = before - after;
+            System.out.println("Database Created in: " + time + "mills\n-----------------");
         } catch (SQLException e) {
             e.printStackTrace();
         }

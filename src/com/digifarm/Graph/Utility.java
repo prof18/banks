@@ -8,6 +8,7 @@ import com.sun.org.apache.xpath.internal.SourceTree;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by nihilus on 07/07/16.
@@ -68,17 +69,19 @@ public class Utility {
      * @param   match           Keyword
      * @return  interestSet     The interest set of node
      */
-    //TODO FIX COINTAINS AND IGNORE CASE
-    public static ArrayList<Node> createInterestSet(ConnectionDB dbConn, ArrayList<Node> set, String match) {
+
+    public static ArrayList<Node> createInterestSet(ConnectionDB dbConn, HashMap<Integer, Node> set, String match) {
         ArrayList<Node> interestSet = new ArrayList<Node>();
         Connection conn = dbConn.getDBConnection();
         try {
             Statement stmn = conn.createStatement();
             ResultSet columns = null;
             ResultSetMetaData meta = null;
+            Node n;
             //check if a Node contains the match string
             System.out.println("\nCreating Interest Set from \"" + match + "\". Please Wait...\n-----------------" );
-            for(Node n: set) {
+            for(Map.Entry<Integer, Node> e : set.entrySet()) {
+                n = e.getValue();
                 //extract all columns from this tuple
                 columns = stmn.executeQuery("SELECT * FROM " + n.getTableName() + " WHERE __search_id = " + n.getSearchID());
                 //check if a match occurs
@@ -87,7 +90,8 @@ public class Utility {
                     int max = meta.getColumnCount();
                     for (int i = 1; i < max; i++) {
                         String str = columns.getString(i);
-                        if (str != null && str.contains(match)) {
+                        if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
+
                             System.out.println("Matched: " + str);
                             interestSet.add(n);
                             break;
@@ -102,6 +106,16 @@ public class Utility {
         return interestSet;
     }
 
+    private static boolean isContained(String s1, String s2) {
+
+        for (String word : s1.split("\\s+")) {
+            if (word.equals(s2))
+                return true;
+        }
+
+        return false;
+    }
+
     /**
      *  This method connect the nodes of the set provided by input
      *
@@ -110,100 +124,138 @@ public class Utility {
      * @param nodeList          A set of Nodes that needs to be connected
      */
 
-    public static void connectNodes(ConnectionDB dBconn, ArrayList<Node> nodeList) {
+    public static void connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> nodeList) {
+
+        long before = System.currentTimeMillis();
+
+        ArrayList<String> queries;
         ArrayList<Edge> edges = new ArrayList<>();
         ArrayList<Edge> backedge = new ArrayList<>();
         ArrayList<Node> adjacent = new ArrayList<>();
 
+        Node n;
+
+        HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
+
+        for (Map.Entry<String, ArrayList<String>> e : sqlKey.entrySet()) {
+
+            queries = e.getValue();
+            System.out.println(e.getKey());
+            for (String s : queries) {
+
+                System.out.println(s);
+
+            }
+        }
+
         Connection conn = dBconn.getDBConnection();
         Statement stm;
-        Statement stm2;
+        ResultSet rs;
 
-        try {
+        int i = 0;
 
-            stm = conn.createStatement();
-            stm2 = conn.createStatement();
-            ResultSet idTo;
+        for (Map.Entry<Integer, Node> e : nodeList.entrySet()) {
 
-            //table name of the foreign key
-            String fromTable;
-            //foreign key
-            String fromKey;
-            //table name of table referred by the foreign key
-            String toTable;
-            //primary key of "toTable"
-            String toKey;
-            //tuple's search_id of fromTable
-            int nIdFrom;
-            //tuple's search_id of toTable
-            int nIdTo;
+            System.out.println("Node: " + i++);
 
-            System.out.println("\nCreating Edges. Please Wait...\n-----------------" );
+            n = e.getValue();
+            queries = sqlKey.get(n.getTableName());
 
-            for (Node n : nodeList ) {
+            if(queries != null && !queries.isEmpty()) {
 
-                //bad query
+                for (String q : queries) {
 
-                ResultSet keys = stm.executeQuery("SELECT source_table::regclass, source_attr.attname AS source_column,\n" +
-                        "\ttarget_table::regclass, target_attr.attname AS target_column\n" +
-                        "FROM pg_attribute target_attr, pg_attribute source_attr,\n" +
-                        "\t(SELECT source_table, target_table, source_constraints[i] source_constraints, target_constraints[i] AS target_constraints\n" +
-                        "\tFROM\n" +
-                        "\t(SELECT conrelid as source_table, confrelid AS target_table, conkey AS source_constraints, confkey AS target_constraints,\n" +
-                        "\tgenerate_series(1, array_upper(conkey, 1)) AS i\n" +
-                        "\tFROM pg_constraint\n" +
-                        "\tWHERE contype = 'f'\n" +
-                        "  ) query1\n" +
-                        " ) query2\n" +
-                        "WHERE target_attr.attnum = target_constraints AND target_attr.attrelid = \t target_table AND\n" +
-                        "\tsource_attr.attnum = source_constraints AND source_attr.attrelid = source_table ORDER BY source_table;");
+                    try {
+                        stm = conn.createStatement();
+                        rs = stm.executeQuery(q);
 
-               /* ResultSet keys = stm.executeQuery("SELECT\n" +
-                        "    tc.table_name, kcu.column_name, \n" +
-                        "    ccu.table_name AS foreign_table_name,\n" +
-                        "    ccu.column_name AS foreign_column_name \n" +
-                        "FROM \n" +
-                        "    information_schema.table_constraints AS tc \n" +
-                        "    JOIN information_schema.key_column_usage AS kcu\n" +
-                        "      ON tc.constraint_name = kcu.constraint_name\n" +
-                        "    JOIN information_schema.constraint_column_usage AS ccu\n" +
-                        "      ON ccu.constraint_name = tc.constraint_name\n" +
-                        "WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name='" +
-                        n.getTableName() + "';");*/
-
-               // System.out.println("Creating Edges from " + n.getTableName());
-
-                while (keys.next()) {
-
-                    fromTable  = keys.getString(1);
-                    fromKey = keys.getString(2);
-                    toTable = keys.getString(3);
-                    toKey = keys.getString(4);
-                    System.out.println("FromTable; " + fromTable+" | fromKey: " + fromKey + " | toTable: " + toTable + " | toKey: " + toKey);
-
-                    idTo = stm2.executeQuery("SELECT " +  "t1.__search_id," +  "t2.__search_id FROM " + fromTable + " AS t1 INNER JOIN " + toTable +
-                            " AS t2 ON " + "t1." + fromKey + " = " + "t2." + toKey) ;
-
-                    while (idTo.next()) {
-
-                        nIdFrom = idTo.getInt(1);
-                        nIdTo = idTo.getInt(2);
-
-                       // System.out.println("Reference from: " + nIdFrom + " to " + nIdTo);
-
-                        /**
-                         *  TODO:
-                         *  - get a node from search id;
-                         *  - create a new Edge from nIdFrom and nIdTo and add it to the Edge's list;
-                         *  - do the same for the backedge
-                         *  - add nIdTo to the list of adjcent Node of nIdFrom (a list is correct??)
-                         */
+                    } catch (SQLException e2) {
+                        e2.printStackTrace();
+                        System.out.println("Crashed: " + q);
                     }
+
+
+                }
+
+            }
+
+        }
+
+        long after = System.currentTimeMillis();
+
+        System.out.println("Time: " + (after - before) / 1000);
+    }
+
+    /**
+     *
+     * @param connDB
+     * @return
+     */
+    private static HashMap<String, ArrayList<String>> foreignKeyTable (ConnectionDB connDB) {
+        HashMap<String, ArrayList<String>> keyTable = new HashMap<>();
+        Connection conn = connDB.getDBConnection();
+        Statement stm, stm1;
+        ResultSet rs, rs1;
+        try {
+            stm = conn.createStatement();
+            //this query retrieves the source table, the destination table, the foreign key, the primary key
+            //and conrelid
+            rs = stm.executeQuery("SELECT c1.relname AS src_table, c3.conrelid, c3.conkey AS foreign_key, c2.relname AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0;\n");
+            String fromTable, toTable;
+            Integer[] fk,pk;
+            Array a;
+
+            while (rs.next()) {
+                fromTable = rs.getString(1);
+                toTable = rs.getString(4);
+                a = rs.getArray(3);
+                fk = (Integer[]) a.getArray();
+                a = rs.getArray(6);
+                pk = (Integer[]) a.getArray();
+
+                ArrayList<String> colName1  = new ArrayList<>();
+                ArrayList<String> colName2 = new ArrayList<>();
+
+                stm1 = conn.createStatement();
+                for (Integer i : fk) {
+                    rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i + " AND a1.attrelid = " + rs.getString(2));
+                    while(rs1.next()) {
+                        colName1.add(rs1.getString(1));
+                    }
+                }
+
+                stm1 = conn.createStatement();
+                for (Integer i : pk) {
+                    rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i + " AND a1.attrelid = " + rs.getString(5));
+                    while(rs1.next()) {
+                        colName2.add(rs1.getString(1));
+                    }
+                }
+
+                String joinCondition = "t1." + colName1.remove(0) + " = t2." + colName2.remove(0);
+                while(!colName1.isEmpty()) {
+                    joinCondition += " AND t1." + colName1.remove(0) + " = t2." + colName2.remove(0);
+                }
+
+                String query = "SELECT " + "t1.__search_id," +  "t2.__search_id FROM " + fromTable + " AS t1 INNER JOIN " + toTable + " AS t2 ON " + joinCondition;
+                System.out.println(query+ ";");
+
+                if (keyTable.containsKey(fromTable)) {
+                    ArrayList<String> list = keyTable.get(fromTable);
+                    list.add(query);
+
+                } else {
+
+                    ArrayList<String> list = new ArrayList<>();
+                    list.add(query);
+                    keyTable.put(fromTable, list);
                 }
             }
 
-        } catch (SQLException e ) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return keyTable;
     }
 }

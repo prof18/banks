@@ -54,14 +54,22 @@ public class Main {
                 System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
             }*/
 
-            //ask for keyboard
+            //Utility.connectNodes(conn, set);
+
+            //ask for keyword
             System.out.println("Enter keyword (comma as separator without spaces):");
+            long before1 = System.currentTimeMillis();
             String keyword = in.nextLine();
             String[] temp;
-            temp = keyword.split(",");
+            temp = keyword.split(" ");
 
+            for (String term: temp ) {
+                ArrayList<Node> interest = Utility.createInterestSet(conn, set, term);
+            }
 
-
+            long after1 = System.currentTimeMillis();
+            long time1 = (after1 - before1)/1000;
+            System.out.println("Interest Set Builded in: " + time1 + " seconds");
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();

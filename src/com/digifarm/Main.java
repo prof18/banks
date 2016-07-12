@@ -7,6 +7,8 @@ import com.digifarm.Graph.Utility;
 import java.nio.channels.Pipe;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -44,9 +46,11 @@ public class Main {
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
 
-            ArrayList<Node> set = Utility.createGraph(conn);
-            Utility.connectNodes(conn, set);
-            /*for (Node n: set) {
+            HashMap<Integer, Node> set = Utility.createGraph(conn,database);
+            //Utility.connectNodes(conn, set);
+            Node n;
+           /* for (Map.Entry<Integer,Node> e: set.entrySet()) {
+                n = e.getValue();
                 System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
             }*/
 
@@ -56,15 +60,7 @@ public class Main {
             String[] temp;
             temp = keyword.split(",");
 
-            for (String s : temp) {
 
-                ArrayList<Node> interestSet = Utility.createInterestSet(conn, set, s);
-                for (Node n : interestSet) {
-                    System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
-                }
-            }
-
-            in.close();
 
 
         } catch (SQLException sqle) {

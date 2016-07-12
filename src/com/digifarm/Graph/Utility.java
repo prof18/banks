@@ -2,10 +2,12 @@ package com.digifarm.Graph;
 
 import com.digifarm.DBConnection.ConnectionDB;
 import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
+import com.sun.org.apache.xml.internal.serializer.utils.SystemIDResolver;
 import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by nihilus on 07/07/16.
@@ -21,8 +23,8 @@ public class Utility {
      *  @return set             A set of Nodes
      *
      **/
-    public static ArrayList<Node> createGraph(ConnectionDB dbConn) {
-        ArrayList<Node> set = new ArrayList<Node>();
+    public static HashMap<Integer, Node> createGraph(ConnectionDB dbConn, String DBName) {
+        HashMap<Integer, Node> set = new HashMap<Integer, Node>();
         //query the database to know tables names
         Connection conn = dbConn.getDBConnection();
         Statement stmn = null, stmn2 = null;
@@ -30,9 +32,11 @@ public class Utility {
             stmn = conn.createStatement();
             stmn2 = conn.createStatement();
             ResultSet tuple;
-            ResultSet table = stmn.executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='mondial'");
+            ResultSet table = stmn.executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='" + DBName + "' ORDER BY TABLE_NAME;");
             String tableName;
             System.out.println("\nCreating graph from DB. Please Wait...\n-----------------" );
+            int id;
+            long before = System.currentTimeMillis();
             while(table.next()) {
                 tableName = table.getString(1);
                 if(!tableName.startsWith("pg_") && !tableName.startsWith("sql_")) {
@@ -40,10 +44,15 @@ public class Utility {
                     tuple = stmn2.executeQuery("SELECT __search_id FROM " + tableName);
                     while(tuple.next()) {
                         //creating and adding a new Node to the set
-                        set.add(new Node(tuple.getInt(1), tableName));
+                        //set.add(new Node(tuple.getInt(1), tableName));
+                        id = tuple.getInt(1);
+                        set.put(id, new Node(id,tableName));
                     }
                 }
             }
+            long after = System.currentTimeMillis();
+            long time = (after - before);
+            System.out.println("Database Created in: " + time + " millis\n-----------------");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -133,7 +142,23 @@ public class Utility {
 
             for (Node n : nodeList ) {
 
-                ResultSet keys = stm.executeQuery("SELECT\n" +
+                //bad query
+
+                ResultSet keys = stm.executeQuery("SELECT source_table::regclass, source_attr.attname AS source_column,\n" +
+                        "\ttarget_table::regclass, target_attr.attname AS target_column\n" +
+                        "FROM pg_attribute target_attr, pg_attribute source_attr,\n" +
+                        "\t(SELECT source_table, target_table, source_constraints[i] source_constraints, target_constraints[i] AS target_constraints\n" +
+                        "\tFROM\n" +
+                        "\t(SELECT conrelid as source_table, confrelid AS target_table, conkey AS source_constraints, confkey AS target_constraints,\n" +
+                        "\tgenerate_series(1, array_upper(conkey, 1)) AS i\n" +
+                        "\tFROM pg_constraint\n" +
+                        "\tWHERE contype = 'f'\n" +
+                        "  ) query1\n" +
+                        " ) query2\n" +
+                        "WHERE target_attr.attnum = target_constraints AND target_attr.attrelid = \t target_table AND\n" +
+                        "\tsource_attr.attnum = source_constraints AND source_attr.attrelid = source_table ORDER BY source_table;");
+
+               /* ResultSet keys = stm.executeQuery("SELECT\n" +
                         "    tc.table_name, kcu.column_name, \n" +
                         "    ccu.table_name AS foreign_table_name,\n" +
                         "    ccu.column_name AS foreign_column_name \n" +
@@ -144,7 +169,7 @@ public class Utility {
                         "    JOIN information_schema.constraint_column_usage AS ccu\n" +
                         "      ON ccu.constraint_name = tc.constraint_name\n" +
                         "WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name='" +
-                        n.getTableName() + "';");
+                        n.getTableName() + "';");*/
 
                // System.out.println("Creating Edges from " + n.getTableName());
 
@@ -156,8 +181,8 @@ public class Utility {
                     toKey = keys.getString(4);
                     System.out.println("FromTable; " + fromTable+" | fromKey: " + fromKey + " | toTable: " + toTable + " | toKey: " + toKey);
 
-                    idTo = stm2.executeQuery("SELECT " + fromTable + ".__search_id," + toTable + ".__search_id FROM " + fromTable + " INNER JOIN " + toTable +
-                            " ON " + fromTable + "." + fromKey + " = " + toTable + "." + toKey + ";") ;
+                    idTo = stm2.executeQuery("SELECT " +  "t1.__search_id," +  "t2.__search_id FROM " + fromTable + " AS t1 INNER JOIN " + toTable +
+                            " AS t2 ON " + "t1." + fromKey + " = " + "t2." + toKey) ;
 
                     while (idTo.next()) {
 

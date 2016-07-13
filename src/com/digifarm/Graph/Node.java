@@ -10,9 +10,7 @@ public class Node {
 
     private int searchID;
     private String tableName;
-    private ArrayList<Node> adjacent = new ArrayList<>();
-    private ArrayList<Edge> edges = new ArrayList<>();
-    private ArrayList<Edge> backEdges = new ArrayList<>();
+    private ArrayList<Node> adjacent;
 
     /**
      * Build a new Node
@@ -23,6 +21,7 @@ public class Node {
     public Node(int searchID, String tableName) {
         this.searchID = searchID;
         this.tableName = tableName;
+        adjacent = new ArrayList<Node>();
     }
 
     /**
@@ -43,33 +42,17 @@ public class Node {
 
     /**
      *
-     * @return adjacent     Return the list of Adjacent Node
+     * @param n     The node to be inserted in the adjacent list
      */
-    public ArrayList<Node> getAdjacent() {
-        return adjacent;
+    public void addAdjacentNode(Node n) {
+        adjacent.add(n);
     }
 
     /**
      *
-     * @param adjacent      Set the list of Adjacent Node
+     * @return      The list of adjacent Nodes is returned
      */
-    public void setAdjacent(ArrayList<Node> adjacent) {
-        this.adjacent = adjacent;
-    }
-
-    public ArrayList<Edge> getBackEdges() {
-        return backEdges;
-    }
-
-    public void setBackEdges(ArrayList<Edge> backEdges) {
-        this.backEdges = backEdges;
-    }
-
-    public ArrayList<Edge> getEdges() {
-        return edges;
-    }
-
-    public void setEdges(ArrayList<Edge> edges) {
-        this.edges = edges;
+    public ArrayList<Node> getAdjacentNodes() {
+        return adjacent;
     }
 }

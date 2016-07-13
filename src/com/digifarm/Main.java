@@ -37,43 +37,34 @@ public class Main {
 
             Scanner in = new Scanner(System.in);
             //ask database username
-            System.out.println("Enter Username:");
+            System.out.print("Enter Username: ");
             String username = in.nextLine();
             //ask database name
-            System.out.println("Enter database name: ");
+            System.out.print("Enter database name: ");
             String database = in.nextLine();
             //connect to database
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
 
             HashMap<Integer, Node> set = Utility.createGraph(conn,database);
-            //Utility.connectNodes(conn, set);
-            Node n;
-           /* for (Map.Entry<Integer,Node> e: set.entrySet()) {
-                n = e.getValue();
-                System.out.println("Table: " + n.getTableName() + ", ID: " + n.getSearchID());
-            }*/
-
-            //Utility.connectNodes(conn, set);
 
             //ask for keyword
-            System.out.println("Enter keyword (comma as separator without spaces):");
-            long before1 = System.currentTimeMillis();
-            String keyword = in.nextLine();
-            String[] temp;
-            temp = keyword.split(" ");
+            System.out.print("Enter keyword (use space as separator): ");
 
-            for (String term: temp ) {
-                ArrayList<Node> interest = Utility.createInterestSet(conn, set, term);
+            String keyword = in.nextLine();
+            String[] temp = keyword.split(" ");
+
+            HashMap<Integer, Node> interest;
+
+            for (String term: temp) {
+                interest = Utility.createInterestSet(conn, set, term);
+                Utility.connectNodes(conn, interest, set);
             }
 
-            long after1 = System.currentTimeMillis();
-            long time1 = (after1 - before1)/1000;
-            System.out.println("Interest Set Builded in: " + time1 + " seconds");
+
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
-
         } catch (ClassNotFoundException ce) {
             System.out.println("Unable to find Driver Class");
             ce.printStackTrace();

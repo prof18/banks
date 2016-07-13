@@ -1,9 +1,6 @@
 package com.digifarm.Graph;
 
 import com.digifarm.DBConnection.ConnectionDB;
-import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
-import com.sun.org.apache.xml.internal.serializer.utils.SystemIDResolver;
-import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -70,8 +67,9 @@ public class Utility {
      * @return  interestSet     The interest set of node
      */
 
-    public static ArrayList<Node> createInterestSet(ConnectionDB dbConn, HashMap<Integer, Node> set, String match) {
-        ArrayList<Node> interestSet = new ArrayList<Node>();
+    public static HashMap<Integer, Node> createInterestSet(ConnectionDB dbConn, HashMap<Integer, Node> set, String match) {
+        long before1 = System.currentTimeMillis();
+        HashMap<Integer, Node> interestSet = new HashMap<Integer, Node>();
         Connection conn = dbConn.getDBConnection();
         try {
             Statement stmn = conn.createStatement();
@@ -79,7 +77,7 @@ public class Utility {
             ResultSetMetaData meta = null;
             Node n;
             //check if a Node contains the match string
-            System.out.println("\nCreating Interest Set from \"" + match + "\". Please Wait...\n-----------------" );
+            System.out.println("\nCreating Interest Set for \"" + match + "\". Please Wait...\n-----------------" );
             for(Map.Entry<Integer, Node> e : set.entrySet()) {
                 n = e.getValue();
                 //extract all columns from this tuple
@@ -91,9 +89,8 @@ public class Utility {
                     for (int i = 1; i < max; i++) {
                         String str = columns.getString(i);
                         if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
-
                             System.out.println("Matched: " + str);
-                            interestSet.add(n);
+                            interestSet.put(n.getSearchID(), n);
                             break;
                         }
                     }
@@ -103,16 +100,24 @@ public class Utility {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        long after1 = System.currentTimeMillis();
+        long time1 = (after1 - before1)/1000;
+        System.out.println("Interest Set Built in: " + time1 + " seconds");
         return interestSet;
     }
 
-    private static boolean isContained(String s1, String s2) {
+    /**
+     *
+     * @param s1    The main string on which s2 is searched
+     * @param s2    The string to be searched inside s1
+     * @return      If s2 is found inside s1 the return value is true
+     */
 
+    private static boolean isContained(String s1, String s2) {
         for (String word : s1.split("\\s+")) {
             if (word.equals(s2))
                 return true;
         }
-
         return false;
     }
 
@@ -124,66 +129,50 @@ public class Utility {
      * @param nodeList          A set of Nodes that needs to be connected
      */
 
-    public static void connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> nodeList) {
+    public static void connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList) {
 
         long before = System.currentTimeMillis();
 
         ArrayList<String> queries;
-        ArrayList<Edge> edges = new ArrayList<>();
+        /*ArrayList<Edge> edges = new ArrayList<>();
         ArrayList<Edge> backedge = new ArrayList<>();
-        ArrayList<Node> adjacent = new ArrayList<>();
-
-        Node n;
+        ArrayList<Node> adjacent = new ArrayList<>();*/
 
         HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
-
-        for (Map.Entry<String, ArrayList<String>> e : sqlKey.entrySet()) {
-
-            queries = e.getValue();
-            System.out.println(e.getKey());
-            for (String s : queries) {
-
-                System.out.println(s);
-
-            }
-        }
+        Node n;
 
         Connection conn = dBconn.getDBConnection();
         Statement stm;
         ResultSet rs;
 
-        int i = 0;
-
-        for (Map.Entry<Integer, Node> e : nodeList.entrySet()) {
-
-            System.out.println("Node: " + i++);
-
+        for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
             n = e.getValue();
             queries = sqlKey.get(n.getTableName());
-
             if(queries != null && !queries.isEmpty()) {
-
                 for (String q : queries) {
-
                     try {
+                        q += " WHERE t1.__search_id = " + n.getSearchID();
+
                         stm = conn.createStatement();
                         rs = stm.executeQuery(q);
 
+                        //extract the list of adjacent nodes
+                        Node connected = null;
+                        while(rs.next()) {
+                            connected = nodeList.get(new Integer(rs.getString(2)));
+                            System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
+                            n.addAdjacentNode(connected);
+                        }
                     } catch (SQLException e2) {
                         e2.printStackTrace();
-                        System.out.println("Crashed: " + q);
                     }
-
-
                 }
-
             }
-
         }
 
         long after = System.currentTimeMillis();
 
-        System.out.println("Time: " + (after - before) / 1000);
+        System.out.println("Nodes connected in: " + (after - before) / 1000 + " seconds");
     }
 
     /**
@@ -238,20 +227,17 @@ public class Utility {
                 }
 
                 String query = "SELECT " + "t1.__search_id," +  "t2.__search_id FROM " + fromTable + " AS t1 INNER JOIN " + toTable + " AS t2 ON " + joinCondition;
-                System.out.println(query+ ";");
+                //System.out.println(query+ ";");
 
                 if (keyTable.containsKey(fromTable)) {
                     ArrayList<String> list = keyTable.get(fromTable);
                     list.add(query);
-
                 } else {
-
                     ArrayList<String> list = new ArrayList<>();
                     list.add(query);
                     keyTable.put(fromTable, list);
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }

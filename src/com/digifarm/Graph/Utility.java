@@ -3,6 +3,7 @@ package com.digifarm.Graph;
 import com.digifarm.DBConnection.ConnectionDB;
 
 import java.sql.*;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -129,14 +130,14 @@ public class Utility {
      * @param nodeList          A set of Nodes that needs to be connected
      */
 
-    public static void connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList) {
+    public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList) {
 
         long before = System.currentTimeMillis();
 
         ArrayList<String> queries;
-        /*ArrayList<Edge> edges = new ArrayList<>();
-        ArrayList<Edge> backedge = new ArrayList<>();
-        ArrayList<Node> adjacent = new ArrayList<>();*/
+        ArrayList<Edge> edges = new ArrayList<>();
+        ArrayList<Edge> backedges = new ArrayList<>();
+
 
         HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
         Node n;
@@ -157,11 +158,18 @@ public class Utility {
                         rs = stm.executeQuery(q);
 
                         //extract the list of adjacent nodes
-                        Node connected = null;
+                        Node connected;
+                        Edge edge;
+                        Edge backedge;
                         while(rs.next()) {
                             connected = nodeList.get(new Integer(rs.getString(2)));
                             System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
                             n.addAdjacentNode(connected);
+                            edge = new Edge(n,connected,1);
+                            edges.add(edge);
+                            backedge = new Edge(connected,n,0);
+                            backedges.add(backedge);
+
                         }
                     } catch (SQLException e2) {
                         e2.printStackTrace();
@@ -173,6 +181,13 @@ public class Utility {
         long after = System.currentTimeMillis();
 
         System.out.println("Nodes connected in: " + (after - before) / 1000 + " seconds");
+
+        ArrayList<ArrayList<Edge>> list = new ArrayList<>();
+        list.add(edges);
+        list.add(backedges);
+        return list;
+
+
     }
 
     /**
@@ -243,5 +258,35 @@ public class Utility {
         }
 
         return keyTable;
+    }
+
+    public static void backEdgePoint(ArrayList<Edge> bedge, ArrayList<Edge> edge) {
+        //il punteggio di un backedge (v,u) è proporzionale al numero di link da v ad u
+        Node v,u;
+        int weight = 0;
+        for (Edge be : bedge ) {
+
+            v = be.getFrom();
+            u = be.getTo();
+
+            for (Edge e : edge) {
+
+                if (u == e.getFrom()) {
+                    System.out.println("u: " + u.getSearchID() + " e: " + e.getFrom().getSearchID());
+
+                    if (v == e.getTo()) {
+                        System.out.println("v: " + v.getSearchID() + " e: " + e.getTo().getSearchID());
+                        System.out.println("Old weight " + be.getWeight());
+                        be.setWeight(be.getWeight() + 1);
+                        System.out.println("New weight: " + be.getWeight());
+                    }
+                }
+
+
+            }
+            System.out.println("Backedge point: " + be.toString());
+
+        }
+
     }
 }

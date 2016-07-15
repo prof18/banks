@@ -1,6 +1,7 @@
 package com.digifarm;
 
 import com.digifarm.DBConnection.ConnectionDB;
+import com.digifarm.Graph.Edge;
 import com.digifarm.Graph.Node;
 import com.digifarm.Graph.Utility;
 
@@ -55,12 +56,23 @@ public class Main {
             String[] temp = keyword.split(" ");
 
             HashMap<Integer, Node> interest;
+            ArrayList<ArrayList<Edge>> list = new ArrayList<>();
 
             for (String term: temp) {
                 interest = Utility.createInterestSet(conn, set, term);
-                Utility.connectNodes(conn, interest, set);
+                list = Utility.connectNodes(conn, interest, set);
             }
 
+            ArrayList<Edge> edges = list.get(0);
+            ArrayList<Edge> backedge = list.get(1);
+
+            for (Edge e : edges)
+                System.out.println("Edges: \n" + e.toString());
+
+            for (Edge b : backedge)
+                System.out.println("Backedges: \n" + b.toString());
+
+            Utility.backEdgePoint(backedge,edges);
 
 
         } catch (SQLException sqle) {

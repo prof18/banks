@@ -27,6 +27,10 @@ public class Edge {
 
     }
 
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
     /**
      *
      * @return weight   Returns edge's weight
@@ -43,5 +47,12 @@ public class Edge {
         return to;
     }
 
-
+    @Override
+    public String toString() {
+        return "Edge{" +
+                "weight=" + weight +
+                ", from=" + from.getSearchID() +
+                ", to=" + to.getSearchID() +
+                '}';
+    }
 }

@@ -162,6 +162,8 @@ public class Utility {
                         Edge edge;
                         Edge backedge;
                         while(rs.next()) {
+
+                            //TODO: i nodi si prendono da interest set!??
                             connected = nodeList.get(new Integer(rs.getString(2)));
                             System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
                             n.addAdjacentNode(connected);
@@ -169,6 +171,9 @@ public class Utility {
                             edges.add(edge);
                             backedge = new Edge(connected,n,0);
                             backedges.add(backedge);
+                            //TODO: incremento del peso
+                            //assign weight to the node --> indegree of the node
+                            connected.incrementWeight();
 
                         }
                     } catch (SQLException e2) {
@@ -186,8 +191,6 @@ public class Utility {
         list.add(edges);
         list.add(backedges);
         return list;
-
-
     }
 
     /**
@@ -260,6 +263,12 @@ public class Utility {
         return keyTable;
     }
 
+    /**
+     * This method calculates the weight of the backedges
+     *
+     * @param bedge
+     * @param edge
+     */
     public static void backEdgePoint(ArrayList<Edge> bedge, ArrayList<Edge> edge) {
         //il punteggio di un backedge (v,u) è proporzionale al numero di link da v ad u
         Node v,u;
@@ -281,8 +290,6 @@ public class Utility {
                         System.out.println("New weight: " + be.getWeight());
                     }
                 }
-
-
             }
             System.out.println("Backedge point: " + be.toString());
 

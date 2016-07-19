@@ -11,6 +11,7 @@ public class Node {
     private int searchID;
     private String tableName;
     private ArrayList<Node> adjacent;
+    private int weight;
 
     /**
      * Build a new Node
@@ -22,6 +23,7 @@ public class Node {
         this.searchID = searchID;
         this.tableName = tableName;
         adjacent = new ArrayList<Node>();
+        weight = 0;
     }
 
     /**
@@ -54,5 +56,13 @@ public class Node {
      */
     public ArrayList<Node> getAdjacentNodes() {
         return adjacent;
+    }
+
+    public void incrementWeight() {
+        weight++;
+    }
+
+    public int getWeight() {
+        return weight;
     }
 }

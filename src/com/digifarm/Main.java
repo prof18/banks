@@ -61,6 +61,11 @@ public class Main {
             for (String term: temp) {
                 interest = Utility.createInterestSet(conn, set, term);
                 list = Utility.connectNodes(conn, interest, set);
+                Node n;
+                for (Map.Entry<Integer, Node> e: interest.entrySet()) {
+                    n = e.getValue();
+                    System.out.println("Node: " + n.getSearchID() + " weight: " + n.getWeight());
+                }
             }
 
             ArrayList<Edge> edges = list.get(0);
@@ -73,6 +78,9 @@ public class Main {
                 System.out.println("Backedges: \n" + b.toString());
 
             Utility.backEdgePoint(backedge,edges);
+
+            Node n;
+
 
 
         } catch (SQLException sqle) {

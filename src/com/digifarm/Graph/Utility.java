@@ -270,30 +270,33 @@ public class Utility {
      * @param edge
      */
     public static void backEdgePoint(ArrayList<Edge> bedge, ArrayList<Edge> edge) {
-        //il punteggio di un backedge (v,u) è proporzionale al numero di link da v ad u
-        Node v,u;
+        //il punteggio di un backedge (v,u) è proporzionale al numero di link a v da nodi dello stesso tipo di u
+        Node to, from;
         int weight = 0;
-        for (Edge be : bedge ) {
+        ArrayList<Node> adjacent = new ArrayList<>();
+        String table;
 
-            v = be.getFrom();
-            u = be.getTo();
+        for (Edge be : bedge) {
 
-            for (Edge e : edge) {
+            to = be.getFrom(); //arrivo
+            from = be.getTo();   //partenza
 
-                if (u == e.getFrom()) {
-                    System.out.println("u: " + u.getSearchID() + " e: " + e.getFrom().getSearchID());
+            table = from.getTableName();
+            adjacent = to.getAdjacentNodes();
 
-                    if (v == e.getTo()) {
-                        System.out.println("v: " + v.getSearchID() + " e: " + e.getTo().getSearchID());
-                        System.out.println("Old weight " + be.getWeight());
-                        be.setWeight(be.getWeight() + 1);
-                        System.out.println("New weight: " + be.getWeight());
-                    }
+            for (Node n : adjacent) {
+                //il nodo n e' dello stesso tipo di u, ovvero appartiene alla stessa tabella
+                if ((n.getTableName()).compareTo(table) == 0) {
+
+                    System.out.println("from table: " + table + " to table: " + n.getTableName());
+                    System.out.println("from: " + to.getSearchID() + " to: " + n.getSearchID());
+                    System.out.println("Old weight " + be.getWeight());
+                    be.setWeight(be.getWeight() + 1);
+                    System.out.println("New weight: " + be.getWeight());
+
                 }
             }
             System.out.println("Backedge point: " + be.toString());
-
         }
-
     }
 }

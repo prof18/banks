@@ -62,7 +62,7 @@ public class Main {
                 interest = Utility.createInterestSet(conn, set, term);
                 list = Utility.connectNodes(conn, interest, set);
                 Node n;
-                for (Map.Entry<Integer, Node> e: interest.entrySet()) {
+                for (Map.Entry<Integer, Node> e: set.entrySet()) {
                     n = e.getValue();
                     System.out.println("Node: " + n.getSearchID() + " weight: " + n.getWeight());
                 }

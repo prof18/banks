@@ -62,7 +62,7 @@ public class Main {
                 interest = Utility.createInterestSet(conn, set, term);
                 list = Utility.connectNodes(conn, interest, set);
                 Node n;
-                for (Map.Entry<Integer, Node> e: set.entrySet()) {
+                for (Map.Entry<Integer, Node> e: interest.entrySet()) {
                     n = e.getValue();
                     System.out.println("Node: " + n.getSearchID() + " weight: " + n.getWeight());
                 }
@@ -77,7 +77,7 @@ public class Main {
             for (Edge b : backedge)
                 System.out.println("Backedges: \n" + b.toString());
 
-            Utility.backEdgePoint(backedge,edges);
+            Utility.backEdgePoint(backedge);
 
             Node n;
 

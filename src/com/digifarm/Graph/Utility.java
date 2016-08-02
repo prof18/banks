@@ -137,6 +137,7 @@ public class Utility {
         ArrayList<String> queries;
         ArrayList<Edge> edges = new ArrayList<>();
         ArrayList<Edge> backedges = new ArrayList<>();
+        ArrayList<Node> toAdd = new ArrayList<>();
 
 
         HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
@@ -158,9 +159,10 @@ public class Utility {
                         rs = stm.executeQuery(q);
 
                         //extract the list of adjacent nodes
-                        Node connected;
+                        Node connected, connected2, connected3;
                         Edge edge;
                         Edge backedge;
+
                         while(rs.next()) {
 
                             //TODO: i nodi si prendono da interest set!??
@@ -171,9 +173,13 @@ public class Utility {
                             edges.add(edge);
                             backedge = new Edge(connected,n,0);
                             backedges.add(backedge);
-                            //TODO: incremento del peso
+                            //incremento del peso
                             //assign weight to the node --> indegree of the node
                             connected.incrementWeight();
+                            //aggiunta del nodo connected all'interest set se non presente
+                            connected2 = interestSet.get(new Integer((rs.getString(2))));
+                            if (connected2 == null)
+                                toAdd.add(connected);
 
                         }
                     } catch (SQLException e2) {
@@ -182,6 +188,10 @@ public class Utility {
                 }
             }
         }
+
+        for (Node node : toAdd)
+            interestSet.put(node.getSearchID(), node);
+
 
         long after = System.currentTimeMillis();
 
@@ -267,12 +277,11 @@ public class Utility {
      * This method calculates the weight of the backedges
      *
      * @param bedge
-     * @param edge
+     *
      */
-    public static void backEdgePoint(ArrayList<Edge> bedge, ArrayList<Edge> edge) {
+    public static void backEdgePoint(ArrayList<Edge> bedge) {
         //il punteggio di un backedge (v,u) è proporzionale al numero di link a v da nodi dello stesso tipo di u
         Node to, from;
-        int weight = 0;
         ArrayList<Node> adjacent = new ArrayList<>();
         String table;
 

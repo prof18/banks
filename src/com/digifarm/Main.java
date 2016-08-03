@@ -5,7 +5,6 @@ import com.digifarm.Graph.Edge;
 import com.digifarm.Graph.Node;
 import com.digifarm.Graph.Utility;
 
-import java.nio.channels.Pipe;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,28 +61,38 @@ public class Main {
                 interest = Utility.createInterestSet(conn, set, term);
                 list = Utility.connectNodes(conn, interest, set);
                 Node n;
-                for (Map.Entry<Integer, Node> e: interest.entrySet()) {
+
+                double maxWeight = Utility.maxNodeWeight(interest);
+                System.out.println("max node weight " + maxWeight);
+
+                //TODO scegliere qui scala lineare o logaritmica
+                Utility.nWeightNorm(interest,"logarithm", maxWeight);
+
+                //stampa di debug dei nodi con i pesi
+                for (Map.Entry<Integer, Node> e : interest.entrySet()) {
                     n = e.getValue();
                     System.out.println("Node: " + n.getSearchID() + " weight: " + n.getWeight());
 
                 }
+
+                ArrayList<Edge> edges = list.get(0);
+                ArrayList<Edge> backedge = list.get(1);
+
+                for (Edge e : edges)
+                    System.out.println("Edges: \n" + e.toString());
+
+                for (Edge b : backedge)
+                    System.out.println("Backedges: \n" + b.toString());
+
+                Utility.backEdgePoint(backedge);
+
+                double minWeight = Utility.minEdgeWeight(edges);
+                System.out.println("min edge weight: " + minWeight);
+
+
+
             }
 
-            int maxWeight = Utility.maxWeight(interest);
-            System.out.println("max node weight " + maxWeight);
-
-            ArrayList<Edge> edges = list.get(0);
-            ArrayList<Edge> backedge = list.get(1);
-
-            for (Edge e : edges)
-                System.out.println("Edges: \n" + e.toString());
-
-            for (Edge b : backedge)
-                System.out.println("Backedges: \n" + b.toString());
-
-            Utility.backEdgePoint(backedge);
-
-            Node n;
 
 
 

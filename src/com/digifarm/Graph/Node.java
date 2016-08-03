@@ -11,7 +11,7 @@ public class Node {
     private int searchID;
     private String tableName;
     private ArrayList<Node> adjacent;
-    private int weight;
+    private double weight;
 
     /**
      * Build a new Node
@@ -62,7 +62,11 @@ public class Node {
         weight++;
     }
 
-    public int getWeight() {
+    public double getWeight() {
         return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
 }

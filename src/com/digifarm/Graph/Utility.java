@@ -310,13 +310,14 @@ public class Utility {
     }
 
     /**
+     * This method calculate the maximus value of the node weight
      *
      * @param nodes
      * @return
      */
-    public static int maxWeight(HashMap<Integer,Node> nodes) {
+    public static double maxNodeWeight(HashMap<Integer,Node> nodes) {
         Node n;
-        int max = 0, weight;
+        double max = 0, weight;
 
         for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
             n = e.getValue();
@@ -326,5 +327,55 @@ public class Utility {
         }
         return max;
     }
+
+    /**
+     * This method calculate the minium value of the edge weight
+     *
+     * @param edges
+     * @return
+     */
+    public static double minEdgeWeight(ArrayList<Edge> edges) {
+
+        double min = Integer.MAX_VALUE, weight;
+        for (Edge e : edges) {
+
+            weight = e.getWeight();
+            if (weight < min)
+                min = weight;
+        }
+
+        return min;
+    }
+
+    /**
+     *
+     * @param nodes
+     * @param type "fraction" for linear scale or "logarithm" for logarithm scale
+     * @param maxWeight
+     */
+    public static void nWeightNorm(HashMap<Integer, Node> nodes, String type, double maxWeight) {
+        Node n;
+        double weight;
+        double normWeight;
+        for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
+
+            n = e.getValue();
+            weight = n.getWeight();
+
+            switch(type) {
+
+                case "fraction" :
+                    normWeight = weight / maxWeight;
+                    n.setWeight(normWeight);
+                    break;
+
+                case "logarithm" :
+                    normWeight = (Math.log(1 + weight/maxWeight)) / Math.log(2);
+                    n.setWeight(normWeight);
+                    break;
+            }
+        }
+    }
+
 
 }

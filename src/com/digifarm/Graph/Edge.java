@@ -7,7 +7,7 @@ import java.util.ArrayList;
  **/
 public class Edge {
 
-    private int weight;
+    private double weight;
     private Node from;
     private Node to;
 
@@ -27,7 +27,7 @@ public class Edge {
 
     }
 
-    public void setWeight(int weight) {
+    public void setWeight(double weight) {
         this.weight = weight;
     }
 
@@ -35,7 +35,7 @@ public class Edge {
      *
      * @return weight   Returns edge's weight
      */
-    public int getWeight() {
+    public double getWeight() {
         return weight;
     }
 

@@ -334,9 +334,9 @@ public class Utility {
      * @param edges
      * @return
      */
-    public static double minEdgeWeight(ArrayList<Edge> edges) {
+    public static double minEdgeWeight(ArrayList<Edge> edges, double min) {
 
-        double min = Integer.MAX_VALUE, weight;
+        double weight;
         for (Edge e : edges) {
 
             weight = e.getWeight();
@@ -348,6 +348,7 @@ public class Utility {
     }
 
     /**
+     * This method normalize the weight of the nodes
      *
      * @param nodes
      * @param type "fraction" for linear scale or "logarithm" for logarithm scale
@@ -377,5 +378,20 @@ public class Utility {
         }
     }
 
+    /**
+     * This method normalize the weight of the edge
+     *
+     * @param edges
+     * @param minWeight
+     */
+    public static void eWeightNorm(ArrayList<Edge> edges, double minWeight) {
+        double weight;
+        double normWeight;
+        for (Edge e : edges) {
+            weight = e.getWeight();
+            normWeight = (Math.log(1 + weight/minWeight)) / Math.log(2);
+            e.setWeight(normWeight);
+        }
+    }
 
 }

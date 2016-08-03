@@ -55,35 +55,22 @@ public class Main {
             String[] temp = keyword.split(" ");
 
 
+
             HashMap<Integer, Node> interest = new HashMap<>();
             ArrayList<ArrayList<Edge>> list = new ArrayList<>();
             ArrayList<HashMap<Integer, Node>> interestList = new ArrayList<>();
+            ArrayList<ArrayList<Edge>> edgeList = new ArrayList<>();
+
             double max = 0;
+            double min = Integer.MAX_VALUE;
 
             for (String term: temp) {
 
                 interest = Utility.createInterestSet(conn, set, term);
                 list = Utility.connectNodes(conn, interest, set);
 
-
-             /*   double maxWeight = Utility.maxNodeWeight(interest);
-                System.out.println("max node weight " + maxWeight);
-
-                //TODO scegliere qui scala lineare o logaritmica
-                Utility.nWeightNorm(interest,"logarithm", maxWeight);
-
-                //stampa di debug dei nodi con i pesi
-                for (Map.Entry<Integer, Node> e : interest.entrySet()) {
-                    n = e.getValue();
-                    System.out.println("Node: " + n.getSearchID() + " weight: " + n.getWeight());
-
-                }*/
-
                 ArrayList<Edge> edges = list.get(0);
                 ArrayList<Edge> backedge = list.get(1);
-
-                for (Edge e : edges)
-                    System.out.println("Edges: \n" + e.toString());
 
                 for (Edge b : backedge)
                     System.out.println("Backedges: \n" + b.toString());
@@ -91,10 +78,10 @@ public class Main {
                 Utility.backEdgePoint(backedge);
 
                 max = Utility.maxNodeWeight(interest, max);
+                min = Utility.minEdgeWeight(edges, min);
 
-               /* double minWeight = Utility.minEdgeWeight(edges);
-                System.out.println("min edge weight: " + minWeight);*/
                 interestList.add(interest);
+                edgeList.add(edges);
 
             }
 
@@ -111,6 +98,14 @@ public class Main {
                     System.out.println("Node: " + n.getSearchID() + " weight: " + n.getWeight());
 
                 }
+            }
+
+            for (ArrayList<Edge> e : edgeList ) {
+
+                //only logarithmic scale
+                Utility.eWeightNorm(e,min);
+                for (Edge ed : e)
+                    System.out.println("Edges: \n" + ed.toString());
             }
 
 

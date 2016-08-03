@@ -54,15 +54,19 @@ public class Main {
             String keyword = in.nextLine();
             String[] temp = keyword.split(" ");
 
+
             HashMap<Integer, Node> interest = new HashMap<>();
             ArrayList<ArrayList<Edge>> list = new ArrayList<>();
+            ArrayList<HashMap<Integer, Node>> interestList = new ArrayList<>();
+            double max = 0;
 
             for (String term: temp) {
+
                 interest = Utility.createInterestSet(conn, set, term);
                 list = Utility.connectNodes(conn, interest, set);
-                Node n;
 
-                double maxWeight = Utility.maxNodeWeight(interest);
+
+             /*   double maxWeight = Utility.maxNodeWeight(interest);
                 System.out.println("max node weight " + maxWeight);
 
                 //TODO scegliere qui scala lineare o logaritmica
@@ -73,7 +77,7 @@ public class Main {
                     n = e.getValue();
                     System.out.println("Node: " + n.getSearchID() + " weight: " + n.getWeight());
 
-                }
+                }*/
 
                 ArrayList<Edge> edges = list.get(0);
                 ArrayList<Edge> backedge = list.get(1);
@@ -86,16 +90,28 @@ public class Main {
 
                 Utility.backEdgePoint(backedge);
 
-                double minWeight = Utility.minEdgeWeight(edges);
-                System.out.println("min edge weight: " + minWeight);
+                max = Utility.maxNodeWeight(interest, max);
 
-
+               /* double minWeight = Utility.minEdgeWeight(edges);
+                System.out.println("min edge weight: " + minWeight);*/
+                interestList.add(interest);
 
             }
 
+            System.out.println("max weight: " + max);
 
+            for (HashMap<Integer, Node> interest2 : interestList) {
 
+                //TODO scegliere qui scala lineare o logaritmica
+                Utility.nWeightNorm(interest2, "logarithm", max);
+                Node n;
+                //stampa di debug dei nodi con i pesi
+                for (Map.Entry<Integer, Node> e : interest2.entrySet()) {
+                    n = e.getValue();
+                    System.out.println("Node: " + n.getSearchID() + " weight: " + n.getWeight());
 
+                }
+            }
 
 
         } catch (SQLException sqle) {

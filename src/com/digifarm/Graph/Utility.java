@@ -315,9 +315,9 @@ public class Utility {
      * @param nodes
      * @return
      */
-    public static double maxNodeWeight(HashMap<Integer,Node> nodes) {
+    public static double maxNodeWeight(HashMap<Integer,Node> nodes, double max) {
         Node n;
-        double max = 0, weight;
+        double weight;
 
         for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
             n = e.getValue();

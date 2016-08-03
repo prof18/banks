@@ -55,7 +55,7 @@ public class Main {
             String keyword = in.nextLine();
             String[] temp = keyword.split(" ");
 
-            HashMap<Integer, Node> interest;
+            HashMap<Integer, Node> interest = new HashMap<>();
             ArrayList<ArrayList<Edge>> list = new ArrayList<>();
 
             for (String term: temp) {
@@ -65,8 +65,12 @@ public class Main {
                 for (Map.Entry<Integer, Node> e: interest.entrySet()) {
                     n = e.getValue();
                     System.out.println("Node: " + n.getSearchID() + " weight: " + n.getWeight());
+
                 }
             }
+
+            int maxWeight = Utility.maxWeight(interest);
+            System.out.println("max node weight " + maxWeight);
 
             ArrayList<Edge> edges = list.get(0);
             ArrayList<Edge> backedge = list.get(1);
@@ -80,6 +84,8 @@ public class Main {
             Utility.backEdgePoint(backedge);
 
             Node n;
+
+
 
 
 

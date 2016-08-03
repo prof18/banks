@@ -308,4 +308,23 @@ public class Utility {
             System.out.println("Backedge point: " + be.toString());
         }
     }
+
+    /**
+     *
+     * @param nodes
+     * @return
+     */
+    public static int maxWeight(HashMap<Integer,Node> nodes) {
+        Node n;
+        int max = 0, weight;
+
+        for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
+            n = e.getValue();
+            weight = n.getWeight();
+            if (weight > max)
+                max = weight;
+        }
+        return max;
+    }
+
 }

@@ -3,7 +3,6 @@ package com.digifarm.Graph;
 import com.digifarm.DBConnection.ConnectionDB;
 
 import java.sql.*;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -103,7 +102,7 @@ public class Utility {
         }
         long after1 = System.currentTimeMillis();
         long time1 = (after1 - before1)/1000;
-        System.out.println("Interest Set Built in: " + time1 + " seconds");
+        System.out.println("Interest Set Built in: " + time1 + " seconds\n");
         return interestSet;
     }
 
@@ -195,7 +194,7 @@ public class Utility {
 
         long after = System.currentTimeMillis();
 
-        System.out.println("Nodes connected in: " + (after - before) / 1000 + " seconds");
+        System.out.println("Nodes connected in: " + (after - before) / 1000 + " seconds\n");
 
         ArrayList<ArrayList<Edge>> list = new ArrayList<>();
         list.add(edges);
@@ -297,15 +296,15 @@ public class Utility {
                 //il nodo n e' dello stesso tipo di u, ovvero appartiene alla stessa tabella
                 if ((n.getTableName()).compareTo(table) == 0) {
 
-                    System.out.println("from table: " + table + " to table: " + n.getTableName());
-                    System.out.println("from: " + to.getSearchID() + " to: " + n.getSearchID());
-                    System.out.println("Old weight " + be.getWeight());
+                    //System.out.println("from table: " + table + " to table: " + n.getTableName());
+                   // System.out.println("from: " + to.getSearchID() + " to: " + n.getSearchID());
+                   // System.out.println("Old weight " + be.getWeight());
                     be.setWeight(be.getWeight() + 1);
-                    System.out.println("New weight: " + be.getWeight());
+                   // System.out.println("New weight: " + be.getWeight());
 
                 }
             }
-            System.out.println("Backedge point: " + be.toString());
+         //   System.out.println("Backedge point: " + be.toString());
         }
     }
 
@@ -315,15 +314,15 @@ public class Utility {
      * @param nodes
      * @return
      */
-    public static double maxNodeWeight(HashMap<Integer,Node> nodes, double max) {
+    public static double maxNodeScore(HashMap<Integer,Node> nodes, double max) {
         Node n;
-        double weight;
+        double score;
 
         for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
             n = e.getValue();
-            weight = n.getWeight();
-            if (weight > max)
-                max = weight;
+            score = n.getScore();
+            if (score > max)
+                max = score;
         }
         return max;
     }
@@ -348,31 +347,31 @@ public class Utility {
     }
 
     /**
-     * This method normalize the weight of the nodes
+     * This method normalize the score of the nodes
      *
      * @param nodes
      * @param type "fraction" for linear scale or "logarithm" for logarithm scale
-     * @param maxWeight
+     * @param maxScore
      */
-    public static void nWeightNorm(HashMap<Integer, Node> nodes, String type, double maxWeight) {
+    public static void nScoreNorm(HashMap<Integer, Node> nodes, String type, double maxScore) {
         Node n;
-        double weight;
-        double normWeight;
+        double score;
+        double normScore;
         for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
 
             n = e.getValue();
-            weight = n.getWeight();
+            score = n.getScore();
 
             switch(type) {
 
                 case "fraction" :
-                    normWeight = weight / maxWeight;
-                    n.setWeight(normWeight);
+                    normScore = score / maxScore;
+                    n.setScore(normScore);
                     break;
 
                 case "logarithm" :
-                    normWeight = (Math.log(1 + weight/maxWeight)) / Math.log(2);
-                    n.setWeight(normWeight);
+                    normScore = (Math.log(1 + score/maxScore)) / Math.log(2);
+                    n.setScore(normScore);
                     break;
             }
         }

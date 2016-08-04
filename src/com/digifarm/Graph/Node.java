@@ -11,6 +11,8 @@ public class Node {
     private int searchID;
     private String tableName;
     private ArrayList<Node> adjacent;
+    private double score;
+    //weight for Dijstra
     private double weight;
 
     /**
@@ -23,7 +25,7 @@ public class Node {
         this.searchID = searchID;
         this.tableName = tableName;
         adjacent = new ArrayList<Node>();
-        weight = 0;
+        score = 0;
     }
 
     /**
@@ -59,7 +61,15 @@ public class Node {
     }
 
     public void incrementWeight() {
-        weight++;
+        score++;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
     }
 
     public double getWeight() {

@@ -72,12 +72,12 @@ public class Main {
                 ArrayList<Edge> edges = list.get(0);
                 ArrayList<Edge> backedge = list.get(1);
 
-                for (Edge b : backedge)
-                    System.out.println("Backedges: \n" + b.toString());
-
                 Utility.backEdgePoint(backedge);
 
-                max = Utility.maxNodeWeight(interest, max);
+                for (Edge b : backedge)
+                    System.out.println("Backedges with calculated weight: \n" + b.toString());
+
+                max = Utility.maxNodeScore(interest, max);
                 min = Utility.minEdgeWeight(edges, min);
 
                 interestList.add(interest);
@@ -85,27 +85,29 @@ public class Main {
 
             }
 
-            System.out.println("max weight: " + max);
+            System.out.println("max weight: " + max + "\n");
 
             for (HashMap<Integer, Node> interest2 : interestList) {
 
                 //TODO scegliere qui scala lineare o logaritmica
-                Utility.nWeightNorm(interest2, "logarithm", max);
+                Utility.nScoreNorm(interest2, "logarithm", max);
                 Node n;
                 //stampa di debug dei nodi con i pesi
                 for (Map.Entry<Integer, Node> e : interest2.entrySet()) {
                     n = e.getValue();
-                    System.out.println("Node: " + n.getSearchID() + " weight: " + n.getWeight());
+                    System.out.println("Node with normalized score: " + n.getSearchID() + " weight: " + n.getScore());
 
                 }
             }
+
+            System.out.println("\n");
 
             for (ArrayList<Edge> e : edgeList ) {
 
                 //only logarithmic scale
                 Utility.eWeightNorm(e,min);
                 for (Edge ed : e)
-                    System.out.println("Edges: \n" + ed.toString());
+                    System.out.println("Edges with normalized weight: \n" + ed.toString());
             }
 
 

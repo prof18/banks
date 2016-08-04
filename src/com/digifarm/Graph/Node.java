@@ -6,7 +6,8 @@ import java.util.ArrayList;
  * Created by marco on 7/7/16.
  **/
 
-public class Node {
+public class Node implements Comparable<Node>{
+
 
     private int searchID;
     private String tableName;
@@ -78,5 +79,16 @@ public class Node {
 
     public void setWeight(double weight) {
         this.weight = weight;
+    }
+
+    @Override
+    public int compareTo(Node node) {
+
+        if (this.weight < node.weight)
+            return -1;
+        else if (this.weight > node.weight)
+            return 1;
+        else
+            return this.searchID = node.getSearchID();
     }
 }

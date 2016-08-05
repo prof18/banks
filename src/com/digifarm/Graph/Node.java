@@ -15,6 +15,7 @@ public class Node implements Comparable<Node>{
     private double score;
     //weight for Dijstra
     private double weight;
+    private Node previousNode;
 
     /**
      * Build a new Node
@@ -81,6 +82,14 @@ public class Node implements Comparable<Node>{
         this.weight = weight;
     }
 
+    public Node getPreviousNode() {
+        return previousNode;
+    }
+
+    public void setPreviousNode(Node previousNode) {
+        this.previousNode = previousNode;
+    }
+
     @Override
     public int compareTo(Node node) {
 
@@ -90,5 +99,17 @@ public class Node implements Comparable<Node>{
             return 1;
         else
             return 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "searchID=" + searchID +
+                ", tableName='" + tableName + '\'' +
+                ", adjacent=" + adjacent +
+                ", score=" + score +
+                ", weight=" + weight +
+                ", previousNode=" + previousNode +
+                '}';
     }
 }

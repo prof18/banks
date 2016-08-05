@@ -65,14 +65,22 @@ public class Dijkstra {
             adjacent = minimum.getAdjacentNodes();
             double startWeight = minimum.getWeight();
 
+            System.out.println("Starting node: " + minimum.toString());
+            System.out.println("Start weight: " + startWeight);
+
             for (Node to : adjacent) {
+                System.out.println("To node: " + to.toString());
                 for (Edge edge : edges) {
                     //we traverse the graph in reverse direction
                     if (edge.getTo().getSearchID() == minimum.getSearchID() && edge.getFrom().getSearchID() == to.getSearchID()) {
                         finalWeight = startWeight + edge.getWeight();
 
-                        if (finalWeight < to.getWeight())
+                        if (finalWeight < to.getWeight()) {
+                            System.out.println("Final weigh: " + finalWeight);
                             to.setWeight(finalWeight);
+                            to.setPreviousNode(minimum);
+                            System.out.println("To Node: " + to.toString());
+                        }
 
                         //TODO controllare se ci sono due ram iche collegano gli stessi nodi
                     }

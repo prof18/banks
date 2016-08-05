@@ -104,7 +104,7 @@ public class Main {
                 //normalize node score
                 //TODO scegliere qui scala lineare (fraction) o logaritmica(logarithm)
                 Utility.nScoreNorm(interestSet, "logarithm", max);
-                Node n;
+                Node n = null;
                 //stampa di debug dei nodi con i pesi
                 System.out.println("\n");
                 for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
@@ -112,6 +112,16 @@ public class Main {
                     System.out.println("Node with normalized score: " + n.getSearchID() + " weight: " + n.getScore());
 
                 }
+
+                System.out.println("\nStarting node: " + n.getSearchID());
+
+
+                Graph graph = new Graph(interestSet,edges,bedges);
+
+                //need to obtain the start node
+                Dijkstra dijkstra = new Dijkstra(graph,n);
+                dijkstra.visit();
+
 
             }
 

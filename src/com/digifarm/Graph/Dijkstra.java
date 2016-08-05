@@ -20,7 +20,7 @@ public class Dijkstra {
     private ArrayList<Edge> bedges = new ArrayList<>();
     private ArrayList<Node> adjacent = new ArrayList<>();
     private PriorityQueue<Node> nodesQueue = new PriorityQueue<Node>();
-    private ArrayList<Edge> allEdge = new ArrayList<>();
+
     //   private Node starting;
 
     public Dijkstra(Graph graph, Node start){
@@ -73,6 +73,8 @@ public class Dijkstra {
 
                         if (finalWeight < to.getWeight())
                             to.setWeight(finalWeight);
+
+                        //TODO controllare se ci sono due ram iche collegano gli stessi nodi
                     }
                 }
             }

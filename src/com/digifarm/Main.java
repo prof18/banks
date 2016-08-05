@@ -1,9 +1,7 @@
 package com.digifarm;
 
 import com.digifarm.DBConnection.ConnectionDB;
-import com.digifarm.Graph.Edge;
-import com.digifarm.Graph.Node;
-import com.digifarm.Graph.Utility;
+import com.digifarm.Graph.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -58,8 +56,7 @@ public class Main {
 
             HashMap<Integer, Node> interest = new HashMap<>();
             ArrayList<ArrayList<Edge>> list = new ArrayList<>();
-            ArrayList<HashMap<Integer, Node>> interestList = new ArrayList<>();
-            ArrayList<ArrayList<Edge>> edgeList = new ArrayList<>();
+            ArrayList<Interest> interestList = new ArrayList<>();
 
             double max = 0;
             double min = Integer.MAX_VALUE;
@@ -70,46 +67,53 @@ public class Main {
                 list = Utility.connectNodes(conn, interest, set);
 
                 ArrayList<Edge> edges = list.get(0);
-                ArrayList<Edge> backedge = list.get(1);
+                ArrayList<Edge> backedges = list.get(1);
 
-                Utility.backEdgePoint(backedge);
+                Utility.backEdgePoint(backedges);
 
-                for (Edge b : backedge)
+                for (Edge b : backedges)
                     System.out.println("Backedges with calculated weight: \n" + b.toString());
 
                 max = Utility.maxNodeScore(interest, max);
                 min = Utility.minEdgeWeight(edges, min);
 
-                interestList.add(interest);
-                edgeList.add(edges);
+                Interest interestElement = new Interest(interest,edges,backedges);
+                interestList.add(interestElement);
 
             }
 
             System.out.println("max weight: " + max + "\n");
 
-            for (HashMap<Integer, Node> interest2 : interestList) {
+            HashMap<Integer, Node> interestSet = new HashMap<>();
+            ArrayList<Edge> edges = new ArrayList<>();
+            ArrayList<Edge> bedges = new ArrayList<>();
 
+            for (Interest i : interestList) {
+
+                //obtain data from interest object
+                interestSet = i.getNode();
+                edges = i.getEdge();
+                bedges = i.getBedge();
+
+                //normalize edge weight
+                //only logarithmic scale
+                Utility.eWeightNorm(edges,min);
+                for (Edge ed : edges)
+                    System.out.println("Edges with normalized weight: \n" + ed.toString());
+
+                //normalize node score
                 //TODO scegliere qui scala lineare (fraction) o logaritmica(logarithm)
-                Utility.nScoreNorm(interest2, "logarithm", max);
+                Utility.nScoreNorm(interestSet, "logarithm", max);
                 Node n;
                 //stampa di debug dei nodi con i pesi
-                for (Map.Entry<Integer, Node> e : interest2.entrySet()) {
+                System.out.println("\n");
+                for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
                     n = e.getValue();
                     System.out.println("Node with normalized score: " + n.getSearchID() + " weight: " + n.getScore());
 
                 }
+
             }
-
-            System.out.println("\n");
-
-            for (ArrayList<Edge> e : edgeList ) {
-
-                //only logarithmic scale
-                Utility.eWeightNorm(e,min);
-                for (Edge ed : e)
-                    System.out.println("Edges with normalized weight: \n" + ed.toString());
-            }
-
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();

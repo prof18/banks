@@ -82,7 +82,8 @@ public class Main {
 
             }
 
-            System.out.println("max weight: " + max + "\n");
+            System.out.println("max score: " + max );
+            System.out.println("min weight: " + min + "\n");
 
             HashMap<Integer, Node> interestSet = new HashMap<>();
             ArrayList<Edge> edges = new ArrayList<>();

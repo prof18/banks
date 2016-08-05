@@ -123,8 +123,10 @@ public class Main {
                 for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
 
                     node = e.getValue();
-                    ExecuteDijstra dijstra = new ExecuteDijstra(graph,node);
-                    dijstra.start();
+                    if (node.isKeywordNode()) {
+                        ExecuteDijstra dijstra = new ExecuteDijstra(graph, node);
+                        dijstra.start();
+                    }
                 }
 
             }

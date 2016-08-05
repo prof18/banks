@@ -18,6 +18,7 @@ public class Dijkstra {
     private ArrayList<Node> adjacent;
     private PriorityQueue<Node> nodesQueue = new PriorityQueue<Node>();
     private ArrayList<Edge> edgeList = new ArrayList<>();
+    private Node start;
 
 
     //   private Node starting;
@@ -28,6 +29,7 @@ public class Dijkstra {
         nodes = graph.getNodeSet();
         edges = graph.getEdge();
         bedges = graph.getBedge();
+        this.start = start;
 
 
 
@@ -106,6 +108,7 @@ public class Dijkstra {
                             nodesQueue.remove(to);
                             to.setWeight(finalWeight);
                             to.setPreviousNode(minimum);
+                            to.addKeywordNode(start);
                             nodesQueue.add(to);
                             System.out.println("To previous node " + to.getPreviousNode().toString());
                         }

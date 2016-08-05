@@ -16,6 +16,8 @@ public class Node implements Comparable<Node> {
     //weight for Dijstra
     private double weight;
     private Node previousNode;
+    private boolean isKeywordNode = false;
+    private ArrayList<Node> keywordNode = new ArrayList<>();
 
     /**
      * Build a new Node
@@ -84,6 +86,23 @@ public class Node implements Comparable<Node> {
 
     public void setPreviousNode(Node previousNode) {
         this.previousNode = previousNode;
+    }
+
+    public boolean isKeywordNode() {
+        return isKeywordNode;
+    }
+
+    public void setKeywordNode(boolean keywordNode) {
+        isKeywordNode = keywordNode;
+    }
+
+    public ArrayList<Node> getKeywordNode() {
+        return keywordNode;
+    }
+
+    public void addKeywordNode(Node node) {
+        keywordNode.add(node);
+
     }
 
     @Override

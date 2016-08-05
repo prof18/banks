@@ -90,6 +90,7 @@ public class Utility {
                         String str = columns.getString(i);
                         if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
                             System.out.println("Matched: " + str);
+                            n.setKeywordNode(true);
                             interestSet.put(n.getSearchID(), n);
                             break;
                         }

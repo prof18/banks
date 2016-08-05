@@ -1,9 +1,6 @@
 package com.digifarm.Graph;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * Created by marco on 7/7/16.
@@ -18,7 +15,7 @@ public class Dijkstra {
     private HashMap<Integer, Node> nodes = new HashMap<>();
     private ArrayList<Edge> edges = new ArrayList<>();
     private ArrayList<Edge> bedges = new ArrayList<>();
-    private ArrayList<Node> adjacent = new ArrayList<>();
+    private ArrayList<Node> adjacent;
     private PriorityQueue<Node> nodesQueue = new PriorityQueue<Node>();
 
     //   private Node starting;
@@ -60,21 +57,26 @@ public class Dijkstra {
         double finalWeight;
         HashMap<Integer, Node> nodeMap = new HashMap<>();
 
-        while (!nodesQueue.isEmpty()) {
+        while (!nodesQueue.isEmpty() && nodesQueue.peek().getWeight() != INFINITE) {
 
             Node minimum = nodesQueue.poll();
-            nodeMap.put(minimum.getSearchID(),minimum);
+            ArrayList<Node> adj = minimum.getAdjacentNodes();
+            adjacent = new ArrayList<>(minimum.getAdjacentNodes());
 
-            Node n;
-            for (Map.Entry<Integer, Node> e : nodeMap.entrySet()) {
-                n = e.getValue();
-                adjacent = n.getAdjacentNodes();
-            }
-            
+//            Collections.copy(adjacent, minimum.getAdjacentNodes());
+            nodeMap.put(minimum.getSearchID(),minimum);
             double startWeight = minimum.getWeight();
 
             System.out.println("Starting node: " + minimum.toString());
             System.out.println("Start weight: " + startWeight);
+            //System.out.println(adjacent.toString());
+
+
+            for (Node n : minimum.getAdjacentNodes()) {
+                if(nodeMap.containsKey(n.getSearchID())) {
+                    adjacent.remove(n);
+                }
+            }
 
             for (Node to : adjacent) {
                 System.out.println("To node: " + to.toString());

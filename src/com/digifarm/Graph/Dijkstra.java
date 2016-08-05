@@ -58,10 +58,12 @@ public class Dijkstra {
     public void visit() {
 
         double finalWeight;
+        ArrayList<Node> nodeList = new ArrayList<>();
 
         while (!nodesQueue.isEmpty()) {
 
             Node minimum = nodesQueue.poll();
+            nodeList.add(minimum);
             adjacent = minimum.getAdjacentNodes();
             double startWeight = minimum.getWeight();
 
@@ -77,12 +79,14 @@ public class Dijkstra {
 
                         if (finalWeight < to.getWeight()) {
                             System.out.println("Final weigh: " + finalWeight);
+                            nodesQueue.remove(to);
                             to.setWeight(finalWeight);
                             to.setPreviousNode(minimum);
+                            nodesQueue.add(to);
                             System.out.println("To previous node " + to.getPreviousNode().toString());
                         }
 
-                        //TODO controllare se ci sono due ram iche collegano gli stessi nodi
+
                     }
                 }
             }

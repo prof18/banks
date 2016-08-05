@@ -58,13 +58,19 @@ public class Dijkstra {
     public void visit() {
 
         double finalWeight;
-        ArrayList<Node> nodeList = new ArrayList<>();
+        HashMap<Integer, Node> nodeMap = new HashMap<>();
 
         while (!nodesQueue.isEmpty()) {
 
             Node minimum = nodesQueue.poll();
-            nodeList.add(minimum);
-            adjacent = minimum.getAdjacentNodes();
+            nodeMap.put(minimum.getSearchID(),minimum);
+
+            Node n;
+            for (Map.Entry<Integer, Node> e : nodeMap.entrySet()) {
+                n = e.getValue();
+                adjacent = n.getAdjacentNodes();
+            }
+            
             double startWeight = minimum.getWeight();
 
             System.out.println("Starting node: " + minimum.toString());

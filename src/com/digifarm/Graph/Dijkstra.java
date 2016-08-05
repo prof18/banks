@@ -17,6 +17,8 @@ public class Dijkstra {
     private ArrayList<Edge> bedges = new ArrayList<>();
     private ArrayList<Node> adjacent;
     private PriorityQueue<Node> nodesQueue = new PriorityQueue<Node>();
+    private ArrayList<Edge> edgeList = new ArrayList<>();
+
 
     //   private Node starting;
 
@@ -27,25 +29,39 @@ public class Dijkstra {
         edges = graph.getEdge();
         bedges = graph.getBedge();
 
+
+
         //edges will contain the edge and also the backedge
-        for (Edge be : bedges)
-           edges.add(be);
+        for (Edge e : edges) {
+            edgeList.add(e);
+        }
+
+        for (Edge be : bedges) {
+            edgeList.add(be);
+        }
+
 
         // starting = start;
 
 
         Node n;
         start.setWeight(0);
-        nodes.remove(start.getSearchID());
+        //nodes.remove(start.getSearchID());
         //il nodo di partenza ha peso zero, gli altri hanno peso infinito
+        //TODO : bisogna renderlo efficente
         for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
                 n = e.getValue();
                 n.setWeight(INFINITE);
-                nodesQueue.add(n);
+
+            if(n.getSearchID() == start.getSearchID())
+                n.setWeight(0);
+
+            nodesQueue.add(n);
+
         }
 
-        nodes.put(start.getSearchID(), start);
-        nodesQueue.add(start);
+        /*nodes.put(start.getSearchID(), start);
+        nodesQueue.add(start);*/
     }
 
 
@@ -80,7 +96,7 @@ public class Dijkstra {
 
             for (Node to : adjacent) {
                 System.out.println("To node: " + to.toString());
-                for (Edge edge : edges) {
+                for (Edge edge : edgeList) {
                     //we traverse the graph in reverse direction
                     if (edge.getTo().getSearchID() == minimum.getSearchID() && edge.getFrom().getSearchID() == to.getSearchID()) {
                         finalWeight = startWeight + edge.getWeight();

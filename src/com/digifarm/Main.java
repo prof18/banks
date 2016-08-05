@@ -119,10 +119,13 @@ public class Main {
 
                 Graph graph = new Graph(interestSet,edges,bedges);
 
-                //need to obtain the start node
-                Dijkstra dijkstra = new Dijkstra(graph,n);
-                dijkstra.visit();
+                Node node;
+                for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
 
+                    node = e.getValue();
+                    ExecuteDijstra dijstra = new ExecuteDijstra(graph,node);
+                    dijstra.start();
+                }
 
             }
 

@@ -79,7 +79,7 @@ public class Dijkstra {
                             System.out.println("Final weigh: " + finalWeight);
                             to.setWeight(finalWeight);
                             to.setPreviousNode(minimum);
-                            System.out.println("To Node: " + to.toString());
+                            System.out.println("To previous node " + to.getPreviousNode().toString());
                         }
 
                         //TODO controllare se ci sono due ram iche collegano gli stessi nodi

@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Created by marco on 7/7/16.
  **/
 
-public class Node implements Comparable<Node>{
+public class Node implements Comparable<Node> {
 
 
     private int searchID;
@@ -20,8 +20,8 @@ public class Node implements Comparable<Node>{
     /**
      * Build a new Node
      *
-     * @param searchID      SearchID of the tuple
-     * @param tableName     Table's name of the selected tuple.
+     * @param searchID  SearchID of the tuple
+     * @param tableName Table's name of the selected tuple.
      */
     public Node(int searchID, String tableName) {
         this.searchID = searchID;
@@ -31,15 +31,13 @@ public class Node implements Comparable<Node>{
     }
 
     /**
-     *
-     * @return  searchID    Returns the SearchID of the Node
+     * @return searchID    Returns the SearchID of the Node
      */
     public int getSearchID() {
         return searchID;
     }
 
     /**
-     *
      * @return tableName    Returns the TableName of the Node
      */
     public String getTableName() {
@@ -47,16 +45,14 @@ public class Node implements Comparable<Node>{
     }
 
     /**
-     *
-     * @param n     The node to be inserted in the adjacent list
+     * @param n The node to be inserted in the adjacent list
      */
     public void addAdjacentNode(Node n) {
         adjacent.add(n);
     }
 
     /**
-     *
-     * @return      The list of adjacent Nodes is returned
+     * @return The list of adjacent Nodes is returned
      */
     public ArrayList<Node> getAdjacentNodes() {
         return adjacent;
@@ -103,23 +99,13 @@ public class Node implements Comparable<Node>{
 
     @Override
     public String toString() {
-        if (previousNode != null) {
-            return "Node{" +
-                    "searchID=" + searchID +
-                    ", tableName='" + tableName + '\'' +
-                    ", adjacent=" + adjacent +
-                    ", score=" + score +
-                    ", weight=" + weight +
-                    ", previousNode=" + previousNode +
-                    '}';
-        } else
-            return "Node{" +
-                    "searchID=" + searchID +
-                    ", tableName='" + tableName + '\'' +
-                    ", adjacent=" + adjacent +
-                    ", score=" + score +
-                    ", weight=" + weight +
-                    ", previousNode= null" +
-                    '}';
+
+        return "Node{" +
+                "searchID=" + searchID +
+                ", tableName='" + tableName + '\'' +
+                ", score=" + score +
+                ", weight=" + weight +
+                '}';
+
     }
 }

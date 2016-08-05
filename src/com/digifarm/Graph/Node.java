@@ -103,13 +103,23 @@ public class Node implements Comparable<Node>{
 
     @Override
     public String toString() {
-        return "Node{" +
-                "searchID=" + searchID +
-                ", tableName='" + tableName + '\'' +
-                ", adjacent=" + adjacent +
-                ", score=" + score +
-                ", weight=" + weight +
-                ", previousNode=" + previousNode +
-                '}';
+        if (previousNode != null) {
+            return "Node{" +
+                    "searchID=" + searchID +
+                    ", tableName='" + tableName + '\'' +
+                    ", adjacent=" + adjacent +
+                    ", score=" + score +
+                    ", weight=" + weight +
+                    ", previousNode=" + previousNode +
+                    '}';
+        } else
+            return "Node{" +
+                    "searchID=" + searchID +
+                    ", tableName='" + tableName + '\'' +
+                    ", adjacent=" + adjacent +
+                    ", score=" + score +
+                    ", weight=" + weight +
+                    ", previousNode= null" +
+                    '}';
     }
 }

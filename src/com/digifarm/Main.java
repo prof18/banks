@@ -89,7 +89,7 @@ public class Main {
 
             for (HashMap<Integer, Node> interest2 : interestList) {
 
-                //TODO scegliere qui scala lineare o logaritmica
+                //TODO scegliere qui scala lineare (fraction) o logaritmica(logarithm)
                 Utility.nScoreNorm(interest2, "logarithm", max);
                 Node n;
                 //stampa di debug dei nodi con i pesi

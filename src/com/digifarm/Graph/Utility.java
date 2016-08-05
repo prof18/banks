@@ -158,14 +158,14 @@ public class Utility {
                         rs = stm.executeQuery(q);
 
                         //extract the list of adjacent nodes
-                        Node connected, connected2, connected3;
+                        Node connected;
                         Edge edge;
                         Edge backedge;
 
                         while(rs.next()) {
 
                             //TODO: i nodi si prendono da interest set!??
-                            connected = nodeList.get(new Integer(rs.getString(2)));
+                            connected = nodeList.get(rs.getInt(2));
                             System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
                             n.addAdjacentNode(connected);
                             edge = new Edge(n,connected,1);
@@ -174,10 +174,9 @@ public class Utility {
                             backedges.add(backedge);
                             //incremento del peso
                             //assign weight to the node --> indegree of the node
-                            connected.incrementWeight();
+                            connected.incrementScore();
                             //aggiunta del nodo connected all'interest set se non presente
-                            connected2 = interestSet.get(new Integer((rs.getString(2))));
-                            if (connected2 == null)
+                            if (!interestSet.containsKey(rs.getInt(2)))
                                 toAdd.add(connected);
 
                         }
@@ -278,6 +277,7 @@ public class Utility {
      * @param bedge
      *
      */
+   // TODO: controllare peso backedge.. deve essere ad uno
     public static void backEdgePoint(ArrayList<Edge> bedge) {
         //il punteggio di un backedge (v,u) è proporzionale al numero di link a v da nodi dello stesso tipo di u
         Node to, from;

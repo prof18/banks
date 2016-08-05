@@ -61,7 +61,7 @@ public class Node implements Comparable<Node>{
         return adjacent;
     }
 
-    public void incrementWeight() {
+    public void incrementScore() {
         score++;
     }
 
@@ -89,6 +89,6 @@ public class Node implements Comparable<Node>{
         else if (this.weight > node.weight)
             return 1;
         else
-            return this.searchID = node.getSearchID();
+            return 0;
     }
 }

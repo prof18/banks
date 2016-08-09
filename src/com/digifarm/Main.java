@@ -56,7 +56,12 @@ public class Main {
 
             HashMap<Integer, Node> interest = new HashMap<>();
             ArrayList<ArrayList<Edge>> list = new ArrayList<>();
+            //classe interest da modifare
             ArrayList<Interest> interestList = new ArrayList<>();
+            //lista di tutti i nodi degli interest set
+            ArrayList<Node> globalNodeList = new ArrayList<>();
+            ArrayList<Edge> globalEdgeList = new ArrayList<>();
+            ArrayList<Edge> globalBEdgeList = new ArrayList<>();
 
             double max = 0;
             double min = Integer.MAX_VALUE;
@@ -77,8 +82,22 @@ public class Main {
                 max = Utility.maxNodeScore(interest, max);
                 min = Utility.minEdgeWeight(edges, min);
 
-                Interest interestElement = new Interest(interest,edges,backedges);
-                interestList.add(interestElement);
+                //add item to global list
+                //node
+                Node node;
+                for (Map.Entry<Integer,Node> e : interest.entrySet()) {
+                    node = e.getValue();
+                    globalNodeList.add(node);
+                }
+                //edge
+                for (Edge edge : edges)
+                    globalEdgeList.add(edge);
+                //backedge
+                for (Edge bedge : backedges)
+                    globalBEdgeList.add(bedge);
+
+                //Interest interestElement = new Interest(globalNodeList,edges,backedges);
+                //interestList.add(interestElement);
 
             }
 
@@ -89,47 +108,46 @@ public class Main {
             ArrayList<Edge> edges = new ArrayList<>();
             ArrayList<Edge> bedges = new ArrayList<>();
 
-            for (Interest i : interestList) {
+            // for (Interest i : interestList) {
 
-                //obtain data from interest object
-                interestSet = i.getNode();
-                edges = i.getEdge();
-                bedges = i.getBedge();
+            //obtain data from interest object
+            //interestSet = i.getNode();
+            // edges = i.getEdge();
+            // bedges = i.getBedge();
 
-                //normalize edge weight
-                //only logarithmic scale
-                Utility.eWeightNorm(edges,min);
-                for (Edge ed : edges)
-                    System.out.println("Edges with normalized weight: \n" + ed.toString());
+            //normalize edge weight
+            //only logarithmic scale
+            Utility.eWeightNorm(globalEdgeList,min);
+            for (Edge ed : globalEdgeList)
+                System.out.println("Edges with normalized weight: \n" + ed.toString());
 
-                //normalize node score
-                //TODO scegliere qui scala lineare (fraction) o logaritmica(logarithm)
-                Utility.nScoreNorm(interestSet, "logarithm", max);
-                Node n = null;
-                //stampa di debug dei nodi con i pesi
-                System.out.println("\n");
-                for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
-                    n = e.getValue();
-                    System.out.println("Node with normalized score: " + n.getSearchID() + " weight: " + n.getScore());
+            //normalize node score
+            //TODO scegliere qui scala lineare (fraction) o logaritmica(logarithm)
+            Utility.nScoreNorm(globalNodeList, "logarithm", max);
+            //Node n = null;
+            //stampa di debug dei nodi con i pesi
+            System.out.println("\n");
+            for (Node nd : globalNodeList) {
 
-                }
-
-                System.out.println("\nStarting node: " + n.getSearchID());
-
-
-                Graph graph = new Graph(interestSet,edges,bedges);
-
-                Node node;
-                for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
-
-                    node = e.getValue();
-                    if (node.isKeywordNode()) {
-                        ExecuteDijstra dijstra = new ExecuteDijstra(graph, node);
-                        dijstra.start();
-                    }
-                }
+                System.out.println("Node with normalized score: " + nd.getSearchID() + " weight: " + nd.getScore());
 
             }
+
+            //print random node for checking dijstra
+            // System.out.println("\nStarting node: " + n.getSearchID());
+
+
+            Graph graph = new Graph(globalNodeList,globalEdgeList,globalBEdgeList);
+
+            //Node node;
+            for (Node node : globalNodeList) {
+                if (node.isKeywordNode()) {
+                    ExecuteDijstra dijstra = new ExecuteDijstra(graph, node);
+                    dijstra.start();
+                }
+            }
+
+            //       }
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();

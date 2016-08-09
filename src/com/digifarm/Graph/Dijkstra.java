@@ -12,7 +12,7 @@ public class Dijkstra {
     private double nodeWeight;
     private double edgeWeight;
     //private Graph graph;
-    private HashMap<Integer, Node> nodes = new HashMap<>();
+    private ArrayList<Node> nodes = new ArrayList<>();
     private ArrayList<Edge> edges = new ArrayList<>();
     private ArrayList<Edge> bedges = new ArrayList<>();
     private ArrayList<Node> adjacent;
@@ -46,13 +46,13 @@ public class Dijkstra {
         // starting = start;
 
 
-        Node n;
+
         start.setWeight(0);
         //nodes.remove(start.getSearchID());
         //il nodo di partenza ha peso zero, gli altri hanno peso infinito
         //TODO : bisogna renderlo efficente
-        for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
-                n = e.getValue();
+        for (Node n : nodes) {
+
                 n.setWeight(INFINITE);
 
             if(n.getSearchID() == start.getSearchID())

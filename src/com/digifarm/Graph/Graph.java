@@ -8,17 +8,17 @@ import java.util.HashMap;
  */
 public class Graph {
 
-    HashMap<Integer, Node> nodeSet;
+    ArrayList<Node> nodeSet;
     ArrayList<Edge> edge = new ArrayList<>();
     ArrayList<Edge> bedge = new ArrayList<>();
 
-    public Graph(HashMap<Integer, Node> nodeSet, ArrayList<Edge> edge, ArrayList<Edge> bedge) {
+    public Graph(ArrayList<Node> nodeSet, ArrayList<Edge> edge, ArrayList<Edge> bedge) {
         this.nodeSet = nodeSet;
         this.edge = edge;
         this.bedge = bedge;
     }
 
-    public HashMap<Integer, Node> getNodeSet() {
+    public ArrayList<Node> getNodeSet() {
         return nodeSet;
     }
 

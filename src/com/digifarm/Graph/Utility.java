@@ -356,13 +356,11 @@ public class Utility {
      * @param type "fraction" for linear scale or "logarithm" for logarithm scale
      * @param maxScore
      */
-    public static void nScoreNorm(HashMap<Integer, Node> nodes, String type, double maxScore) {
-        Node n;
+    public static void nScoreNorm(ArrayList<Node> nodes, String type, double maxScore) {
+
         double score;
         double normScore;
-        for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
-
-            n = e.getValue();
+        for (Node n : nodes) {
             score = n.getScore();
 
             switch(type) {

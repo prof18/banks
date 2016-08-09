@@ -142,8 +142,14 @@ public class Main {
             //Node node;
             for (Node node : globalNodeList) {
                 if (node.isKeywordNode()) {
-                    ExecuteDijstra dijstra = new ExecuteDijstra(graph, node);
-                    dijstra.start();
+
+                    //TODO: No Thread. Only for test purpose
+                    Dijkstra dijkstra = new Dijkstra(graph,node);
+                    dijkstra.visit();
+
+                    //TODO: Dijstra with thread
+                    /*ExecuteDijstra dijstra = new ExecuteDijstra(graph, node);
+                    dijstra.start();*/
                 }
             }
 

@@ -179,8 +179,9 @@ public class Utility {
                             //aggiunta del nodo connected all'interest set se non presente
                             if (!interestSet.containsKey(rs.getInt(2))) {
                                 toAdd.add(connected);
-                                connected.addAdjacentNode(n);
+                                //connected.addAdjacentNode(n);
                             }
+                            connected.addAdjacentNode(n);
 
                         }
                     } catch (SQLException e2) {

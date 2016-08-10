@@ -45,7 +45,8 @@ public class Main {
             //classe interest da modifare
             ArrayList<Interest> interestList = new ArrayList<>();
             //lista di tutti i nodi degli interest set
-            ArrayList<Node> globalNodeList = new ArrayList<>();
+            //ArrayList<Node> globalNodeList = new ArrayList<>();
+            HashMap<Integer, Node> globalNodeList = new HashMap<>();
             ArrayList<Edge> globalEdgeList = new ArrayList<>();
             ArrayList<Edge> globalBEdgeList = new ArrayList<>();
 
@@ -73,7 +74,14 @@ public class Main {
                 Node node;
                 for (Map.Entry<Integer,Node> e : interest.entrySet()) {
                     node = e.getValue();
-                    globalNodeList.add(node);
+                    //bisogna controllare se il nodo e' gia' presente nella lista, per evitare doppioni.
+                    if (globalNodeList.containsKey(node.getSearchID())) {
+                        //aggiungere le nuove adiacenze
+                        (globalNodeList.get(node.getSearchID())).mergeAdjacent(node.getAdjacentNodes());
+
+                    } else
+                        globalNodeList.put(node.getSearchID(),node);
+
                 }
                 //edge
                 for (Edge edge : edges)
@@ -113,8 +121,9 @@ public class Main {
             //Node n = null;
             //stampa di debug dei nodi con i pesi
             System.out.println("\n");
-            for (Node nd : globalNodeList) {
-
+            Node nd;
+            for (Map.Entry<Integer, Node> e : globalNodeList.entrySet()) {
+                nd = e.getValue();
                 System.out.println("Node with normalized score: " + nd.getSearchID() + " weight: " + nd.getScore());
 
             }
@@ -125,8 +134,9 @@ public class Main {
 
             Graph graph = new Graph(globalNodeList,globalEdgeList,globalBEdgeList);
 
-            //Node node;
-            for (Node node : globalNodeList) {
+            Node node;
+            for (Map.Entry<Integer, Node> e : globalNodeList.entrySet()) {
+                node = e.getValue();
                 if (node.isKeywordNode()) {
 
                     //TODO: No Thread. Only for test purpose

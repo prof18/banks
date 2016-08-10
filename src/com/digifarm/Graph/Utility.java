@@ -143,6 +143,7 @@ public class Utility {
         HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
         Node n;
 
+
         Connection conn = dBconn.getDBConnection();
         Statement stm;
         ResultSet rs;
@@ -357,11 +358,13 @@ public class Utility {
      * @param type "fraction" for linear scale or "logarithm" for logarithm scale
      * @param maxScore
      */
-    public static void nScoreNorm(ArrayList<Node> nodes, String type, double maxScore) {
+    public static void nScoreNorm(HashMap<Integer, Node> nodes, String type, double maxScore) {
 
         double score;
         double normScore;
-        for (Node n : nodes) {
+        Node n;
+        for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
+            n = e.getValue();
             score = n.getScore();
 
             switch(type) {
@@ -394,7 +397,5 @@ public class Utility {
             e.setWeight(normWeight);
         }
     }
-
-
 
 }

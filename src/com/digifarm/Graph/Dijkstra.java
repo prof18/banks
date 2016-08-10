@@ -2,6 +2,7 @@ package com.digifarm.Graph;
 
 import java.util.*;
 
+
 /**
  * Created by marco on 7/7/16.
  */
@@ -12,7 +13,7 @@ public class Dijkstra {
     private double nodeWeight;
     private double edgeWeight;
     //private Graph graph;
-    private ArrayList<Node> nodes = new ArrayList<>();
+    private HashMap<Integer, Node> nodes = new HashMap<>();
     private ArrayList<Edge> edges = new ArrayList<>();
     private ArrayList<Edge> bedges = new ArrayList<>();
     private ArrayList<Node> adjacent;
@@ -51,8 +52,9 @@ public class Dijkstra {
         //nodes.remove(start.getSearchID());
         //il nodo di partenza ha peso zero, gli altri hanno peso infinito
         //TODO : bisogna renderlo efficente
-        for (Node n : nodes) {
-
+        Node n;
+        for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
+                n = e.getValue();
                 n.setWeight(INFINITE);
 
             if(n.getSearchID() == start.getSearchID())

@@ -102,7 +102,14 @@ public class Node implements Comparable<Node> {
 
     public void addKeywordNode(Node node) {
         keywordNode.add(node);
+    }
 
+    public void mergeAdjacent(ArrayList<Node> adjacent2) {
+        ArrayList<Node> adjacent1 = this.getAdjacentNodes();
+        for (Node n : adjacent2) {
+            if (!adjacent1.contains(n))
+                adjacent1.add(n);
+        }
     }
 
     @Override

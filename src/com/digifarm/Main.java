@@ -61,11 +61,11 @@ public class Main {
                 ArrayList<Edge> edges = list.get(0);
                 ArrayList<Edge> backedges = list.get(1);
 
-                Utility.backEdgePoint(backedges);
+               // Utility.backEdgePoint(backedges);
 
-                for (Edge b : backedges)
+              /*  for (Edge b : backedges)
                     System.out.println("Backedges with calculated weight: \n" + b.toString());
-
+               */
                 max = Utility.maxNodeScore(interest, max);
                 min = Utility.minEdgeWeight(edges, min);
 
@@ -94,6 +94,15 @@ public class Main {
                 //interestList.add(interestElement);
 
             }
+
+            Utility.backEdgePoint(globalBEdgeList);
+
+            for (Edge e : globalEdgeList)
+                System.out.println("Edges after globalList: \n" + e.toString());
+
+            for (Edge b : globalBEdgeList)
+                System.out.println("Backedges after  globaList: \n" + b.toString());
+
 
             System.out.println("max score: " + max );
             System.out.println("min weight: " + min + "\n");
@@ -141,6 +150,7 @@ public class Main {
 
                     //TODO: No Thread. Only for test purpose
                     Dijkstra dijkstra = new Dijkstra(graph,node);
+                    System.out.println("------------------------------");
                     dijkstra.visit();
 
                     //TODO: Dijstra with thread

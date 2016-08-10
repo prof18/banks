@@ -172,7 +172,7 @@ public class Utility {
                             n.addAdjacentNode(connected);
                             edge = new Edge(n,connected,1);
                             edges.add(edge);
-                            backedge = new Edge(connected,n,1);
+                            backedge = new Edge(connected,n,0);
                             backedges.add(backedge);
                             //incremento del peso
                             //assign weight to the node --> indegree of the node

@@ -91,6 +91,8 @@ public class Utility {
                         if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
                             System.out.println("Matched: " + str);
                             n.setKeywordNode(true);
+                            n.addKeyword(match);
+                            n.addKeywordNodeList(match);
                             interestSet.put(n.getSearchID(), n);
                             break;
                         }

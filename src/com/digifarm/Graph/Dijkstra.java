@@ -17,7 +17,7 @@ public class Dijkstra {
     private ArrayList<Edge> edges = new ArrayList<>();
     private ArrayList<Edge> bedges = new ArrayList<>();
     private ArrayList<Node> adjacent;
-    private PriorityQueue<Node> nodesQueue = new PriorityQueue<Node>();
+    private PriorityQueue<Node> nodesQueue = new PriorityQueue<>();
     private ArrayList<Edge> edgeList = new ArrayList<>();
     private Node start;
 
@@ -110,7 +110,8 @@ public class Dijkstra {
                             nodesQueue.remove(to);
                             to.setWeight(finalWeight);
                             to.setPreviousNode(minimum);
-                            to.addKeywordNode(start);
+                            //to.addKeywordNode(start);
+                            to.addNodeToList(start);
                             nodesQueue.add(to);
                             System.out.println("To previous node " + to.getPreviousNode().toString());
                         }

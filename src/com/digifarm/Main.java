@@ -23,7 +23,7 @@ public class Main {
             //ask database username
             System.out.print("Enter Username: ");
             String username = in.nextLine();
-            //ask database name
+            //ask database name}
             System.out.print("Enter database name: ");
             String database = in.nextLine();
             //connect to database
@@ -77,7 +77,7 @@ public class Main {
                     //bisogna controllare se il nodo e' gia' presente nella lista, per evitare doppioni.
                     if (globalNodeList.containsKey(node.getSearchID())) {
                         //aggiungere le nuove adiacenze
-                        (globalNodeList.get(node.getSearchID())).mergeAdjacent(node.getAdjacentNodes());
+                        (globalNodeList.get(node.getSearchID())).mergeNode(node.getAdjacentNodes(),term);
 
                     } else
                         globalNodeList.put(node.getSearchID(),node);

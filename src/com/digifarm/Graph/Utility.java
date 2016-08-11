@@ -69,7 +69,7 @@ public class Utility {
 
     public static HashMap<Integer, Node> createInterestSet(ConnectionDB dbConn, HashMap<Integer, Node> set, String match) {
         long before1 = System.currentTimeMillis();
-        HashMap<Integer, Node> interestSet = new HashMap<Integer, Node>();
+        HashMap<Integer, Node> interestSet = new HashMap<>();
         Connection conn = dbConn.getDBConnection();
         try {
             Statement stmn = conn.createStatement();
@@ -92,7 +92,6 @@ public class Utility {
                             System.out.println("Matched: " + str);
                             n.setKeywordNode(true);
                             n.addKeyword(match);
-                            n.addKeywordNodeList(match);
                             interestSet.put(n.getSearchID(), n);
                             break;
                         }
@@ -195,7 +194,9 @@ public class Utility {
         }
 
         for (Node node : toAdd)
+
             interestSet.put(node.getSearchID(), node);
+
 
 
         long after = System.currentTimeMillis();

@@ -20,7 +20,7 @@ public class Node implements Comparable<Node> {
     private boolean isKeywordNode = false;
     //lista di keyword
     private ArrayList<String> keywordList = new ArrayList<>();
-    private ArrayList<Node> keywordNode = new ArrayList<>();
+    //private ArrayList<Node> keywordNode = new ArrayList<>();
     private HashMap<String, ArrayList<Node>> container = new HashMap<>();
 
     /**
@@ -99,14 +99,14 @@ public class Node implements Comparable<Node> {
     public void setKeywordNode(boolean keywordNode) {
         isKeywordNode = keywordNode;
     }
-
+/*
     public ArrayList<Node> getKeywordNode() {
         return keywordNode;
     }
 
     public void addKeywordNode(Node node) {
         keywordNode.add(node);
-    }
+    }*/
 
     public void mergeNode(ArrayList<Node> adjacent2, String keyword) {
         ArrayList<Node> adjacent1 = this.getAdjacentNodes();
@@ -116,7 +116,7 @@ public class Node implements Comparable<Node> {
             if (!adjacent1.contains(n))
                 adjacent1.add(n);
         }
-        //update the keyword list of the current node
+        //update the keyword lis147t of the current node
         //bisogna lasciarlo perche' qualcuno puo' essere stronzo e scrivere "Venice Venice"
         //TODO: CONTROLLARE NEL MAIN CHE LE PAROLE CHIAVE SIANO UNICHE
         if (!keyword1.contains(keyword))
@@ -144,7 +144,7 @@ public class Node implements Comparable<Node> {
         ArrayList<String> keyword = node.getKeywordList();
 
         for (String s : keyword)
-            (container.get(s)).add(node);
+            (this.container.get(s)).add(node);
     }
 
     @Override

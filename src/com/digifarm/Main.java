@@ -171,6 +171,8 @@ public class Main {
 
             //       }
 
+            System.out.println("fine");
+
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         } catch (ClassNotFoundException ce) {

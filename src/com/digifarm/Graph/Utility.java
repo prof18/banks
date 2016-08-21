@@ -193,9 +193,11 @@ public class Utility {
             }
         }
 
-        for (Node node : toAdd)
+        for (Node node : toAdd) {
 
             interestSet.put(node.getSearchID(), node);
+            System.out.println("Not keyword node: " + node);
+        }
 
 
 

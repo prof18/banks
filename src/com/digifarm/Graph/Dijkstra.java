@@ -111,7 +111,8 @@ public class Dijkstra {
                             to.setWeight(finalWeight);
                             to.setPreviousNode(minimum);
                             //to.addKeywordNode(start);
-                            to.addNodeToList(start);
+                            //to.addNodeToList(start);
+                            to.addNodeToVLi(start);
                             nodesQueue.add(to);
                             System.out.println("To previous node " + to.getPreviousNode().toString());
                         }

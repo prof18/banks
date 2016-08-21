@@ -21,7 +21,8 @@ public class Node implements Comparable<Node> {
     //lista di keyword
     private ArrayList<String> keywordList = new ArrayList<>();
     //private ArrayList<Node> keywordNode = new ArrayList<>();
-    private HashMap<String, ArrayList<Node>> container = new HashMap<>();
+    private HashMap<String, ArrayList<Node>> vLi = new HashMap<>();
+
 
     /**
      * Build a new Node
@@ -132,6 +133,7 @@ public class Node implements Comparable<Node> {
         return keywordList;
     }
 
+/*
     //dentro in createInterestSet
     //aggiunge una nuova lista di nodi per la parola chiave in questione
     public void addKeywordNodeList(String keyword) {
@@ -144,7 +146,22 @@ public class Node implements Comparable<Node> {
         ArrayList<String> keyword = node.getKeywordList();
 
         for (String s : keyword)
-            (this.container.get(s)).add(node);
+            (container.get(s)).add(node);
+    }
+*/
+
+    //create v.Li list
+    public void createVLi(String keyword) {
+        ArrayList<Node> nodes = new ArrayList<>();
+        vLi.put(keyword,nodes);
+    }
+
+    //aggiunge il nodo di partenza alla v.Li (nel nodo in questione) della keyword corrente
+    public void addNodeToVLi(Node n) {
+        ArrayList<String> keyword = n.getKeywordList();
+        for (String s : keyword) {
+            vLi.get(s).add(n);
+        }
     }
 
     @Override

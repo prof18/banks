@@ -95,6 +95,16 @@ public class Main {
 
             }
 
+            //per il nodo n, dobbiamo inizializzare la lista di nodi
+            // v.Li per ogni parola chiave
+            Node n;
+            for (Map.Entry<Integer,Node> e : globalNodeList.entrySet()) {
+
+                n = e.getValue();
+                for (String term: temp)
+                    n.createVLi(term);
+            }
+
             Utility.backEdgePoint(globalBEdgeList);
 
             for (Edge e : globalEdgeList)

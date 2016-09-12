@@ -4,10 +4,7 @@ import com.digifarm.DBConnection.ConnectionDB;
 import com.digifarm.Graph.*;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by marco on 7/6/16.
@@ -152,8 +149,9 @@ public class Main {
 
 
             Graph graph = new Graph(globalNodeList,globalEdgeList,globalBEdgeList);
-            ArrayList<ExecuteDijstra> t = new ArrayList<>();
+
             //TODO: creare coda(Priority QUEUE) di SPIterator ordinati in base alla distanza(IteratorHeap)
+            PriorityQueue<SPIterator> iteratorHeap = new PriorityQueue<>();
             Node node;
             for (Map.Entry<Integer, Node> e : globalNodeList.entrySet()) {
                 SPIterator it = new SPIterator();
@@ -164,11 +162,14 @@ public class Main {
                     Dijkstra dijkstra = new Dijkstra(graph,node,it);
                     System.out.println("------------------------------");
                     dijkstra.visit();
-
+                    iteratorHeap.add(it);
+                    System.out.println("fine for");
                 }
             }
 
             System.out.println("fine");
+            String s = "prova";
+
 
 
         } catch (SQLException sqle) {

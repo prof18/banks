@@ -119,7 +119,7 @@ public class Node implements Comparable<Node> {
         }
         //update the keyword lis147t of the current node
         //bisogna lasciarlo perche' qualcuno puo' essere stronzo e scrivere "Venice Venice"
-        //TODO: CONTROLLARE NEL MAIN CHE LE PAROLE CHIAVE SIANO UNICHE
+        //TODO: CONTROLLARE NEL MAIN CHE LE PAROLE CHIAVE SIANO UNICHE. Ad esempio scrivi milan milan
         if (!keyword1.contains(keyword))
             keyword1.add(keyword);
     }

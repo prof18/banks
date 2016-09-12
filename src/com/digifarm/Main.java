@@ -153,34 +153,20 @@ public class Main {
 
             Graph graph = new Graph(globalNodeList,globalEdgeList,globalBEdgeList);
             ArrayList<ExecuteDijstra> t = new ArrayList<>();
-
+            //TODO: creare coda(Priority QUEUE) di SPIterator ordinati in base alla distanza(IteratorHeap)
             Node node;
             for (Map.Entry<Integer, Node> e : globalNodeList.entrySet()) {
+                SPIterator it = new SPIterator();
                 node = e.getValue();
                 if (node.isKeywordNode()) {
 
-                    //TODO: No Thread. Only for test purpose
-                    Dijkstra dijkstra = new Dijkstra(graph,node);
+
+                    Dijkstra dijkstra = new Dijkstra(graph,node,it);
                     System.out.println("------------------------------");
                     dijkstra.visit();
 
-                    //TODO: Dijstra with thread
-                   /* ExecuteDijstra dijstra = new ExecuteDijstra(graph, node);
-                    t.add(dijstra);
-                    System.out.println("------------------------------");
-                    dijstra.start();
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException ex) {}*/
                 }
             }
-
-            /*for (ExecuteDijstra th : t) {
-                try {
-                    th.join();
-                } catch (InterruptedException e)
-                {}
-            }*/
 
             System.out.println("fine");
 

@@ -20,17 +20,20 @@ public class Dijkstra {
     private PriorityQueue<Node> nodesQueue = new PriorityQueue<>();
     private ArrayList<Edge> edgeList = new ArrayList<>();
     private Node start;
+    private SPIterator spIt;
 
 
     //   private Node starting;
 
-    public Dijkstra(Graph graph, Node start){
+    public Dijkstra(Graph graph, Node start, SPIterator it){
 
         //this.graph = graph;
         nodes = graph.getNodeSet();
         edges = graph.getEdge();
         bedges = graph.getBedge();
         this.start = start;
+        spIt = it;
+        it.add(start);
 
 
 
@@ -80,7 +83,7 @@ public class Dijkstra {
         while (!nodesQueue.isEmpty() && nodesQueue.peek().getWeight() != INFINITE) {
 
             Node minimum = nodesQueue.poll();
-            ArrayList<Node> adj = minimum.getAdjacentNodes();
+         //   ArrayList<Node> adj = minimum.getAdjacentNodes();
             adjacent = new ArrayList<>(minimum.getAdjacentNodes());
 
 //            Collections.copy(adjacent, minimum.getAdjacentNodes());
@@ -92,6 +95,8 @@ public class Dijkstra {
             //System.out.println(adjacent.toString());
 
 
+            //controllo necessario per evitare di rivisitare nodi
+            //(il padre ha come aidacente un figlio e viceversa)
             for (Node n : minimum.getAdjacentNodes()) {
                 if(nodeMap.containsKey(n.getSearchID())) {
                     adjacent.remove(n);
@@ -112,7 +117,10 @@ public class Dijkstra {
                             to.setPreviousNode(minimum);
                             //to.addKeywordNode(start);
                             //to.addNodeToList(start);
-                            to.addNodeToVLi(start);
+                            //TODO: non bisogna farlo qua, ma con l'iteratore. Vedi prospettive.txt
+                            //to.addNodeToVLi(start);
+                            spIt.add(to);
+                            spIt.setDistance(finalWeight);
                             nodesQueue.add(to);
                             System.out.println("To previous node " + to.getPreviousNode().toString());
                         }

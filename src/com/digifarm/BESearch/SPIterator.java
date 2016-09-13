@@ -69,9 +69,9 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
         int minL = Math.min(l1,l2);
 
         for (int i = 0; i < minL; i++) {
-            if ( this.getDistance(i) < spIterator.getDistance(i))
+            if ( (int) this.getDistance(i) < (int) spIterator.getDistance(i))
                return -1;
-            else if (this.getDistance(i) > spIterator.getDistance(i))
+            else if ((int) this.getDistance(i) > (int) spIterator.getDistance(i))
                 return 1;
 
         }

@@ -135,6 +135,7 @@ public class Main {
                     iteratorHeap.add(it);
                 }
             }
+            System.out.println("fine");
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();

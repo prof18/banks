@@ -23,9 +23,9 @@ public class ConnectionDialog extends JDialog implements ActionListener, WindowL
     private JPasswordField pass;
     private JButton connect;
 
-    public ConnectionDialog(MainUI guiDB) {
-        super(guiDB, "Database Connection", true);
-        this.mainUI = guiDB;
+    public ConnectionDialog(MainUI mainUI) {
+        super(mainUI, "Database Connection", true);
+        this.mainUI = mainUI;
         //JDialog components creation
         connectionPanel = new JPanel(new GridLayout(6, 1));
         //TODO: change with username
@@ -67,8 +67,7 @@ public class ConnectionDialog extends JDialog implements ActionListener, WindowL
     public void actionPerformed(ActionEvent e) {
         try {
             ConnectionDB conn = new ConnectionDB(user.getText(), new String(pass.getPassword()), dbaddress.getText(), dbport.getText(), dbname.getText());
-            mainUI.setDBConnection(conn);
-            System.out.println("Connected");
+            mainUI.setDBConnection(conn, dbname.getText());
             //show main ui
             mainUI.setVisible(true);
             //close dialog

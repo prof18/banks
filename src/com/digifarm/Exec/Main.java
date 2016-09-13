@@ -14,11 +14,12 @@ import java.util.*;
 
 
 public class Main {
-    public static void main(String[] args) {
 
-        try {
+    public static void dbSearch(String keyword, ConnectionDB conn, String database) {
 
-            Scanner in = new Scanner(System.in);
+
+
+            /*Scanner in = new Scanner(System.in);
             //ask database username
             System.out.print("Enter Username: ");
             String username = in.nextLine();
@@ -27,14 +28,15 @@ public class Main {
             String database = in.nextLine();
             //connect to database
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
-            System.out.println("Connected\n-----------------");
 
-            HashMap<Integer, Node> set = Utility.createGraph(conn,database);
+
+
 
             //ask for keyword
             System.out.print("Enter keyword (use space as separator): ");
 
-            String keyword = in.nextLine();
+            String keyword = in.nextLine();*/
+            HashMap<Integer, Node> set = Utility.createGraph(conn,database);
             String[] temp = keyword.split(" ");
 
             HashMap<Integer, Node> interest = new HashMap<>();
@@ -135,12 +137,5 @@ public class Main {
                     iteratorHeap.add(it);
                 }
             }
-
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-        } catch (ClassNotFoundException ce) {
-            System.out.println("Unable to find Driver Class");
-            ce.printStackTrace();
-        }
     }
 }

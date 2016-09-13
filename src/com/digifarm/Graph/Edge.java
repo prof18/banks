@@ -1,16 +1,13 @@
 package com.digifarm.Graph;
 
-import java.util.ArrayList;
-
 /**
- * Created by marco on 7/7/16.
+ * Created by digifarmer on 7/7/16.
  **/
 public class Edge {
 
     private double weight;
     private Node from;
     private Node to;
-
 
     /**
      * Build a new Edge between two Node.
@@ -31,10 +28,6 @@ public class Edge {
         this.weight = weight;
     }
 
-    /**
-     *
-     * @return weight   Returns edge's weight
-     */
     public double getWeight() {
         return weight;
     }

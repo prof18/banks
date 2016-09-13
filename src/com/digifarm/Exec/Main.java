@@ -1,5 +1,7 @@
-package com.digifarm;
+package com.digifarm.Exec;
 
+import com.digifarm.BESearch.Dijkstra;
+import com.digifarm.BESearch.SPIterator;
 import com.digifarm.DBConnection.ConnectionDB;
 import com.digifarm.Graph.*;
 
@@ -7,8 +9,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * Created by marco on 7/6/16.
- */
+ * Created by digifarmer on 7/6/16.
+ **/
 
 
 public class Main {
@@ -20,7 +22,7 @@ public class Main {
             //ask database username
             System.out.print("Enter Username: ");
             String username = in.nextLine();
-            //ask database name}
+            //ask database name
             System.out.print("Enter database name: ");
             String database = in.nextLine();
             //connect to database
@@ -35,14 +37,10 @@ public class Main {
             String keyword = in.nextLine();
             String[] temp = keyword.split(" ");
 
-
-
             HashMap<Integer, Node> interest = new HashMap<>();
             ArrayList<ArrayList<Edge>> list = new ArrayList<>();
-            //classe interest da modifare
-            ArrayList<Interest> interestList = new ArrayList<>();
-            //lista di tutti i nodi degli interest set
-            //ArrayList<Node> globalNodeList = new ArrayList<>();
+
+            //global nodes,edges,backedges lists of interest set
             HashMap<Integer, Node> globalNodeList = new HashMap<>();
             ArrayList<Edge> globalEdgeList = new ArrayList<>();
             ArrayList<Edge> globalBEdgeList = new ArrayList<>();
@@ -52,78 +50,55 @@ public class Main {
 
             for (String term: temp) {
 
+                //interest set creation
                 interest = Utility.createInterestSet(conn, set, term);
+                //interest set connection
                 list = Utility.connectNodes(conn, interest, set);
 
+                //extract edges and backedge list
                 ArrayList<Edge> edges = list.get(0);
                 ArrayList<Edge> backedges = list.get(1);
 
-               // Utility.backEdgePoint(backedges);
-
-              /*  for (Edge b : backedges)
-                    System.out.println("Backedges with calculated weight: \n" + b.toString());
-               */
                 max = Utility.maxNodeScore(interest, max);
                 min = Utility.minEdgeWeight(edges, min);
 
-                //add item to global list
-                //node
+                //add node to global list
                 Node node;
                 for (Map.Entry<Integer,Node> e : interest.entrySet()) {
                     node = e.getValue();
-                    //bisogna controllare se il nodo e' gia' presente nella lista, per evitare doppioni.
+                    //needs to check if the node is already in the global list to avoid duplicates
                     if (globalNodeList.containsKey(node.getSearchID())) {
-                        //aggiungere le nuove adiacenze
+                        //if the node is already int he global list we need to update the adjacent list
                         (globalNodeList.get(node.getSearchID())).mergeNode(node.getAdjacentNodes(),term);
-
                     } else
                         globalNodeList.put(node.getSearchID(),node);
-
                 }
-                //edge
+                //add edge to global list
                 for (Edge edge : edges)
                     globalEdgeList.add(edge);
-                //backedge
+                //add backedge to global list
                 for (Edge bedge : backedges)
                     globalBEdgeList.add(bedge);
-
-                //Interest interestElement = new Interest(globalNodeList,edges,backedges);
-                //interestList.add(interestElement);
-
             }
 
-            //per il nodo n, dobbiamo inizializzare la lista di nodi
-            // v.Li per ogni parola chiave
+            //initialize the nodelist v.Li for each keyword
             Node n;
             for (Map.Entry<Integer,Node> e : globalNodeList.entrySet()) {
-
                 n = e.getValue();
                 for (String term: temp)
                     n.createVLi(term);
             }
 
+            //assign point to the backedge
             Utility.backEdgePoint(globalBEdgeList);
 
+            //debug print
             for (Edge e : globalEdgeList)
                 System.out.println("Edges after globalList: \n" + e.toString());
-
             for (Edge b : globalBEdgeList)
                 System.out.println("Backedges after  globaList: \n" + b.toString());
-
-
             System.out.println("max score: " + max );
             System.out.println("min weight: " + min + "\n");
-
-            HashMap<Integer, Node> interestSet = new HashMap<>();
-            ArrayList<Edge> edges = new ArrayList<>();
-            ArrayList<Edge> bedges = new ArrayList<>();
-
-            // for (Interest i : interestList) {
-
-            //obtain data from interest object
-            //interestSet = i.getNode();
-            // edges = i.getEdge();
-            // bedges = i.getBedge();
 
             //normalize edge weight
             //only logarithmic scale
@@ -134,8 +109,8 @@ public class Main {
             //normalize node score
             //TODO scegliere qui scala lineare (fraction) o logaritmica(logarithm)
             Utility.nScoreNorm(globalNodeList, "logarithm", max);
-            //Node n = null;
-            //stampa di debug dei nodi con i pesi
+
+            //debug print: nodes with score
             System.out.println("\n");
             Node nd;
             for (Map.Entry<Integer, Node> e : globalNodeList.entrySet()) {
@@ -143,10 +118,6 @@ public class Main {
                 System.out.println("Node with normalized score: " + nd.getSearchID() + " weight: " + nd.getScore());
 
             }
-
-            //print random node for checking dijstra
-            // System.out.println("\nStarting node: " + n.getSearchID());
-
 
             Graph graph = new Graph(globalNodeList,globalEdgeList,globalBEdgeList);
 
@@ -158,19 +129,12 @@ public class Main {
                 node = e.getValue();
                 if (node.isKeywordNode()) {
 
-
                     Dijkstra dijkstra = new Dijkstra(graph,node,it);
                     System.out.println("------------------------------");
                     dijkstra.visit();
                     iteratorHeap.add(it);
-                    System.out.println("fine for");
                 }
             }
-
-            System.out.println("fine");
-            String s = "prova";
-
-
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
@@ -178,6 +142,5 @@ public class Main {
             System.out.println("Unable to find Driver Class");
             ce.printStackTrace();
         }
-
     }
 }

@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Created by marco on 7/7/16.
+ * Created by digifarmer on 7/7/16.
  **/
 public class ConnectionDB {
 
@@ -27,20 +27,16 @@ public class ConnectionDB {
     public Connection getDBConnection() {
 
         return conn;
-
     }
 
     public void closeDBConnection() {
         try {
-
             if(conn != null) conn.close();
 
         } catch(SQLException se) {
-
             se.printStackTrace();
 
         } finally {
-
             conn = null;
         }
     }

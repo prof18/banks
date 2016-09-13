@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by nihilus on 07/07/16.
+ * Created by digifarmer on 07/07/16.
  **/
 public class Utility {
 
@@ -116,6 +116,7 @@ public class Utility {
      */
 
     private static boolean isContained(String s1, String s2) {
+        //split string by whitespace
         for (String word : s1.split("\\s+")) {
             if (word.equals(s2))
                 return true;
@@ -123,12 +124,15 @@ public class Utility {
         return false;
     }
 
+
     /**
      *  This method connect the nodes of the set provided by input
      *
-     * @param   dBconn          An instance of ConnectionDB
-     * @see     ConnectionDB
-     * @param nodeList          A set of Nodes that needs to be connected
+     * @param dBconn             An instance of ConnectionDB
+     * @see   ConnectionDB
+     * @param interestSet       The interest set that has to be connected
+     * @param nodeList          The "global" node list
+     * @return                  An ArrayList of edge and backedge
      */
 
     public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList) {
@@ -140,10 +144,8 @@ public class Utility {
         ArrayList<Edge> backedges = new ArrayList<>();
         ArrayList<Node> toAdd = new ArrayList<>();
 
-
         HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
         Node n;
-
 
         Connection conn = dBconn.getDBConnection();
         Statement stm;
@@ -167,7 +169,6 @@ public class Utility {
 
                         while(rs.next()) {
 
-                            //TODO: i nodi si prendono da interest set!??
                             connected = nodeList.get(rs.getInt(2));
                             System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
                             n.addAdjacentNode(connected);
@@ -175,16 +176,13 @@ public class Utility {
                             edges.add(edge);
                             backedge = new Edge(connected,n,0);
                             backedges.add(backedge);
-                            //incremento del peso
-                            //assign weight to the node --> indegree of the node
+                            //assign score to the node --> indegree of the node
                             connected.incrementScore();
-                            //aggiunta del nodo connected all'interest set se non presente
+                            //the destination node could not be in the interest set. It isn't a keyword node
                             if (!interestSet.containsKey(rs.getInt(2))) {
                                 toAdd.add(connected);
-                                //connected.addAdjacentNode(n);
                             }
                             connected.addAdjacentNode(n);
-
                         }
                     } catch (SQLException e2) {
                         e2.printStackTrace();
@@ -194,12 +192,9 @@ public class Utility {
         }
 
         for (Node node : toAdd) {
-
             interestSet.put(node.getSearchID(), node);
             System.out.println("Not keyword node: " + node);
         }
-
-
 
         long after = System.currentTimeMillis();
 
@@ -213,8 +208,10 @@ public class Utility {
 
     /**
      *
-     * @param connDB
-     * @return
+     *
+     * @param connDB            An instance of ConnectionDB
+     * @see   ConnectionDB
+     * @return                  An Hash map with key the fromTable and the value the query that retrieves node connections
      */
     private static HashMap<String, ArrayList<String>> foreignKeyTable (ConnectionDB connDB) {
         HashMap<String, ArrayList<String>> keyTable = new HashMap<>();
@@ -224,8 +221,10 @@ public class Utility {
         try {
             stm = conn.createStatement();
             //this query retrieves the source table, the destination table, the foreign key, the primary key
-            //and conrelid
-            rs = stm.executeQuery("SELECT c1.relname AS src_table, c3.conrelid, c3.conkey AS foreign_key, c2.relname AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0;\n");
+            //and conrelid (The table this constraint is on; 0 if not a table constraint)
+            rs = stm.executeQuery("SELECT c1.relname AS src_table, c3.conrelid, c3.conkey AS foreign_key, c2.relname " +
+                    "AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 " +
+                    "ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0;\n");
             String fromTable, toTable;
             Integer[] fk,pk;
             Array a;
@@ -243,7 +242,8 @@ public class Utility {
 
                 stm1 = conn.createStatement();
                 for (Integer i : fk) {
-                    rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i + " AND a1.attrelid = " + rs.getString(2));
+                    rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i +
+                            " AND a1.attrelid = " + rs.getString(2));
                     while(rs1.next()) {
                         colName1.add(rs1.getString(1));
                     }
@@ -251,7 +251,8 @@ public class Utility {
 
                 stm1 = conn.createStatement();
                 for (Integer i : pk) {
-                    rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i + " AND a1.attrelid = " + rs.getString(5));
+                    rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i +
+                            " AND a1.attrelid = " + rs.getString(5));
                     while(rs1.next()) {
                         colName2.add(rs1.getString(1));
                     }
@@ -262,8 +263,8 @@ public class Utility {
                     joinCondition += " AND t1." + colName1.remove(0) + " = t2." + colName2.remove(0);
                 }
 
-                String query = "SELECT " + "t1.__search_id," +  "t2.__search_id FROM " + fromTable + " AS t1 INNER JOIN " + toTable + " AS t2 ON " + joinCondition;
-                //System.out.println(query+ ";");
+                String query = "SELECT " + "t1.__search_id," +  "t2.__search_id FROM " + fromTable + " AS t1 INNER JOIN " +
+                        toTable + " AS t2 ON " + joinCondition;
 
                 if (keyTable.containsKey(fromTable)) {
                     ArrayList<String> list = keyTable.get(fromTable);
@@ -284,45 +285,44 @@ public class Utility {
     /**
      * This method calculates the weight of the backedges
      *
-     * @param bedge
-     *
      */
-   // TODO: controllare peso backedge.. deve essere ad uno
+
     public static void backEdgePoint(ArrayList<Edge> bedge) {
-        //il punteggio di un backedge (v,u) è proporzionale al numero di link a v da nodi dello stesso tipo di u
+        //the point of an backedge is proportional to number of link to v from nodes of the same type as u
         Node to, from;
         ArrayList<Node> adjacent = new ArrayList<>();
         String table;
 
         for (Edge be : bedge) {
 
-            to = be.getFrom(); //arrivo         --> v
-            from = be.getTo();   //partenza     --> u
+            to = be.getFrom();   //finish       --> v
+            from = be.getTo();   //start     --> u
 
             table = from.getTableName();
             adjacent = to.getAdjacentNodes();
 
             for (Node n : adjacent) {
-                //il nodo n e' dello stesso tipo di u, ovvero appartiene alla stessa tabella
+                //Node n is of the same type of u, i.e. belongs to the same table
                 if ((n.getTableName()).compareTo(table) == 0) {
-
-                    //System.out.println("from table: " + table + " to table: " + n.getTableName());
-                   // System.out.println("from: " + to.getSearchID() + " to: " + n.getSearchID());
-                   // System.out.println("Old weight " + be.getWeight());
                     be.setWeight(be.getWeight() + 1);
-                   // System.out.println("New weight: " + be.getWeight());
-
                 }
             }
-         //   System.out.println("Backedge point: " + be.toString());
         }
     }
 
     /**
-     * This method calculate the maximus value of the node weight
+     *
      *
      * @param nodes
      * @return
+     */
+
+    /**
+     * This method calculate the maximus value of the node score
+     *
+     * @param nodes     Hash Map of nodes
+     * @param max       The actual max value
+     * @return          The max value
      */
     public static double maxNodeScore(HashMap<Integer,Node> nodes, double max) {
         Node n;
@@ -338,10 +338,11 @@ public class Utility {
     }
 
     /**
-     * This method calculate the minium value of the edge weight
+     * This method calculate the minimum value of the edge weight
      *
-     * @param edges
-     * @return
+     * @param edges     List of nodes
+     * @param min       The actual min value
+     * @return          The min value
      */
     public static double minEdgeWeight(ArrayList<Edge> edges, double min) {
 
@@ -359,9 +360,9 @@ public class Utility {
     /**
      * This method normalize the score of the nodes
      *
-     * @param nodes
-     * @param type "fraction" for linear scale or "logarithm" for logarithm scale
-     * @param maxScore
+     * @param nodes         Hash Map of nodes
+     * @param type          "fraction" for linear scale or "logarithm" for logarithm scale
+     * @param maxScore      The max score for normalization
      */
     public static void nScoreNorm(HashMap<Integer, Node> nodes, String type, double maxScore) {
 
@@ -390,8 +391,8 @@ public class Utility {
     /**
      * This method normalize the weight of the edge
      *
-     * @param edges
-     * @param minWeight
+     * @param edges         List of edges
+     * @param minWeight     The minimum score for normalization
      */
     public static void eWeightNorm(ArrayList<Edge> edges, double minWeight) {
         double weight;
@@ -402,5 +403,4 @@ public class Utility {
             e.setWeight(normWeight);
         }
     }
-
 }

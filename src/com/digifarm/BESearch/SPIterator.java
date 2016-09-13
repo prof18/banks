@@ -1,18 +1,22 @@
-package com.digifarm.Graph;
+package com.digifarm.BESearch;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
 
 /**
- * Created by marco on 9/12/16.
- */
+ * Created by digifarmer on 9/12/16.
+ **/
 public class SPIterator<Node> implements Comparable<SPIterator> {
 
-    //private int size = 0;
-    //private static final int DEFAULT_CAPACITY = 10;
     private ArrayList<Double> distance;
     private ArrayList<Node> list;
 
+    /**
+     *  Create an iterator with a list of Nodes and a list of distances.
+     *  The distances in 0 is the distance between node 0 and node 1. The distance in 1 is the
+     *  distance between node 0 and node 2 etc.
+     *
+     */
     public SPIterator() {
         list = new ArrayList<>();
         distance = new ArrayList<>();
@@ -36,12 +40,6 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
         return list.size();
     }
 
-    /**
-     *
-     * Es. nella posizione 0, c'è la distanza tra il nodo 0 e il nodo 1 e così via.
-     *
-     * @param dist
-     */
     public void setDistance(double dist) {
         distance.add(dist);
     }
@@ -54,12 +52,15 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
         distance.remove(0);
     }
 
+    //create an iterator on the list.
+    //TODO: reimplement the iterator
     public ListIterator<Node> createIterator(){
         ListIterator<Node> iterator = list.listIterator();
         return iterator;
 
     }
 
+    //TODO: fix errors on sorting
     @Override
     public int compareTo(SPIterator spIterator) {
 

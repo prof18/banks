@@ -4,9 +4,7 @@ import com.digifarm.DBConnection.ConnectionDB;
 import com.digifarm.Exec.Main;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,116 +18,74 @@ import java.io.PrintStream;
  **/
 public class MainUI extends JFrame implements ActionListener, WindowListener {
 
-   //dbconnection management
+   //database management
     private ConnectionDB conn;
     private String dbName;
 
-    private PrintStream standardOut;
-
     private JTextArea textArea = new JTextArea();
     private JTextField keyword;
-    private JPanel first, inside;
     private JButton search;
-    private JLabel title1 = new JLabel("Enter keyword. Use space as separator");
     private JScrollPane console;
 
-    private Border blackline =  BorderFactory.createLineBorder(Color.black);
-
-
     public MainUI() {
-        //configurazione generale del JFrame
+        //cjFrame configuration
         setTitle("Banks by Digifarmer");
-        setSize(950, 350);
-     //   setResizable(false);
+        setSize(700, 550);
+        setResizable(false);
         setVisible(false);
-        //jframe centering
-        Dimension dim = getToolkit().getScreenSize();
-        //setLocation((dim.width - getWidth()) / 2, (dim.height - getHeight()) / 2);
-        //layout configuration
-      //  setLayout(new GridLayout(0, 1));
         //end program when click on X
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+        //re-assigns standard output stream and error output stream
         PrintStream printStream = new PrintStream(new CustomOutputStream(textArea));
-        standardOut = System.out;
-
-        // re-assigns standard output stream and error output stream
         System.setOut(printStream);
         System.setErr(printStream);
 
-      //first = new JPanel(new GridLayout(7,1));
-     //   first.setBorder(new EmptyBorder(0, 20, 20, 20));
-     /* //  first.setBorder(blackline);
-        inside = new JPanel(new GridLayout(1,2,100,0));
-
-        title1 = new JLabel("Enter keyword. Use space as separator");
-        title1.setHorizontalAlignment(JLabel.CENTER);
-
-        //keyword.setPreferredSize(new Dimension(150, 80));
-        */
-        keyword = new JTextField();
+        keyword = new JTextField("Enter keyword. Use space as separator",40);
         search = new JButton("Search");
 
         // creates the GUI
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-       // add(title1,constraints);
-
-        constraints.gridx = 1;
-        constraints.fill=GridBagConstraints.HORIZONTAL;
+        //keyword edit text placement
         constraints.insets = new Insets(20, 20, 20, 20);
+        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        keyword.setPreferredSize( search.getPreferredSize() );
         add(keyword, constraints);
 
-        constraints.gridx = 0;
+        //search button placement
+        constraints.gridx = 1;
         constraints.gridy = 0;
         constraints.insets = new Insets(20, 20, 20, 20);
         constraints.anchor = GridBagConstraints.EAST;
-
         add(search, constraints);
 
-
-
+        //console area placement
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.gridwidth = 2;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weightx = 1.0;
         constraints.weighty = 1.0;
-
-
-
-
-
-        console = new JScrollPane(textArea);
-        add(console, constraints);
         textArea.setBorder(new EmptyBorder(20,20,20,20));
         textArea.setEditable(false);
-        //textArea.setBorder(BorderFactory.createLineBorder(Color.black));
-       /* first.add(title1);
-        inside.add(keyword);
-        inside.add(search, BorderLayout.EAST);
-        first.add(inside);*/
-   //     add(first);
+        console = new JScrollPane(textArea);
+        add(console, constraints);
 
-       // add(console);
-
-        search.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                textArea.setText(" ");
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Main.dbSearch(keyword.getText(),conn,dbName);
-                    }
-                });
-                t.start();
-
-            }
+        //button listener
+        search.addActionListener(e -> {
+            textArea.setText(" ");
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Main.dbSearch(keyword.getText(),conn,dbName);
+                }
+            });
+            t.start();
         });
-
-
     }
 
     public void setDBConnection(ConnectionDB conn, String dbName) {
@@ -138,9 +94,8 @@ public class MainUI extends JFrame implements ActionListener, WindowListener {
 
     }
 
-
+    @Override
     public void actionPerformed(ActionEvent e) {
-
     }
 
     @Override
@@ -172,6 +127,4 @@ public class MainUI extends JFrame implements ActionListener, WindowListener {
     @Override
     public void windowOpened(WindowEvent arg0) {
     }
-
-
 }

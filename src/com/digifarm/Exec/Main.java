@@ -132,7 +132,7 @@ public class Main {
                 if (node.isKeywordNode()) {
 
                     Dijkstra dijkstra = new Dijkstra(graph,node,it);
-                    System.out.println("------------------------------");
+                    //System.out.println("------------------------------");
                     dijkstra.visit();
                     iteratorHeap.add(it);
                 }

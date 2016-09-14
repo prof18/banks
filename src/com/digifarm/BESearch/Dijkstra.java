@@ -33,6 +33,7 @@ public class Dijkstra {
         bedges = graph.getBedge();
         this.start = start;
         spIt = it;
+        //add starting node to the iterator
         it.add(start);
 
         //edges will contain the edge and also the backedge

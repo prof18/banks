@@ -21,6 +21,8 @@ public class Node implements Comparable<Node> {
     private ArrayList<String> keywordList = new ArrayList<>();
     //v.Li node list for each keyword
     private HashMap<String, ArrayList<Node>> vLi = new HashMap<>();
+    //The node is already visited by an iterator
+    private boolean isVisited = false;
 
     public Node(int searchID, String tableName) {
         this.searchID = searchID;
@@ -81,6 +83,14 @@ public class Node implements Comparable<Node> {
         isKeywordNode = keywordNode;
     }
 
+    public void setVisited(boolean visit) {
+        isVisited = visit;
+    }
+
+    public boolean isVisited() {
+        return isVisited;
+    }
+
     /**
      * This method merge the adjacent list and the keyword list of two nodes (that they'll be the same btw)
      *
@@ -120,16 +130,8 @@ public class Node implements Comparable<Node> {
         vLi.put(keyword,nodes);
     }
 
-    /**
-     *  Add a node to the v.Li of the current keyword
-     *
-     * @param n     The node to add to the v.Li
-     */
-    public void addNodeToVLi(Node n) {
-        ArrayList<String> keyword = n.getKeywordList();
-        for (String s : keyword) {
-            vLi.get(s).add(n);
-        }
+    public HashMap<String, ArrayList<Node>> getvLi() {
+        return vLi;
     }
 
     @Override

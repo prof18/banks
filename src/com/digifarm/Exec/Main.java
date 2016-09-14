@@ -4,6 +4,8 @@ import com.digifarm.BESearch.Dijkstra;
 import com.digifarm.BESearch.SPIterator;
 import com.digifarm.DBConnection.ConnectionDB;
 import com.digifarm.Graph.*;
+import com.digifarm.Tree.TNode;
+import com.digifarm.Tree.Tree;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -81,13 +83,13 @@ public class Main {
                     globalBEdgeList.add(bedge);
             }
 
-            //initialize the nodelist v.Li for each keyword
+            /*//initialize the nodelist v.Li for each keyword
             Node n;
             for (Map.Entry<Integer,Node> e : globalNodeList.entrySet()) {
                 n = e.getValue();
                 for (String term: temp)
                     n.createVLi(term);
-            }
+            }*/
 
             //assign point to the backedge
             Utility.backEdgePoint(globalBEdgeList);
@@ -135,7 +137,58 @@ public class Main {
                     iteratorHeap.add(it);
                 }
             }
-            System.out.println("fine");
+
+            Node v;
+            while (!iteratorHeap.isEmpty()) {
+                //remove first iterator from heap
+                SPIterator spIterator = iteratorHeap.poll();
+                ListIterator<Node> iterator = spIterator.createIterator();
+                v = iterator.next();
+                iterator.remove();
+                //remove the first distance because we have polled the corresponding node
+                spIterator.deleteDistance();
+                //if there is another nodes, reinsert the iterator in the heap
+                if (iterator.hasNext())
+                    iteratorHeap.add(spIterator);
+                //the init of the nodelist v.Li
+                if (!v.isVisited()) {
+                    for (String term: temp)
+                        v.createVLi(term);
+                    v.setVisited(true);
+                }
+
+                Node origin = (Node) spIterator.getOrigin();
+                HashMap<String, ArrayList<Node>> vLi = v.getvLi();
+
+                //calculate cross product
+                ArrayList<ArrayList<Node>> crossProduct = generateCrossProduct(origin,v,temp);
+
+                //insert origin to v.Li
+                ArrayList<String> keywordList = v.getKeywordList();
+                for (String s: keywordList ) {
+                    if (vLi.containsKey(s)) {
+                        vLi.get(s).add(origin);
+                    }
+                }
+
+                //cycle on the tuple
+                for (ArrayList<Node> tuple : crossProduct ) {
+
+                    Tree tree = new Tree();
+                    tree.setRoot(new TNode(v));
+
+                    for (Node n : tuple ) {
+
+
+
+                    }
+                }
+
+                System.out.println("hello it's me");
+
+            } //[C] while
+
+            System.out.println("ciao");
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
@@ -143,5 +196,43 @@ public class Main {
             System.out.println("Unable to find Driver Class");
             ce.printStackTrace();
         }
+    }
+
+    public static ArrayList<ArrayList<Node>> generateCrossProduct(Node origin, Node v, String[] keyword) {
+
+        //container of the cross products
+        ArrayList<ArrayList<Node>> crossProduct = new ArrayList<>();
+
+        //obtain map of vL.i
+        HashMap<String, ArrayList<Node>> vLi = v.getvLi();
+
+        for (String k : keyword ) {
+
+            //v.L of k
+            ArrayList<Node> list = vLi.get(k);
+
+            if (list.size() != 0) {
+
+                //obtain the keyword of the node v
+                ArrayList<String> keywordList = v.getKeywordList();
+                //for each key of the node, we need to add the node present in the v.Lkey
+                for (String key : keywordList ) {
+
+                    //the REAL Cross Product
+                    ArrayList<Node> tuple = new ArrayList<>();
+                    tuple.add(origin);
+
+                    ArrayList<Node> nodeList = vLi.get(key);
+                    for (Node n : nodeList )
+                        tuple.add(n);
+                    crossProduct.add(tuple);
+                }
+
+                return crossProduct;
+            }
+        }
+        //the crossProduct is empty if any v.Li is empty
+        return crossProduct;
+
     }
 }

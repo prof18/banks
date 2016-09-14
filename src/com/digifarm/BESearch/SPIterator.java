@@ -10,6 +10,7 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
 
     private ArrayList<Double> distance;
     private ArrayList<Node> list;
+    private Node origin;
 
     /**
      *  Create an iterator with a list of Nodes and a list of distances.
@@ -49,18 +50,26 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
     }
 
     public void deleteDistance() {
-        distance.remove(0);
+        if (distance.size() != 0)
+            distance.remove(0);
     }
+
+    public Node getOrigin() {
+        return  origin;
+    }
+
 
     //create an iterator on the list.
     //TODO: reimplement the iterator
     public ListIterator<Node> createIterator(){
         ListIterator<Node> iterator = list.listIterator();
+        //save the starting node
+        //TODO: se non serve, togliamolo
+        origin = list.get(0);
         return iterator;
 
     }
 
-    //TODO: fix errors on sorting
     @Override
     public int compareTo(SPIterator spIterator) {
 

@@ -90,7 +90,7 @@ public class Dijkstra {
                 for (Edge edge : edgeList) {
                     //we traverse the graph in reverse direction
                     if (edge.getTo().getSearchID() == minimum.getSearchID() && edge.getFrom().getSearchID() == to.getSearchID()) {
-                        finalWeight = startWeight + edge.getWeight();
+                        finalWeight = startWeight + edge.getScore();
                         if (finalWeight < to.getWeight()) {
                             System.out.println("Final weigh: " + finalWeight);
                             nodesQueue.remove(to);

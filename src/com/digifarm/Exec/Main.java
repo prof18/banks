@@ -4,8 +4,11 @@ import com.digifarm.BESearch.Dijkstra;
 import com.digifarm.BESearch.SPIterator;
 import com.digifarm.DBConnection.ConnectionDB;
 import com.digifarm.Graph.*;
+import com.digifarm.Graph.Utility;
 import com.digifarm.Tree.TNode;
 import com.digifarm.Tree.Tree;
+import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+import com.sun.corba.se.impl.util.*;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -16,6 +19,9 @@ import java.util.*;
 
 
 public class Main {
+
+
+
     public static void main(String[] args) {
 
         try {
@@ -47,6 +53,8 @@ public class Main {
             ArrayList<Edge> globalEdgeList = new ArrayList<>();
             ArrayList<Edge> globalBEdgeList = new ArrayList<>();
 
+            ArrayList<Edge> edgeList = new ArrayList<>();
+
             double max = 0;
             double min = Integer.MAX_VALUE;
 
@@ -60,6 +68,7 @@ public class Main {
                 //extract edges and backedge list
                 ArrayList<Edge> edges = list.get(0);
                 ArrayList<Edge> backedges = list.get(1);
+                edgeList = edges;
 
                 max = Utility.maxNodeScore(interest, max);
                 min = Utility.minEdgeWeight(edges, min);
@@ -93,6 +102,7 @@ public class Main {
 
             //assign point to the backedge
             Utility.backEdgePoint(globalBEdgeList);
+
 
             //debug print
             for (Edge e : globalEdgeList)
@@ -144,6 +154,13 @@ public class Main {
 
             Node v;
             ArrayList<Tree> treess = new ArrayList<>();
+
+            //tree heap
+            int HEAP_SIZE = 32;
+            PriorityQueue<Tree> outputHeap = new PriorityQueue<>();
+            PriorityQueue<Tree> outputBuffer = new PriorityQueue<>();
+
+
             while (!iteratorHeap.isEmpty()) {
                 //remove first iterator from heap
                 SPIterator spIterator = iteratorHeap.poll();
@@ -192,6 +209,7 @@ public class Main {
 
                         Node previous = v;
                         //find a path from v to each origin node in the tuple
+                        //if v = n, the tree is only the root; the cycle isn't necessary
                         while (previous !=  null && v != n) {
 
                             Node tmp = previous;
@@ -199,24 +217,39 @@ public class Main {
                            // System.out.println("esigrwhjieasjkld");
                             tree.addSon(previous,tmp);
                             tree.addFather(tmp,previous);
+                            System.out.println("hsrs");
                         }
-
+                        System.out.println("Fine while");
                     }
                     System.out.println("fine for");
 
+                    //calculate node score
+                    Utility.overallNodeScore(tree);
+                    //calculate edge score
+                    Utility.overallEdgeScore(edgeList,tree);
+                    //calculate global score
+                    double lambda = 0.2;
+                    //TODO choose "multiplication" or "addition"
+                    Utility.globalScore(tree,lambda,"addition");
+
                     HashMap<Node, ArrayList<Node>> sons = tree.getSons();
                     if (sons.get(tree.getRoot()) == null ) {
-                        treess.add(tree);
+                        addTree(tree,outputHeap,outputBuffer,HEAP_SIZE);
                     }
                     else if (sons.get(tree.getRoot()).size() == 1)
                         break;
                     else
-                        treess.add(tree);
+                        addTree(tree,outputHeap,outputBuffer,HEAP_SIZE);
+
                 }
 
                 System.out.println("hello it's me");
 
             } //[C] while
+
+            while (outputHeap.size() != 0) {
+                outputBuffer.add(outputHeap.poll());
+            }
 
             System.out.println("ciao");
 
@@ -264,5 +297,15 @@ public class Main {
         //the crossProduct is empty if any v.Li is empty
         return crossProduct;
 
+    }
+
+    public static void addTree(Tree tree, PriorityQueue<Tree> outputHeap, PriorityQueue<Tree> outputBuffer, int maxHeapSize) {
+
+        if (outputHeap.size() == maxHeapSize ) {
+            outputBuffer.add(outputHeap.poll());
+            outputHeap.add(tree);
+        } else {
+            outputHeap.add(tree);
+        }
     }
 }

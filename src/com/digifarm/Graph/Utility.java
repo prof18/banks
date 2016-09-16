@@ -1,6 +1,7 @@
 package com.digifarm.Graph;
 
 import com.digifarm.DBConnection.ConnectionDB;
+import com.digifarm.Tree.Tree;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -304,7 +305,7 @@ public class Utility {
             for (Node n : adjacent) {
                 //Node n is of the same type of u, i.e. belongs to the same table
                 if ((n.getTableName()).compareTo(table) == 0) {
-                    be.setWeight(be.getWeight() + 1);
+                    be.setScore(be.getScore() + 1);
                 }
             }
         }
@@ -349,7 +350,7 @@ public class Utility {
         double weight;
         for (Edge e : edges) {
 
-            weight = e.getWeight();
+            weight = e.getScore();
             if (weight < min)
                 min = weight;
         }
@@ -398,9 +399,84 @@ public class Utility {
         double weight;
         double normWeight;
         for (Edge e : edges) {
-            weight = e.getWeight();
+            weight = e.getScore();
             normWeight = (Math.log(1 + weight/minWeight)) / Math.log(2);
-            e.setWeight(normWeight);
+            e.setScore(normWeight);
         }
+    }
+
+    /**
+     *  The overall score is computed considering the root and the leaves
+     *
+     * @param tree
+     */
+    public static void overallNodeScore(Tree tree) {
+
+        double NScore = 0;
+        double i = 0;
+        NScore += tree.getRoot().getScore();
+        i++;
+        ArrayList<Node> sons;
+        for (Map.Entry<Node, ArrayList<Node>> e: tree.getSons().entrySet() ){
+            sons = e.getValue();
+            if (sons.isEmpty() && e.getKey().equals(tree.getRoot())) {
+                break;
+            } else if (sons.isEmpty()){
+                NScore += e.getKey().getScore();
+                i++;
+            }
+        }
+        double mean = NScore/i;
+        tree.setNodeScore(mean);
+    }
+
+    /**
+     *  The overall edge score is  1/(1+"sum of"escore
+     *
+     * @param edges
+     * @param tree
+     */
+    public static void overallEdgeScore(ArrayList<Edge> edges, Tree tree) {
+
+        double sum = 0;
+        double i = 0;
+        for (Edge e : edges ) {
+            for (Map.Entry<Node,ArrayList<Node>> entry : tree.getSons().entrySet()) {
+                if (entry.getKey() == e.getFrom()) {
+                    for (Node n : entry.getValue()) {
+                        if (n == e.getTo()) {
+                            sum += e.getScore();
+                            i++;
+                        }
+                    }
+                }
+            }
+        }
+        double score = 1/(1+sum);
+        tree.setEdgeScore(score);
+    }
+
+    /***
+     *
+     * @param tree
+     * @param lambda
+     * @param type          The type of computing. "multiplication" or "addition"
+     */
+    public static void globalScore(Tree tree, double lambda, String type) {
+
+       double globalScore = -1;
+
+        switch (type) {
+
+            case "multiplication" :
+                globalScore = tree.getEdgeScore()* Math.pow(tree.getNodeScore(),lambda);
+                break;
+            case "addition" :
+                globalScore = (1-lambda)*tree.getEdgeScore() + lambda*tree.getNodeScore();
+                break;
+        }
+
+        tree.setGlobalScore(globalScore);
+
     }
 }

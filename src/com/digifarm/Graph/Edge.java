@@ -5,7 +5,7 @@ package com.digifarm.Graph;
  **/
 public class Edge {
 
-    private double weight;
+    private double score;
     private Node from;
     private Node to;
 
@@ -20,16 +20,16 @@ public class Edge {
 
         this.from = from;
         this.to = to;
-        this.weight = weight;
+        this.score = weight;
 
     }
 
-    public void setWeight(double weight) {
-        this.weight = weight;
+    public void setScore(double score) {
+        this.score = score;
     }
 
-    public double getWeight() {
-        return weight;
+    public double getScore() {
+        return score;
     }
 
     public Node getFrom() {
@@ -43,7 +43,7 @@ public class Edge {
     @Override
     public String toString() {
         return "Edge{" +
-                "weight=" + weight +
+                "score=" + score +
                 ", from=" + from.getSearchID() +
                 ", to=" + to.getSearchID() +
                 '}';

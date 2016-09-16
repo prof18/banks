@@ -1,6 +1,7 @@
 package com.digifarm.BESearch;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ListIterator;
 
 /**
@@ -11,6 +12,8 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
     private ArrayList<Double> distance;
     private ArrayList<Node> list;
     private Node origin;
+    //map to take reference of the previous node.
+    private HashMap<Node, Node> previousList;
 
     /**
      *  Create an iterator with a list of Nodes and a list of distances.
@@ -21,6 +24,7 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
     public SPIterator() {
         list = new ArrayList<>();
         distance = new ArrayList<>();
+        previousList = new HashMap<>();
     }
 
     public void add(Node n) {
@@ -58,6 +62,14 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
         return  origin;
     }
 
+
+    public void addPrevious(Node current, Node previous) {
+        previousList.put(current,previous);
+    }
+
+    public HashMap<Node, Node> getPreviousList() {
+        return previousList;
+    }
 
     //create an iterator on the list.
     //TODO: reimplement the iterator

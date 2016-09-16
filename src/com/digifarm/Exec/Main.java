@@ -175,11 +175,22 @@ public class Main {
                 for (ArrayList<Node> tuple : crossProduct ) {
 
                     Tree tree = new Tree();
-                    tree.setRoot(new TNode(v));
+                    ArrayList<TNode> sons = new ArrayList<>();
+
+                    //v is the root of the tree
+                    TNode root = new TNode(v);
+                    root.setFather(null);
+                    tree.setRoot(root);
 
                     for (Node n : tuple ) {
 
+                        Node previous = v;
+                        //find a path from v to each origin node in the tuple
+                        while (spIterator.getPreviousList().get(previous) !=  n) {
 
+                            previous = (Node) spIterator.getPreviousList().get(previous);
+
+                        }
 
                     }
                 }

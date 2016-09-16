@@ -34,7 +34,8 @@ public class Dijkstra {
         this.start = start;
         spIt = it;
         //add starting node to the iterator
-        it.add(start);
+        spIt.add(start);
+        spIt.addPrevious(start,null);
 
         //edges will contain the edge and also the backedge
         for (Edge e : edges) {
@@ -98,6 +99,7 @@ public class Dijkstra {
                             //TODO: non bisogna farlo qua, ma con l'iteratore. Vedi prospettive.txt
                             //to.addNodeToVLi(start);
                             spIt.add(to);
+                            spIt.addPrevious(to,minimum);
                             spIt.setDistance(finalWeight);
                             nodesQueue.add(to);
                             System.out.println("To previous node " + to.getPreviousNode().toString());

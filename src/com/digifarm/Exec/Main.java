@@ -125,6 +125,9 @@ public class Main {
 
             //TODO: creare coda(Priority QUEUE) di SPIterator ordinati in base alla distanza(IteratorHeap)
             PriorityQueue<SPIterator> iteratorHeap = new PriorityQueue<>();
+            //we need a map to know the respective iterator of a start node.
+            HashMap<Node, HashMap<Node,Node>> path = new HashMap<>();
+
             Node node;
             for (Map.Entry<Integer, Node> e : globalNodeList.entrySet()) {
                 SPIterator it = new SPIterator();
@@ -132,6 +135,7 @@ public class Main {
                 if (node.isKeywordNode()) {
 
                     Dijkstra dijkstra = new Dijkstra(graph,node,it);
+                    path.put(node,it.getPreviousList());
                     System.out.println("------------------------------");
                     dijkstra.visit();
                     iteratorHeap.add(it);
@@ -139,6 +143,7 @@ public class Main {
             }
 
             Node v;
+            ArrayList<Tree> treess = new ArrayList<>();
             while (!iteratorHeap.isEmpty()) {
                 //remove first iterator from heap
                 SPIterator spIterator = iteratorHeap.poll();
@@ -171,28 +176,39 @@ public class Main {
                     }
                 }
 
+
                 //cycle on the tuple
                 for (ArrayList<Node> tuple : crossProduct ) {
 
                     Tree tree = new Tree();
-                    ArrayList<TNode> sons = new ArrayList<>();
+
 
                     //v is the root of the tree
-                    TNode root = new TNode(v);
-                    root.setFather(null);
-                    tree.setRoot(root);
+                    tree.setRoot(v);
 
                     for (Node n : tuple ) {
 
+                        HashMap<Node, Node> previousPath = path.get(n);
+
                         Node previous = v;
                         //find a path from v to each origin node in the tuple
-                        while (spIterator.getPreviousList().get(previous) !=  n) {
+                        while (previous !=  null && v != n) {
 
-                            previous = (Node) spIterator.getPreviousList().get(previous);
-
+                            Node tmp = previous;
+                            previous = previousPath.get(previous);
+                           // System.out.println("esigrwhjieasjkld");
+                            tree.addSon(previous,tmp);
+                            tree.addFather(tmp,previous);
                         }
 
                     }
+                    System.out.println("fine for");
+
+                    HashMap<Node, ArrayList<Node>> sons = tree.getSons();
+                    if (sons.get(tree.getRoot()) == null || sons.get(tree.getRoot()).size() == 1)
+                        break;
+
+                    treess.add(tree);
                 }
 
                 System.out.println("hello it's me");

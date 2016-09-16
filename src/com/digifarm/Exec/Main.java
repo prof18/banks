@@ -205,10 +205,13 @@ public class Main {
                     System.out.println("fine for");
 
                     HashMap<Node, ArrayList<Node>> sons = tree.getSons();
-                    if (sons.get(tree.getRoot()) == null || sons.get(tree.getRoot()).size() == 1)
+                    if (sons.get(tree.getRoot()) == null ) {
+                        treess.add(tree);
+                    }
+                    else if (sons.get(tree.getRoot()).size() == 1)
                         break;
-
-                    treess.add(tree);
+                    else
+                        treess.add(tree);
                 }
 
                 System.out.println("hello it's me");

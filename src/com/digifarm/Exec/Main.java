@@ -5,10 +5,7 @@ import com.digifarm.BESearch.SPIterator;
 import com.digifarm.DBConnection.ConnectionDB;
 import com.digifarm.Graph.*;
 import com.digifarm.Graph.Utility;
-import com.digifarm.Tree.TNode;
 import com.digifarm.Tree.Tree;
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
-import com.sun.corba.se.impl.util.*;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -37,7 +34,9 @@ public class Main {
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
 
-            HashMap<Integer, Node> set = Utility.createGraph(conn,database);
+           dbInfo info = new dbInfo();
+
+           Utility.createGraph(conn,database,info);
 
             //ask for keyword
             System.out.print("Enter keyword (use space as separator): ");
@@ -46,6 +45,7 @@ public class Main {
             String[] temp = keyword.split(" ");
 
             HashMap<Integer, Node> interest = new HashMap<>();
+
             ArrayList<ArrayList<Edge>> list = new ArrayList<>();
 
             //global nodes,edges,backedges lists of interest set
@@ -61,9 +61,10 @@ public class Main {
             for (String term: temp) {
 
                 //interest set creation
-                interest = Utility.createInterestSet(conn, set, term);
+                interest = Utility.createInterestSet(conn, term, info);
+
                 //interest set connection
-                list = Utility.connectNodes(conn, interest, set);
+                list = Utility.connectNodes(conn, interest, info.getNodes());
 
                 //extract edges and backedge list
                 ArrayList<Edge> edges = list.get(0);

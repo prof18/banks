@@ -13,6 +13,8 @@ import java.util.Map;
  **/
 public class Utility {
 
+
+
     /**
      *  This method will create the Graph to be used by the algorithm; it will query the database for
      *  all tables and it will extract all the known tuples (saving in the Node objects the search_id).
@@ -22,56 +24,77 @@ public class Utility {
      *  @return set             A set of Nodes
      *
      **/
-    public static HashMap<Integer, Node> createGraph(ConnectionDB dbConn, String DBName) {
+    public static void createGraph(ConnectionDB dbConn, String DBName, dbInfo info) {
         HashMap<Integer, Node> set = new HashMap<Integer, Node>();
         //query the database to know tables names
         Connection conn = dbConn.getDBConnection();
-        Statement stmn = null, stmn2 = null;
+        Statement stmn = null, stmn2 = null, stm3 = null;
+        ArrayList<String> tableList = new ArrayList<>();
+        HashMap<String, ArrayList<String>> columnMap = new HashMap<>();
+
         try {
             stmn = conn.createStatement();
             stmn2 = conn.createStatement();
-            ResultSet tuple;
+            stm3 = conn.createStatement();
+            ResultSet tuple, column;
             ResultSet table = stmn.executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='" + DBName + "' ORDER BY TABLE_NAME;");
             String tableName;
             System.out.println("\nCreating graph from DB. Please Wait...\n-----------------" );
             int id;
+            String columnName;
             long before = System.currentTimeMillis();
             while(table.next()) {
                 tableName = table.getString(1);
                 if(!tableName.startsWith("pg_") && !tableName.startsWith("sql_")) {
+                    tableList.add(tableName);
                     //now we know the table name, we need to extract the search_id for each tuple
                     tuple = stmn2.executeQuery("SELECT __search_id FROM " + tableName);
+                    //insert table name
                     while(tuple.next()) {
                         //creating and adding a new Node to the set
                         //set.add(new Node(tuple.getInt(1), tableName));
                         id = tuple.getInt(1);
                         set.put(id, new Node(id,tableName));
                     }
+                    column = stm3.executeQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE" +
+                            " table_name= '" + tableName + "'");
+                    ArrayList<String> columnList = new ArrayList<>();
+                    while (column.next()) {
+                        columnName = column.getString(1);
+                        columnList.add(columnName);
+                    }
+                    columnMap.put(tableName,columnList);
                 }
+
             }
+            //set the table list
+            info.setTableList(tableList);
+            info.setColumnList(columnMap);
             long after = System.currentTimeMillis();
             long time = (after - before);
             System.out.println("Database Created in: " + time + " millis\n-----------------");
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return set;
+        info.setNodes(set);
     }
+
 
     /**
      *  This method create a set of interest nodes filtered by keywords
      *
      * @param   dbConn          An instance of ConnectionDB
      * @see     ConnectionDB
-     * @param   set             A set of Node
+     *
      * @param   match           Keyword
      * @return  interestSet     The interest set of node
      */
 
-    public static HashMap<Integer, Node> createInterestSet(ConnectionDB dbConn, HashMap<Integer, Node> set, String match) {
+    public static HashMap<Integer, Node> createInterestSet(ConnectionDB dbConn, String match, dbInfo info) {
         long before1 = System.currentTimeMillis();
         HashMap<Integer, Node> interestSet = new HashMap<>();
         Connection conn = dbConn.getDBConnection();
+        HashMap<Integer, Node> set = info.getNodes();
         try {
             Statement stmn = conn.createStatement();
             ResultSet columns = null;
@@ -103,6 +126,15 @@ public class Utility {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        //check if a match correspond to a table
+        
+        for (String table : info.getTableList()) {
+            if (match.toLowerCase().compareTo(table.toLowerCase()) == 0) {
+
+            }
+        }
+
         long after1 = System.currentTimeMillis();
         long time1 = (after1 - before1)/1000;
         System.out.println("Interest Set Built in: " + time1 + " seconds\n");

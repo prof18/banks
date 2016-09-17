@@ -414,16 +414,15 @@ public class Utility {
 
         double NScore = 0;
         double i = 0;
-        NScore += tree.getRoot().getScore() * tree.getRoot().getKeywordList().size();
+        NScore += tree.getRoot().getScore();
         i++;
-
         ArrayList<Node> sons;
         for (Map.Entry<Node, ArrayList<Node>> e: tree.getSons().entrySet() ){
             sons = e.getValue();
             if (sons.isEmpty() && e.getKey().equals(tree.getRoot())) {
                 break;
             } else if (sons.isEmpty()){
-                NScore += e.getKey().getScore() * e.getKey().getKeywordList().size();
+                NScore += e.getKey().getScore();
                 i++;
             }
         }

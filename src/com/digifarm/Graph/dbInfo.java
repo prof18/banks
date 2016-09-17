@@ -37,4 +37,12 @@ public class dbInfo {
     public ArrayList<String> getTableList() {
         return tableList;
     }
+
+    public void setMatchedTable(ArrayList<String> matchedTable) {
+        this.matchedTable = matchedTable;
+    }
+
+    public ArrayList<String> getMatchedTable() {
+        return matchedTable;
+    }
 }

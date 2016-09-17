@@ -127,13 +127,14 @@ public class Utility {
             e.printStackTrace();
         }
 
-        //check if a match correspond to a table
-        
+     /*   //check if a match correspond to a table
+        ArrayList<String> matchList = new ArrayList<>();
         for (String table : info.getTableList()) {
             if (match.toLowerCase().compareTo(table.toLowerCase()) == 0) {
-
+                matchList.add(match);
             }
         }
+        info.setMatchedTable(matchList);*/
 
         long after1 = System.currentTimeMillis();
         long time1 = (after1 - before1)/1000;
@@ -168,7 +169,7 @@ public class Utility {
      * @return                  An ArrayList of edge and backedge
      */
 
-    public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList) {
+    public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList, dbInfo info) {
 
         long before = System.currentTimeMillis();
 

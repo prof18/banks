@@ -60,11 +60,20 @@ public class Main {
 
             for (String term: temp) {
 
+                for (String table : info.getTableList()) {
+                    if (term.toLowerCase().compareTo(table.toLowerCase()) == 0) {
+                        
+                        break;
+                    }
+                }
                 //interest set creation
                 interest = Utility.createInterestSet(conn, term, info);
 
+
                 //interest set connection
-                list = Utility.connectNodes(conn, interest, info.getNodes());
+                list = Utility.connectNodes(conn, interest, info.getNodes(),info);
+
+
 
                 //extract edges and backedge list
                 ArrayList<Edge> edges = list.get(0);
@@ -92,14 +101,6 @@ public class Main {
                 for (Edge bedge : backedges)
                     globalBEdgeList.add(bedge);
             }
-
-            /*//initialize the nodelist v.Li for each keyword
-            Node n;
-            for (Map.Entry<Integer,Node> e : globalNodeList.entrySet()) {
-                n = e.getValue();
-                for (String term: temp)
-                    n.createVLi(term);
-            }*/
 
             //assign point to the backedge
             Utility.backEdgePoint(globalBEdgeList);

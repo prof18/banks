@@ -81,7 +81,7 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
         ListIterator<Node> iterator = list.listIterator();
         //save the starting node
         //TODO: se non serve, togliamolo
-        origin = list.get(0);
+        //origin = list.get(0);
         return iterator;
 
     }

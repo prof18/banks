@@ -162,7 +162,7 @@ public class Main {
             PriorityQueue<Tree> outputBuffer = new PriorityQueue<>();
 
 
-            while (!iteratorHeap.isEmpty()) {
+           while (!iteratorHeap.isEmpty()) {
                 //remove first iterator from heap
                 SPIterator spIterator = iteratorHeap.poll();
                 ListIterator<Node> iterator = spIterator.createIterator();
@@ -270,29 +270,42 @@ public class Main {
         //obtain map of vL.i
         HashMap<String, ArrayList<Node>> vLi = v.getvLi();
 
-        for (String k : keyword ) {
+        ArrayList<String> originKey = origin.getKeywordList();
 
-            //v.L of k
-            ArrayList<Node> list = vLi.get(k);
+        for (String oK : originKey) {
 
-            if (list.size() != 0) {
+            for (String k : keyword ) {
 
-                //obtain the keyword of the node v
-                ArrayList<String> keywordList = v.getKeywordList();
-                //for each key of the node, we need to add the node present in the v.Lkey
-                for (String key : keywordList ) {
+                if (oK.compareTo(k) != 0) {
 
+                    //v.L of k
+                    ArrayList<Node> list = vLi.get(k);
+
+                    if (list.size() != 0) {
+
+                        //obtain the keyword of the node v
+                        ArrayList<String> keywordList = v.getKeywordList();
+                        //for each key of the node, we need to add the node present in the v.Lkey
+                        for (String key : keywordList ) {
+
+                            //the REAL Cross Product
+                            ArrayList<Node> tuple = new ArrayList<>();
+                            tuple.add(origin);
+
+                            ArrayList<Node> nodeList = vLi.get(key);
+                            for (Node n : nodeList )
+                                tuple.add(n);
+                            crossProduct.add(tuple);
+                        }
+
+                        return crossProduct;
+                    }
+                } else {
                     //the REAL Cross Product
                     ArrayList<Node> tuple = new ArrayList<>();
                     tuple.add(origin);
-
-                    ArrayList<Node> nodeList = vLi.get(key);
-                    for (Node n : nodeList )
-                        tuple.add(n);
-                    crossProduct.add(tuple);
+                    return crossProduct;
                 }
-
-                return crossProduct;
             }
         }
         //the crossProduct is empty if any v.Li is empty

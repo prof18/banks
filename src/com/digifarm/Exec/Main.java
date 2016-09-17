@@ -184,7 +184,7 @@ public class Main {
                 HashMap<String, ArrayList<Node>> vLi = v.getvLi();
 
                 //calculate cross product
-                ArrayList<ArrayList<Node>> crossProduct = generateCrossProduct(origin,v);
+                ArrayList<ArrayList<Node>> crossProduct = generateCrossProduct(origin,v,temp);
 
                 //insert origin to v.Li
                 ArrayList<String> keywordList = v.getKeywordList();
@@ -271,53 +271,56 @@ public class Main {
         }
     }
 
-    public static ArrayList<ArrayList<Node>> generateCrossProduct(Node origin, Node v) {
+    public static ArrayList<ArrayList<Node>> generateCrossProduct(Node origin, Node v, String[] keyword) {
 
-        //crossProduct wrapper
-        ArrayList<ArrayList<Node>> crossProduct = new ArrayList();
+        //container of the cross products
+        ArrayList<ArrayList<Node>> crossProduct = new ArrayList<>();
 
-        //map of vLi
-        HashMap<String, ArrayList<Node>> vLiMap = v.getvLi();
+        //obtain map of vL.i
+        HashMap<String, ArrayList<Node>> vLi = v.getvLi();
 
-        //keyword list of origin
-        ArrayList<String> originKeyList = origin.getKeywordList();
+        ArrayList<String> originKey = origin.getKeywordList();
 
-        for (String oK : originKeyList) {
+        for (String oK : originKey) {
 
-            for (Map.Entry<String, ArrayList<Node>> entry : vLiMap.entrySet()) {
+            for (String k : keyword ) {
 
-                if (oK.compareTo(entry.getKey()) != 0) {
+                if (oK.compareTo(k) != 0) {
 
-                    ArrayList<Node> nodeL = entry.getValue();
+                    //v.L of k
+                    ArrayList<Node> list = vLi.get(k);
 
-                    if (nodeL.size() != 0) {
+                    if (list.size() != 0) {
 
-                        ArrayList<Node> tuple = new ArrayList();
-                        tuple.add(origin);
+                        //obtain the keyword of the node v
+                        ArrayList<String> keywordList = v.getKeywordList();
+                        //for each key of the node, we need to add the node present in the v.Lkey
+                        for (String key : keywordList ) {
 
-                        for (Node n : nodeL) {
-                            if (n.getSearchID() != origin.getSearchID())
+                            //the REAL Cross Product
+                            ArrayList<Node> tuple = new ArrayList<>();
+                            tuple.add(origin);
+
+                            ArrayList<Node> nodeList = vLi.get(key);
+                            for (Node n : nodeList )
                                 tuple.add(n);
+                            crossProduct.add(tuple);
                         }
 
-                        crossProduct.add(tuple);
-
+                        return crossProduct;
                     }
-
                 } else {
-                    ArrayList<Node> tuple = new ArrayList();
+                    //the REAL Cross Product
+                    ArrayList<Node> tuple = new ArrayList<>();
                     tuple.add(origin);
-                    crossProduct.add(tuple);
+                    return crossProduct;
                 }
-
             }
-
         }
-
+        //the crossProduct is empty if any v.Li is empty
         return crossProduct;
 
     }
-
 
     public static void addTree(Tree tree, PriorityQueue<Tree> outputHeap, PriorityQueue<Tree> outputBuffer, int maxHeapSize) {
 

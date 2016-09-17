@@ -127,15 +127,6 @@ public class Utility {
             e.printStackTrace();
         }
 
-     /*   //check if a match correspond to a table
-        ArrayList<String> matchList = new ArrayList<>();
-        for (String table : info.getTableList()) {
-            if (match.toLowerCase().compareTo(table.toLowerCase()) == 0) {
-                matchList.add(match);
-            }
-        }
-        info.setMatchedTable(matchList);*/
-
         long after1 = System.currentTimeMillis();
         long time1 = (after1 - before1)/1000;
         System.out.println("Interest Set Built in: " + time1 + " seconds\n");
@@ -169,7 +160,7 @@ public class Utility {
      * @return                  An ArrayList of edge and backedge
      */
 
-    public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList, dbInfo info) {
+    public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList, dbInfo info, ArrayList<String> matchList) {
 
         long before = System.currentTimeMillis();
 
@@ -182,8 +173,8 @@ public class Utility {
         Node n;
 
         Connection conn = dBconn.getDBConnection();
-        Statement stm;
-        ResultSet rs;
+        Statement statement;
+        ResultSet resultSet;
 
         for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
             n = e.getValue();
@@ -193,17 +184,17 @@ public class Utility {
                     try {
                         q += " WHERE t1.__search_id = " + n.getSearchID();
 
-                        stm = conn.createStatement();
-                        rs = stm.executeQuery(q);
+                        statement = conn.createStatement();
+                        resultSet = statement.executeQuery(q);
 
                         //extract the list of adjacent nodes
                         Node connected;
                         Edge edge;
                         Edge backedge;
 
-                        while(rs.next()) {
+                        while(resultSet.next()) {
 
-                            connected = nodeList.get(rs.getInt(2));
+                            connected = nodeList.get(resultSet.getInt(2));
                             System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
                             n.addAdjacentNode(connected);
                             edge = new Edge(n,connected,1);
@@ -213,7 +204,7 @@ public class Utility {
                             //assign score to the node --> indegree of the node
                             connected.incrementScore();
                             //the destination node could not be in the interest set. It isn't a keyword node
-                            if (!interestSet.containsKey(rs.getInt(2))) {
+                            if (!interestSet.containsKey(resultSet.getInt(2))) {
                                 toAdd.add(connected);
                             }
                             connected.addAdjacentNode(n);
@@ -223,11 +214,75 @@ public class Utility {
                     }
                 }
             }
+
         }
+
 
         for (Node node : toAdd) {
             interestSet.put(node.getSearchID(), node);
             System.out.println("Not keyword node: " + node);
+        }
+
+        Node node;
+        String table;
+
+        Statement stm, stm1;
+        ResultSet rs, rs1;
+
+        ArrayList<String> colName1 = new ArrayList<>();
+        ArrayList<String> colName2 = new ArrayList<>();
+
+        for (String s : matchList) {
+
+
+
+
+                    try {
+                        stm = conn.createStatement();
+                        rs = stm.executeQuery("SELECT c1.relname AS src_table, c3.conrelid, c3.conkey AS foreign_key, c2.relname " +
+                                "AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 " +
+                                "ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0" +
+                                " AND c1.relname = '" + s + "' ;");
+                        String fromTable, toTable;
+                        Integer[] fk, pk;
+                        Array a;
+
+
+                        while (rs.next()) {
+                            fromTable = rs.getString(1);
+                            toTable = rs.getString(4);
+                            a = rs.getArray(3);
+                            fk = (Integer[]) a.getArray();
+                            a = rs.getArray(6);
+                            pk = (Integer[]) a.getArray();
+
+
+                            stm1 = conn.createStatement();
+                            for (Integer i : fk) {
+                                rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i +
+                                        " AND a1.attrelid = " + rs.getString(2));
+                                while (rs1.next()) {
+                                    colName1.add(rs1.getString(1));
+                                }
+                            }
+
+                            stm1 = conn.createStatement();
+                            for (Integer i : pk) {
+                                rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i +
+                                        " AND a1.attrelid = " + rs.getString(5));
+                                while (rs1.next()) {
+                                    colName2.add(rs1.getString(1));
+                                }
+                            }
+                        }
+
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+
+
+            System.out.println("fine");
+
         }
 
         long after = System.currentTimeMillis();

@@ -7,6 +7,7 @@ import com.digifarm.Graph.*;
 import com.digifarm.Graph.Utility;
 import com.digifarm.Tree.Tree;
 
+import java.sql.Array;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -58,20 +59,32 @@ public class Main {
             double max = 0;
             double min = Integer.MAX_VALUE;
 
-            for (String term: temp) {
+            ArrayList<String> matchList = new ArrayList<>();
 
-                for (String table : info.getTableList()) {
-                    if (term.toLowerCase().compareTo(table.toLowerCase()) == 0) {
-                        
-                        break;
+            ArrayList<String> notTable = new ArrayList<>();
+
+            for (String s : temp ) {
+
+                for (String t : info.getTableList()) {
+
+                    if (s.toLowerCase().compareTo(t.toLowerCase()) == 0) {
+                        matchList.add(s);
+                    } else {
+                        notTable.add(s);
                     }
+
                 }
+
+            }
+
+            for (String term: notTable) {
+
                 //interest set creation
                 interest = Utility.createInterestSet(conn, term, info);
 
 
                 //interest set connection
-                list = Utility.connectNodes(conn, interest, info.getNodes(),info);
+                list = Utility.connectNodes(conn, interest, info.getNodes(),info,matchList);
 
 
 
@@ -101,6 +114,8 @@ public class Main {
                 for (Edge bedge : backedges)
                     globalBEdgeList.add(bedge);
             }
+
+
 
             //assign point to the backedge
             Utility.backEdgePoint(globalBEdgeList);

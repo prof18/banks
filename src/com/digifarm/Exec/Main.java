@@ -216,7 +216,7 @@ public class Main {
                             Node tmp = previous;
                             previous = previousPath.get(previous);
                            // System.out.println("esigrwhjieasjkld");
-                            tree.addSon(previous,tmp);
+                            tree.addSon(tmp,previous);
                             tree.addFather(tmp,previous);
                             System.out.println("hsrs");
                         }
@@ -224,10 +224,19 @@ public class Main {
                     }
                     System.out.println("fine for");
 
+                    ArrayList<Edge> overallEdges = new ArrayList<>();
+                    for (Edge e : globalEdgeList) {
+                        overallEdges.add(e);
+                    }
+
+                    for (Edge be : globalBEdgeList) {
+                        overallEdges.add(be);
+                    }
+
                     //calculate node score
                     Utility.overallNodeScore(tree);
                     //calculate edge score
-                    Utility.overallEdgeScore(edgeList,tree);
+                    Utility.overallEdgeScore(overallEdges,tree);
                     //calculate global score
                     double lambda = 0.2;
                     //TODO choose "multiplication" or "addition"
@@ -237,7 +246,7 @@ public class Main {
                     if (sons.get(tree.getRoot()) == null ) {
                         addTree(tree,outputHeap,outputBuffer,HEAP_SIZE);
                     }
-                    else if (sons.get(tree.getRoot()).size() == 1)
+                    else if (sons.get(tree.getRoot()).size() == 1 /*&& sons.get(sons.get(tree.getRoot()).get(0)).size() == 0*/)
                         break;
                     else
                         addTree(tree,outputHeap,outputBuffer,HEAP_SIZE);

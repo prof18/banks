@@ -13,7 +13,9 @@ public class Tree implements Comparable<Tree> {
     private Node root;
     //list of tree node
     //private ArrayList<Node> nodeList;
+    //key is father, value is list of sons
     private HashMap<Node, ArrayList<Node>> sons;
+    //key is son, value is father
     private HashMap<Node, Node> father;
     private double nodeScore;
     private double edgeScore;

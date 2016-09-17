@@ -13,7 +13,7 @@ public class Node implements Comparable<Node> {
     private String tableName;
     private ArrayList<Node> adjacent;
     private double score;
-    //weight for Dijstra
+    //weight for Dijstra500
     private double weight;
     private Node previousNode;
     private boolean isKeywordNode = false;

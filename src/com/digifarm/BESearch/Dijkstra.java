@@ -36,6 +36,7 @@ public class Dijkstra {
         //add starting node to the iterator
         spIt.add(start);
         spIt.addPrevious(start,null);
+        spIt.setOrigin(start);
 
         //edges will contain the edge and also the backedge
         for (Edge e : edges) {

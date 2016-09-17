@@ -149,11 +149,12 @@ public class Main {
                     System.out.println("------------------------------");
                     dijkstra.visit();
                     iteratorHeap.add(it);
+                    System.out.println("dada");
                 }
             }
 
             Node v;
-            ArrayList<Tree> treess = new ArrayList<>();
+           // ArrayList<Tree> treess = new ArrayList<>();
 
             //tree heap
             int HEAP_SIZE = 32;

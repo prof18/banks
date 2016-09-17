@@ -62,6 +62,10 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
         return  origin;
     }
 
+    public void setOrigin(Node n) {
+        origin = n;
+    }
+
 
     public void addPrevious(Node current, Node previous) {
         previousList.put(current,previous);

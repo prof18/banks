@@ -13,7 +13,9 @@ public class Tree implements Comparable<Tree> {
     private Node root;
     //list of tree node
     //private ArrayList<Node> nodeList;
+    //key is father, value is list of sons
     private HashMap<Node, ArrayList<Node>> sons;
+    //key is son, value is father
     private HashMap<Node, Node> father;
     private double nodeScore;
     private double edgeScore;
@@ -38,21 +40,27 @@ public class Tree implements Comparable<Tree> {
         //is the root
         //if (current != null) {
 
-            if (sons.containsKey(current)) {
-                for (Node n : sons.get(current)) {
-                    if (n == son) {
-                        break;
-                    } else {
-                        sons.get(current).add(son);
-                    }
-                }
+        ArrayList<Node> toAdd = new ArrayList<>();
 
-            } else {
-                ArrayList<Node> sonList = new ArrayList<>();
-                sonList.add(son);
-                sons.put(current, sonList);
+        if (sons.containsKey(current)) {
+            for (Node n : sons.get(current)) {
+                if (n == son) {
+                    break;
+                } else {
+                    toAdd.add(son);
+                    //sons.get(current).add(son);
+                }
             }
-      //  }
+            for (Node n : toAdd) {
+                sons.get(current).add(son);
+            }
+
+        } else {
+            ArrayList<Node> sonList = new ArrayList<>();
+            sonList.add(son);
+            sons.put(current, sonList);
+        }
+  //  }
 
 
     }

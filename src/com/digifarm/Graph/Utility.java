@@ -414,15 +414,16 @@ public class Utility {
 
         double NScore = 0;
         double i = 0;
-        NScore += tree.getRoot().getScore();
+        NScore += tree.getRoot().getScore() * tree.getRoot().getKeywordList().size();
         i++;
+
         ArrayList<Node> sons;
         for (Map.Entry<Node, ArrayList<Node>> e: tree.getSons().entrySet() ){
             sons = e.getValue();
             if (sons.isEmpty() && e.getKey().equals(tree.getRoot())) {
                 break;
             } else if (sons.isEmpty()){
-                NScore += e.getKey().getScore();
+                NScore += e.getKey().getScore() * e.getKey().getKeywordList().size();
                 i++;
             }
         }
@@ -464,7 +465,7 @@ public class Utility {
      */
     public static void globalScore(Tree tree, double lambda, String type) {
 
-       double globalScore = -1;
+        double globalScore = -1;
 
         switch (type) {
 

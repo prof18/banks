@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * Created by digifarmer on 07/07/16.
@@ -160,7 +161,7 @@ public class Utility {
      * @return                  An ArrayList of edge and backedge
      */
 
-    public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList, dbInfo info, ArrayList<String> matchList) {
+    public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList, dbInfo info, ArrayList<String> matchList,String keyW) {
 
         long before = System.currentTimeMillis();
 
@@ -173,8 +174,8 @@ public class Utility {
         Node n;
 
         Connection conn = dBconn.getDBConnection();
-        Statement statement, statement1, statement4;
-        ResultSet resultSet, resultSet1, resultSet4;
+        Statement statement, statement1, statement4, statement5;
+        ResultSet resultSet, resultSet1, resultSet4, resultSet5;
 
         String tbl;
 
@@ -258,7 +259,7 @@ public class Utility {
             String pointTable;
             String fk;
             String currentTable;
-/*
+
 
             try {
 
@@ -277,38 +278,69 @@ public class Utility {
                     currentTable = resultSet1.getString(3);
                     fk = resultSet1.getString(4);
 
-                    statement4 = conn.createStatement();
-                    resultSet4 = statement4.executeQuery("SELECT t1.__search_id FROM " + pointTable + " AS t1 INNER JOIN " +
-                            currentTable + " as t2 on t1." + key + " = t2." + fk + " where t2.__search_id = '"
-                            + n.getSearchID() + "'; ");
-                    while (resultSet4.next()) {
+                    //for (Map.Entry<String,ArrayList<String>> entry : info.getColumnList().entrySet()) {
+/*
+                    HashMap<String, ArrayList<String>> columnMap = info.getColumnList();
 
-                        int id = resultSet4.getInt(1);
-                        Node nd = new Node(id,pointTable);
-                        System.out.println(nd.getTableName() + "->" + nd.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
-                        nd.addAdjacentNode(n);
-                        Edge edge = new Edge(nd,n,1);
-                        edges.add(edge);
-                        Edge bedge = new Edge(n,nd,0);
-                        n.incrementScore();
-                        toAdd.add(nd);
-                        n.addAdjacentNode(nd);
-                    }
+                    ArrayList<String> columns = columnMap.get(currentTable);
+                        for(String cl : columns) {
+
+                            statement5 = conn.createStatement();
+                            resultSet5 = statement5.executeQuery("SELECT " + cl + " from " + currentTable + " where " +
+                                    " __search_id = '" + n.getSearchID() + "';" );
+                            while (resultSet5.next()) {
+                                String keyComp = resultSet5.getString(1);
+                                if(keyComp != null && keyComp.toLowerCase().compareTo(keyW) == 0) {*/
+                                    statement4 = conn.createStatement();
+                                    resultSet4 = statement4.executeQuery("SELECT t1.__search_id FROM " + pointTable + " AS t1 INNER JOIN " +
+                                            currentTable + " as t2 on t1." + key + " = t2." + fk + " where t2.__search_id = '"
+                                            + n.getSearchID() + "'; ");
+                                    while (resultSet4.next()) {
+
+                                        int id = resultSet4.getInt(1);
+                                        Node nd = new Node(id,pointTable);
+                                        nd.addKeyword(keyW);
+                                        nd.setKeywordNode(true);
+                                        System.out.println(nd.getTableName() + "->" + nd.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
+                                        nd.addAdjacentNode(n);
+                                        Edge edge = new Edge(nd,n,1);
+                                        edges.add(edge);
+                                        Edge bedge = new Edge(n,nd,0);
+                                        backedges.add(bedge);
+                                        n.incrementScore();
+                                        toAdd.add(nd);
+                                        n.addAdjacentNode(nd);
+                                  //  }
+                               // }
+                            //}
+                        }
+
+
+
+
+
 
                 }
 
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-*/
+
 
 
         }
 
 
         for (Node node : toAdd) {
-            interestSet.put(node.getSearchID(), node);
-            System.out.println("Not keyword node: " + node);
+            if (interestSet.containsKey(node)) {
+
+                for(String s : node.getKeywordList())
+
+                    interestSet.get(node).mergeNode(node.getAdjacentNodes(), s);
+
+            } else
+                interestSet.put(node.getSearchID(), node);
+
         }
 
         Node node;

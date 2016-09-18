@@ -86,7 +86,7 @@ public class Main {
 
 
                 //interest set connection
-                list = Utility.connectNodes(conn, interest, info.getNodes(),info,matchList);
+                list = Utility.connectNodes(conn, interest, info.getNodes(),info,matchList,term);
 
 
 
@@ -165,7 +165,7 @@ public class Main {
 
                     Dijkstra dijkstra = new Dijkstra(graph,node,it);
                     path.put(node,it.getPreviousList());
-                    System.out.println("------------------------------");
+                    //System.out.println("------------------------------");
                     dijkstra.visit();
                     iteratorHeap.add(it);
                     //System.out.println("dada");
@@ -174,6 +174,8 @@ public class Main {
 
             Node v;
             // ArrayList<Tree> treess = new ArrayList<>();
+
+
 
             //tree heap
             int HEAP_SIZE = 500;
@@ -272,7 +274,7 @@ public class Main {
 
                 }
 
-               // System.out.println("hello it's me");
+                System.out.println("hello it's me");
 
             } //[C] while
 
@@ -281,7 +283,7 @@ public class Main {
             }
 
 
-           // System.out.println("ciao");
+            System.out.println("ciao");
 
             int i=0;
             double lastScore = 0;

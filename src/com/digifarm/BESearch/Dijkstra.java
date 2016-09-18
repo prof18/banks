@@ -75,8 +75,8 @@ public class Dijkstra {
             nodeMap.put(minimum.getSearchID(),minimum);
             double startWeight = minimum.getWeight();
 
-            System.out.println("Starting node: " + minimum.toString());
-            System.out.println("Start weight: " + startWeight);
+            //System.out.println("Starting node: " + minimum.toString());
+            //System.out.println("Start weight: " + startWeight);
 
             //necessary check to avoid nodes revisiting.
             //the father has as adjacent the son and vice versa
@@ -87,13 +87,13 @@ public class Dijkstra {
             }
 
             for (Node to : adjacent) {
-                System.out.println("To node: " + to.toString());
+                //System.out.println("To node: " + to.toString());
                 for (Edge edge : edgeList) {
                     //we traverse the graph in reverse direction
                     if (edge.getTo().getSearchID() == minimum.getSearchID() && edge.getFrom().getSearchID() == to.getSearchID()) {
                         finalWeight = startWeight + edge.getScore();
                         if (finalWeight < to.getWeight()) {
-                            System.out.println("Final weigh: " + finalWeight);
+                            //System.out.println("Final weigh: " + finalWeight);
                             nodesQueue.remove(to);
                             to.setWeight(finalWeight);
                             to.setPreviousNode(minimum);
@@ -103,7 +103,7 @@ public class Dijkstra {
                             spIt.addPrevious(to,minimum);
                             spIt.setDistance(finalWeight);
                             nodesQueue.add(to);
-                            System.out.println("To previous node " + to.getPreviousNode().toString());
+                            //System.out.println("To previous node " + to.getPreviousNode().toString());
                         }
                     }
                 }

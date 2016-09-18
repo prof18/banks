@@ -45,4 +45,8 @@ public class dbInfo {
     public ArrayList<String> getMatchedTable() {
         return matchedTable;
     }
+
+    public HashMap<String, ArrayList<String>> getColumnList() {
+        return columnList;
+    }
 }

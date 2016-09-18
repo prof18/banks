@@ -4,6 +4,7 @@ import com.digifarm.Graph.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by marco on 9/14/16.
@@ -97,6 +98,10 @@ public class Tree implements Comparable<Tree> {
         this.globalScore = globalScore;
     }
 
+    public HashMap<Node, Node> getFather() {
+        return father;
+    }
+
     @Override
     public int compareTo(Tree tree) {
 
@@ -108,4 +113,34 @@ public class Tree implements Comparable<Tree> {
         else
             return 0;
     }
+
+    @Override
+    public String toString() {
+
+        String nodeId = "Root " + getRoot().getSearchID();
+        String FatherAndSons = " ";
+
+        for(Map.Entry<Node, ArrayList<Node>> entry : getSons().entrySet() ) {
+
+            FatherAndSons += '\n' + "Father : " + entry.getKey().getSearchID() + " Sons : ";
+
+            for( Node e : entry.getValue()) {
+
+                if (e != null)
+                    FatherAndSons +=  e.getSearchID() + " ";
+
+            }
+
+        }
+
+        String Tree ="-----------------------------" + '\n' +
+                "Tree " + '\n' +
+                nodeId +
+                FatherAndSons + '\n' ;
+
+        return Tree;
+    }
+
+
+
 }

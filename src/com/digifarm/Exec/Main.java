@@ -265,7 +265,7 @@ public class Main {
                     if (sons.get(tree.getRoot()) == null ) {
                         addTree(tree,outputHeap,outputBuffer,HEAP_SIZE);
                     }
-                    else if (sons.get(tree.getRoot()).size() == 1 /*&& sons.get(sons.get(tree.getRoot()).get(0)).size() == 0*/)
+                    else if (sons.get(tree.getRoot()).size() == 1 && sons.get(sons.get(tree.getRoot()).get(0)).size() == 0)
                         break;
                     else
                         addTree(tree,outputHeap,outputBuffer,HEAP_SIZE);
@@ -278,6 +278,17 @@ public class Main {
 
             while (outputHeap.size() != 0) {
                 outputBuffer.add(outputHeap.poll());
+            }
+
+
+            System.out.println("ciao");
+
+            int i=0;
+            while(i < 10 && !outputBuffer.isEmpty()) {
+
+
+                System.out.println(outputBuffer.poll().toString());
+                i++;
             }
 
             System.out.println("ciao");

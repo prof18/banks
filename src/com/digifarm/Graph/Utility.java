@@ -327,6 +327,7 @@ public class Utility {
                         for (Integer id : searchIdList) {
 
                             Node term = new Node(id,fromTable);
+                            term.setKeywordNode(true);
                             temp.put(id,term);
 
                             // interestSet.put(id, term);

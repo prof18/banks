@@ -65,16 +65,18 @@ public class Main {
 
             for (String s : temp ) {
 
+                boolean isMatched = false;
+
                 for (String t : info.getTableList()) {
 
                     if (s.toLowerCase().compareTo(t.toLowerCase()) == 0) {
                         matchList.add(s);
-                    } else {
-                        notTable.add(s);
+                        isMatched = true;
                     }
 
                 }
-
+                if(!isMatched)
+                    notTable.add(s);
             }
 
             for (String term: notTable) {

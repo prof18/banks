@@ -231,6 +231,7 @@ public class Utility {
 
         ArrayList<String> colName1 = new ArrayList<>();
         ArrayList<String> colName2 = new ArrayList<>();
+        String fromTable = null, toTable = null;
 
         for (String s : matchList) {
 
@@ -243,7 +244,7 @@ public class Utility {
                                 "AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 " +
                                 "ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0" +
                                 " AND c1.relname = '" + s + "' ;");
-                        String fromTable, toTable;
+
                         Integer[] fk, pk;
                         Array a;
 
@@ -283,6 +284,76 @@ public class Utility {
 
             System.out.println("fine");
 
+        }
+        Node node2;
+        Statement statement2;
+        ResultSet resultSet2, resultSet3;
+        String key = null;
+        ArrayList<Integer> searchIdList = new ArrayList<>();
+
+        try {
+
+            statement2 = conn.createStatement();
+
+            ArrayList<HashMap<Integer, Node>> adding = new ArrayList<>();
+            HashMap<Integer, Node> temp = new HashMap<>();
+
+            for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
+
+                node2 = e.getValue();
+
+                for (String t : colName2) {
+
+                    //found a tuple that is a destination tuple from the search term
+                    if (toTable.compareTo(node2.getTableName()) == 0) {
+
+                        //find two same value of the key
+                        for (String t1 : colName1) {
+
+                            resultSet2 = statement2.executeQuery("SELECT " + t + " FROM " + toTable + " WHERE __search_id = '"
+                                                                    + node2.getSearchID() + "';");
+                            while (resultSet2.next())
+                                key = resultSet2.getString(1);
+
+                            resultSet3 = statement2.executeQuery("SELECT __search_id FROM " + fromTable + " WHERE " + t1 +
+                                                                    " = '" + key + "';");
+                            while (resultSet3.next()) {
+                                int searchId = resultSet3.getInt(1);
+                                searchIdList.add(searchId);
+                            }
+                        }
+
+
+                        for (Integer id : searchIdList) {
+
+                            Node term = new Node(id,fromTable);
+                            temp.put(id,term);
+
+                            // interestSet.put(id, term);
+
+                            term.addAdjacentNode(node2);
+                            Edge edge = new Edge(term,node2,1);
+                            edges.add(edge);
+                            Edge backedge = new Edge(node2, term,0);
+                            backedges.add(backedge);
+                            node2.incrementScore();
+
+                        }
+
+                    }
+                }
+
+
+
+
+            }
+
+            for (Map.Entry<Integer,Node> entry : temp.entrySet()) {
+                interestSet.put(entry.getKey(),entry.getValue());
+            }
+
+        } catch (SQLException ex2){
+            ex2.printStackTrace();
         }
 
         long after = System.currentTimeMillis();

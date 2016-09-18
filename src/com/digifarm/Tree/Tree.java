@@ -117,6 +117,7 @@ public class Tree implements Comparable<Tree> {
     @Override
     public String toString() {
 
+        double score = getGlobalScore();
         String nodeId = "Root " + getRoot().getSearchID();
         String FatherAndSons = " ";
 
@@ -129,14 +130,14 @@ public class Tree implements Comparable<Tree> {
                 if (e != null)
                     FatherAndSons +=  e.getSearchID() + " ";
                 else
-                    FatherAndSons += "It doesn't have sons";
-
+                    FatherAndSons += "Non ha figli";
             }
 
         }
 
         String Tree ="-----------------------------" + '\n' +
                 "Tree " + '\n' +
+                "Score " + score + '\n' +
                 nodeId +
                 FatherAndSons + '\n' ;
 

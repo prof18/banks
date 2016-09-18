@@ -123,32 +123,32 @@ public class Main {
             Utility.backEdgePoint(globalBEdgeList);
 
 
-            //debug print
+            /*//debug print
             for (Edge e : globalEdgeList)
                 System.out.println("Edges after globalList: \n" + e.toString());
             for (Edge b : globalBEdgeList)
                 System.out.println("Backedges after  globaList: \n" + b.toString());
             System.out.println("max score: " + max );
-            System.out.println("min weight: " + min + "\n");
+            System.out.println("min weight: " + min + "\n");*/
 
             //normalize edge weight
             //only logarithmic scale
             Utility.eWeightNorm(globalEdgeList,min);
-            for (Edge ed : globalEdgeList)
-                System.out.println("Edges with normalized weight: \n" + ed.toString());
+           /* for (Edge ed : globalEdgeList)
+                System.out.println("Edges with normalized weight: \n" + ed.toString());*/
 
             //normalize node score
             //TODO scegliere qui scala lineare (fraction) o logaritmica(logarithm)
             Utility.nScoreNorm(globalNodeList, "logarithm", max);
 
-            //debug print: nodes with score
+            /*//debug print: nodes with score
             System.out.println("\n");
             Node nd;
             for (Map.Entry<Integer, Node> e : globalNodeList.entrySet()) {
                 nd = e.getValue();
                 System.out.println("Node with normalized score: " + nd.getSearchID() + " weight: " + nd.getScore());
 
-            }
+            }*/
 
             Graph graph = new Graph(globalNodeList,globalEdgeList,globalBEdgeList);
 
@@ -168,7 +168,7 @@ public class Main {
                     System.out.println("------------------------------");
                     dijkstra.visit();
                     iteratorHeap.add(it);
-                    System.out.println("dada");
+                    //System.out.println("dada");
                 }
             }
 
@@ -176,7 +176,7 @@ public class Main {
             // ArrayList<Tree> treess = new ArrayList<>();
 
             //tree heap
-            int HEAP_SIZE = 32;
+            int HEAP_SIZE = 500;
             PriorityQueue<Tree> outputHeap = new PriorityQueue<>();
             PriorityQueue<Tree> outputBuffer = new PriorityQueue<>();
 
@@ -206,7 +206,7 @@ public class Main {
                 ArrayList<ArrayList<Node>> crossProduct = generateCrossProduct(origin,v);
 
                 //insert origin to v.Li
-                ArrayList<String> keywordList = v.getKeywordList();
+                ArrayList<String> keywordList = origin.getKeywordList();
                 for (String s: keywordList ) {
                     if (vLi.containsKey(s)) {
                         vLi.get(s).add(origin);
@@ -237,11 +237,11 @@ public class Main {
                             // System.out.println("esigrwhjieasjkld");
                             tree.addSon(tmp,previous);
                             tree.addFather(tmp,previous);
-                            System.out.println("hsrs");
+                           // System.out.println("hsrs");
                         }
-                        System.out.println("Fine while");
+                       // System.out.println("Fine while");
                     }
-                    System.out.println("fine for");
+              //      System.out.println("fine for");
 
                     ArrayList<Edge> overallEdges = new ArrayList<>();
                     for (Edge e : globalEdgeList) {
@@ -272,7 +272,7 @@ public class Main {
 
                 }
 
-                System.out.println("hello it's me");
+               // System.out.println("hello it's me");
 
             } //[C] while
 
@@ -281,17 +281,28 @@ public class Main {
             }
 
 
-            System.out.println("ciao");
+           // System.out.println("ciao");
 
             int i=0;
+            double lastScore = 0;
             while(i < 10 && !outputBuffer.isEmpty()) {
 
-
-                System.out.println(outputBuffer.poll().toString());
+                Tree Ttemp = outputBuffer.poll();
+                lastScore = Ttemp.getGlobalScore();
+                System.out.println(Ttemp.toString());
                 i++;
             }
 
-            System.out.println("ciao");
+            Tree Ttemp = new Tree();
+            if(!outputBuffer.isEmpty())
+                Ttemp = outputBuffer.poll();
+
+            while( Double.compare(lastScore , Ttemp.getGlobalScore() ) == 0 && !outputBuffer.isEmpty()) {
+
+                System.out.println(Ttemp.toString());
+                Ttemp = outputBuffer.poll();
+
+            }
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
@@ -334,11 +345,12 @@ public class Main {
 
                     }
 
-                } else {
+                }  else if (vLiMap.entrySet().size()==1 ){
                     ArrayList<Node> tuple = new ArrayList();
                     tuple.add(origin);
                     crossProduct.add(tuple);
                 }
+
 
             }
 

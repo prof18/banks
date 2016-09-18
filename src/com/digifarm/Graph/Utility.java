@@ -173,14 +173,17 @@ public class Utility {
         Node n;
 
         Connection conn = dBconn.getDBConnection();
-        Statement statement;
-        ResultSet resultSet;
+        Statement statement, statement1, statement4;
+        ResultSet resultSet, resultSet1, resultSet4;
+
+        String tbl;
 
         for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
             n = e.getValue();
             queries = sqlKey.get(n.getTableName());
             if(queries != null && !queries.isEmpty()) {
                 for (String q : queries) {
+                    String tmpQ = q;
                     try {
                         q += " WHERE t1.__search_id = " + n.getSearchID();
 
@@ -212,8 +215,93 @@ public class Utility {
                     } catch (SQLException e2) {
                         e2.printStackTrace();
                     }
+
+                  /*  //second try
+                    try {
+                        tmpQ += " WHERE t2.__search_id = '" + n.getSearchID() + "';";
+
+                        statement1 = conn.createStatement();
+                        resultSet1 = statement1.executeQuery(tmpQ);
+
+                        //extract the list of adjacent nodes
+                        Node connected;
+                        Edge edge;
+                        Edge backedge;
+
+                        while(resultSet1.next()) {
+
+                            //now is the source
+                            connected = nodeList.get(resultSet1.getInt(1));
+                            System.out.println(n.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + connected.getSearchID());
+                            //n.addAdjacentNode(connected);
+                            connected.addAdjacentNode(n);
+                            edge = new Edge(connected,n,1);
+                            edges.add(edge);
+                            backedge = new Edge(n,connected,0);
+                            backedges.add(backedge);
+                            //assign score to the node --> indegree of the node
+                            n.incrementScore();
+                            //the destination node could not be in the interest set. It isn't a keyword node
+                            if (!interestSet.containsKey(resultSet1.getInt(1))) {
+                                toAdd.add(connected);
+                            }
+                            n.addAdjacentNode(connected);
+                        }
+                    } catch (SQLException e2) {
+                        e2.printStackTrace();
+                    }*/
                 }
             }
+
+            tbl = n.getTableName();
+            String key;
+            String pointTable;
+            String fk;
+            String currentTable;
+/*
+
+            try {
+
+                statement1 = conn.createStatement();
+                resultSet1 = statement1.executeQuery("SELECT tc.table_name, kcu.column_name, ccu.table_name\n" +
+                        "AS foreign_table_name, ccu.column_name AS foreign_column_name\n" +
+                        "FROM information_schema.table_constraints tc\n" +
+                        "JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name\n" +
+                        "JOIN information_schema.constraint_column_usage ccu ON ccu.constraint_name = tc.constraint_name\n" +
+                        "WHERE constraint_type = 'FOREIGN KEY'\n" +
+                        "AND ccu.table_name= '" + tbl + "';");
+                while (resultSet1.next()) {
+
+                    pointTable = resultSet1.getString(1);
+                    key = resultSet1.getString(2);
+                    currentTable = resultSet1.getString(3);
+                    fk = resultSet1.getString(4);
+
+                    statement4 = conn.createStatement();
+                    resultSet4 = statement4.executeQuery("SELECT t1.__search_id FROM " + pointTable + " AS t1 INNER JOIN " +
+                            currentTable + " as t2 on t1." + key + " = t2." + fk + " where t2.__search_id = '"
+                            + n.getSearchID() + "'; ");
+                    while (resultSet4.next()) {
+
+                        int id = resultSet4.getInt(1);
+                        Node nd = new Node(id,pointTable);
+                        System.out.println(nd.getTableName() + "->" + nd.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
+                        nd.addAdjacentNode(n);
+                        Edge edge = new Edge(nd,n,1);
+                        edges.add(edge);
+                        Edge bedge = new Edge(n,nd,0);
+                        n.incrementScore();
+                        toAdd.add(nd);
+                        n.addAdjacentNode(nd);
+                    }
+
+                }
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+*/
+
 
         }
 
@@ -236,125 +324,125 @@ public class Utility {
         for (String s : matchList) {
 
 
+            try {
+                stm = conn.createStatement();
+                rs = stm.executeQuery("SELECT c1.relname AS src_table, c3.conrelid, c3.conkey AS foreign_key, c2.relname " +
+                        "AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 " +
+                        "ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0" +
+                        " AND c1.relname = '" + s + "' ;");
+
+                Integer[] fk, pk;
+                Array a;
 
 
-                    try {
-                        stm = conn.createStatement();
-                        rs = stm.executeQuery("SELECT c1.relname AS src_table, c3.conrelid, c3.conkey AS foreign_key, c2.relname " +
-                                "AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 " +
-                                "ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0" +
-                                " AND c1.relname = '" + s + "' ;");
-
-                        Integer[] fk, pk;
-                        Array a;
+                while (rs.next()) {
+                    fromTable = rs.getString(1);
+                    toTable = rs.getString(4);
+                    a = rs.getArray(3);
+                    fk = (Integer[]) a.getArray();
+                    a = rs.getArray(6);
+                    pk = (Integer[]) a.getArray();
 
 
-                        while (rs.next()) {
-                            fromTable = rs.getString(1);
-                            toTable = rs.getString(4);
-                            a = rs.getArray(3);
-                            fk = (Integer[]) a.getArray();
-                            a = rs.getArray(6);
-                            pk = (Integer[]) a.getArray();
-
-
-                            stm1 = conn.createStatement();
-                            for (Integer i : fk) {
-                                rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i +
-                                        " AND a1.attrelid = " + rs.getString(2));
-                                while (rs1.next()) {
-                                    colName1.add(rs1.getString(1));
-                                }
-                            }
-
-                            stm1 = conn.createStatement();
-                            for (Integer i : pk) {
-                                rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i +
-                                        " AND a1.attrelid = " + rs.getString(5));
-                                while (rs1.next()) {
-                                    colName2.add(rs1.getString(1));
-                                }
-                            }
+                    stm1 = conn.createStatement();
+                    for (Integer i : fk) {
+                        rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i +
+                                " AND a1.attrelid = " + rs.getString(2));
+                        while (rs1.next()) {
+                            colName1.add(rs1.getString(1));
                         }
-
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
                     }
+
+                    stm1 = conn.createStatement();
+                    for (Integer i : pk) {
+                        rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i +
+                                " AND a1.attrelid = " + rs.getString(5));
+                        while (rs1.next()) {
+                            colName2.add(rs1.getString(1));
+                        }
+                    }
+                }
+
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
 
 
             System.out.println("fine");
 
-        }
-        Node node2;
-        Statement statement2;
-        ResultSet resultSet2, resultSet3;
-        String key = null;
-        ArrayList<Integer> searchIdList = new ArrayList<>();
 
-        try {
+            Node node2;
+            Statement statement2;
+            ResultSet resultSet2, resultSet3;
+            String key = null;
+            ArrayList<Integer> searchIdList = new ArrayList<>();
 
-            statement2 = conn.createStatement();
+            try {
 
-            ArrayList<HashMap<Integer, Node>> adding = new ArrayList<>();
-            HashMap<Integer, Node> temp = new HashMap<>();
+                statement2 = conn.createStatement();
 
-            for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
+                ArrayList<HashMap<Integer, Node>> adding = new ArrayList<>();
+                HashMap<Integer, Node> temp = new HashMap<>();
 
-                node2 = e.getValue();
+                for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
 
-                for (String t : colName2) {
+                    node2 = e.getValue();
 
-                    //found a tuple that is a destination tuple from the search term
-                    if (toTable.compareTo(node2.getTableName()) == 0) {
+                    for (String t : colName2) {
 
-                        //find two same value of the key
-                        for (String t1 : colName1) {
+                        //found a tuple that is a destination tuple from the search term
+                        if (toTable.compareTo(node2.getTableName()) == 0) {
 
-                            resultSet2 = statement2.executeQuery("SELECT " + t + " FROM " + toTable + " WHERE __search_id = '"
-                                                                    + node2.getSearchID() + "';");
-                            while (resultSet2.next())
-                                key = resultSet2.getString(1);
+                            //find two same value of the key
+                            for (String t1 : colName1) {
 
-                            resultSet3 = statement2.executeQuery("SELECT __search_id FROM " + fromTable + " WHERE " + t1 +
-                                                                    " = '" + key + "';");
-                            while (resultSet3.next()) {
-                                int searchId = resultSet3.getInt(1);
-                                searchIdList.add(searchId);
+                                resultSet2 = statement2.executeQuery("SELECT " + t + " FROM " + toTable + " WHERE __search_id = '"
+                                        + node2.getSearchID() + "';");
+                                while (resultSet2.next())
+                                    key = resultSet2.getString(1);
+
+                                resultSet3 = statement2.executeQuery("SELECT __search_id FROM " + fromTable + " WHERE " + t1 +
+                                        " = '" + key + "';");
+                                while (resultSet3.next()) {
+                                    int searchId = resultSet3.getInt(1);
+                                    searchIdList.add(searchId);
+                                }
                             }
+
+
+                            for (Integer id : searchIdList) {
+
+                                Node term = new Node(id, fromTable);
+                                term.setKeywordNode(true);
+                                //TODO: uncomment
+                                term.addKeyword(s);
+                                temp.put(id, term);
+
+                                // interestSet.put(id, term);
+
+                                term.addAdjacentNode(node2);
+                                Edge edge = new Edge(term, node2, 1);
+                                edges.add(edge);
+                                Edge backedge = new Edge(node2, term, 0);
+                                backedges.add(backedge);
+                                node2.incrementScore();
+
+                            }
+
                         }
-
-
-                        for (Integer id : searchIdList) {
-
-                            Node term = new Node(id,fromTable);
-                            term.setKeywordNode(true);
-                            temp.put(id,term);
-
-                            // interestSet.put(id, term);
-
-                            term.addAdjacentNode(node2);
-                            Edge edge = new Edge(term,node2,1);
-                            edges.add(edge);
-                            Edge backedge = new Edge(node2, term,0);
-                            backedges.add(backedge);
-                            node2.incrementScore();
-
-                        }
-
                     }
+
+
+                }
+
+                for (Map.Entry<Integer, Node> entry : temp.entrySet()) {
+                    interestSet.put(entry.getKey(), entry.getValue());
                 }
 
 
-
-
+            } catch (SQLException ex2) {
+                ex2.printStackTrace();
             }
-
-            for (Map.Entry<Integer,Node> entry : temp.entrySet()) {
-                interestSet.put(entry.getKey(),entry.getValue());
-            }
-
-        } catch (SQLException ex2){
-            ex2.printStackTrace();
         }
 
         long after = System.currentTimeMillis();

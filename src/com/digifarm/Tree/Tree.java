@@ -128,6 +128,8 @@ public class Tree implements Comparable<Tree> {
 
                 if (e != null)
                     FatherAndSons +=  e.getSearchID() + " ";
+                else
+                    FatherAndSons += "It doesn't have sons";
 
             }
 

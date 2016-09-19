@@ -6,6 +6,7 @@ import com.digifarm.DBConnection.ConnectionDB;
 import com.digifarm.Graph.*;
 import com.digifarm.Graph.Utility;
 import com.digifarm.Tree.Tree;
+import com.sun.org.apache.xml.internal.serializer.ElemDesc;
 
 import java.sql.Array;
 import java.sql.SQLException;
@@ -69,8 +70,8 @@ public class Main {
 
                 for (String t : info.getTableList()) {
 
-                    if (s.toLowerCase().compareTo(t.toLowerCase()) == 0) {
-                        matchList.add(s);
+                    if /*(s.toLowerCase().compareTo(t.toLowerCase()) == 0)*/ (Utility.isContained(s.toLowerCase(),t.toLowerCase())) {
+                        matchList.add(t);
                         isMatched = true;
                     }
 
@@ -88,6 +89,33 @@ public class Main {
                 //interest set connection
                 list = Utility.connectNodes(conn, interest, info.getNodes(),info,matchList,term);
 
+              /*  Node n = new Node(260,"borders");
+                n.addKeyword(term);
+
+
+                if (term.compareTo("hungary") == 0) {
+                    interest.get(3556).addAdjacentNode(n);
+                    n.addAdjacentNode(interest.get(3556));
+                } else {
+                    interest.get(3445).addAdjacentNode(n);
+                    n.addAdjacentNode(interest.get(3445));
+                }
+                n.setKeywordNode(true);
+                interest.put(260,n);
+                globalNodeList.put(260,n);
+                if (term.compareTo("hungary") == 0) {
+                    Edge e1 = new Edge(n,interest.get(3556),1);
+                    Edge be1 = new Edge(interest.get(3556),n,0);
+                    globalEdgeList.add(e1);
+                    globalBEdgeList.add(be1);
+                } else {
+                    Edge e2 = new Edge(n, interest.get(3445), 1);
+                    Edge be2 = new Edge(interest.get(3445), n, 0);
+
+                    globalEdgeList.add(e2);
+
+                    globalBEdgeList.add(be2);
+                }*/
 
 
                 //extract edges and backedge list
@@ -118,10 +146,14 @@ public class Main {
             }
 
 
+/*
+            globalNodeList.get(260).addKeyword("slovakia");
+            globalNodeList.get(260).addAdjacentNode(globalNodeList.get(3445));
+            globalNodeList.get(3556).setScore(1);
+*/
 
             //assign point to the backedge
             Utility.backEdgePoint(globalBEdgeList);
-
 
             /*//debug print
             for (Edge e : globalEdgeList)

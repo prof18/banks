@@ -141,7 +141,7 @@ public class Utility {
      * @return      If s2 is found inside s1 the return value is true
      */
 
-    private static boolean isContained(String s1, String s2) {
+    public static boolean isContained(String s1, String s2) {
         //split string by whitespace
         for (String word : s1.split("\\s+")) {
             if (word.equals(s2))
@@ -261,7 +261,7 @@ public class Utility {
             String currentTable;
 
 
-            try {
+            /*try {
 
                 statement1 = conn.createStatement();
                 resultSet1 = statement1.executeQuery("SELECT tc.table_name, kcu.column_name, ccu.table_name\n" +
@@ -279,7 +279,7 @@ public class Utility {
                     fk = resultSet1.getString(4);
 
                     //for (Map.Entry<String,ArrayList<String>> entry : info.getColumnList().entrySet()) {
-/*
+*//*
                     HashMap<String, ArrayList<String>> columnMap = info.getColumnList();
 
                     ArrayList<String> columns = columnMap.get(currentTable);
@@ -290,7 +290,7 @@ public class Utility {
                                     " __search_id = '" + n.getSearchID() + "';" );
                             while (resultSet5.next()) {
                                 String keyComp = resultSet5.getString(1);
-                                if(keyComp != null && keyComp.toLowerCase().compareTo(keyW) == 0) {*/
+                                if(keyComp != null && keyComp.toLowerCase().compareTo(keyW) == 0) {*//*
                                     statement4 = conn.createStatement();
                                     resultSet4 = statement4.executeQuery("SELECT t1.__search_id FROM " + pointTable + " AS t1 INNER JOIN " +
                                             currentTable + " as t2 on t1." + key + " = t2." + fk + " where t2.__search_id = '"
@@ -325,7 +325,7 @@ public class Utility {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-
+*/
 
 
         }

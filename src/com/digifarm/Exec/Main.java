@@ -7,6 +7,7 @@ import com.digifarm.Graph.*;
 import com.digifarm.Graph.Utility;
 import com.digifarm.Tree.Tree;
 import com.sun.org.apache.xml.internal.serializer.ElemDesc;
+import com.sun.org.apache.xpath.internal.axes.HasPositionalPredChecker;
 
 import java.sql.Array;
 import java.sql.SQLException;
@@ -36,15 +37,59 @@ public class Main {
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
 
-           dbInfo info = new dbInfo();
+            dbInfo info = new dbInfo();
 
-           Utility.createGraph(conn,database,info);
+            //create a graph from all the database
+            Utility.createGraph(conn,database,info);
 
             //ask for keyword
-            System.out.print("Enter keyword (use space as separator): ");
+            System.out.print("Enter keyword (use comma as separator): ");
 
             String keyword = in.nextLine();
-            String[] temp = keyword.split(" ");
+            String[] temp = keyword.split(",");
+
+            HashMap<String, ArrayList<Node>> tableTuple = new HashMap<>();
+            //keyword that aren't table
+            ArrayList<String> notTable = new ArrayList<>();
+            //keyword that are table
+            ArrayList<String> tableMatch = new ArrayList<>();
+
+            //cycle the keyword provided
+            for (String s : temp) {
+
+                boolean isMatched = false;
+
+                //cycle the table
+                for (String table : info.getTableList()) {
+
+                    //the input was a name of a table --> save all the tuple of the table
+                    if (s.toLowerCase().compareTo(table.toLowerCase()) == 0 ) {
+
+                        tableTuple.put(table,Utility.getTableTuple(table,conn));
+                        tableMatch.add(table);
+                        isMatched = true;
+                    }
+                }
+
+                if (!isMatched)
+                    notTable.add(s);
+            }
+
+            HashMap<Integer, Node> interestSet = new HashMap<>();
+            ArrayList<ArrayList<Edge>> edgeWrapper = new ArrayList<>();
+
+            for (String s : notTable) {
+
+                //create the interest set for the current keyword
+                interestSet = Utility.createInterestSet(conn,s,info);
+
+                //connects the node in the interest set
+                edgeWrapper = Utility.connectNodes(conn,interestSet,info.getNodes(),info,tableMatch,s);
+
+
+            }
+
+            //TODO: END REWRITING
 
             HashMap<Integer, Node> interest = new HashMap<>();
 
@@ -62,7 +107,7 @@ public class Main {
 
             ArrayList<String> matchList = new ArrayList<>();
 
-            ArrayList<String> notTable = new ArrayList<>();
+           // ArrayList<String> notTable = new ArrayList<>();
 
             for (String s : temp ) {
 

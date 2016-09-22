@@ -34,6 +34,7 @@ public class Utility {
         HashMap<String, ArrayList<String>> columnMap = new HashMap<>();
 
         try {
+
             stmn = conn.createStatement();
             stmn2 = conn.createStatement();
             stm3 = conn.createStatement();
@@ -57,6 +58,7 @@ public class Utility {
                         id = tuple.getInt(1);
                         set.put(id, new Node(id,tableName));
                     }
+                    //get the column of tableName
                     column = stm3.executeQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE" +
                             " table_name= '" + tableName + "'");
                     ArrayList<String> columnList = new ArrayList<>();
@@ -70,6 +72,7 @@ public class Utility {
             }
             //set the table list
             info.setTableList(tableList);
+            //set the column map
             info.setColumnList(columnMap);
             long after = System.currentTimeMillis();
             long time = (after - before);
@@ -78,6 +81,40 @@ public class Utility {
             e.printStackTrace();
         }
         info.setNodes(set);
+    }
+
+    /**
+     *  Get all the tuple from a table
+     *
+     * @param table
+     * @param conDB
+     * @return
+     */
+    public static ArrayList<Node> getTableTuple(String table, ConnectionDB conDB) {
+
+        Connection conn = conDB.getDBConnection();
+        Statement stm = null;
+        ResultSet rs = null;
+        int id = -1;
+        //HashMap<String,ArrayList<Node>> tableTuple = new HashMap<>();
+        ArrayList<Node> list = new ArrayList<>();
+
+        try {
+
+            stm = conn.createStatement();
+            rs = stm.executeQuery("SELECT __search_id FROM " + table);
+            while (rs.next()) {
+
+                id = rs.getInt(1);
+                list.add(new Node(id,table));
+            }
+
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
+        return list;
     }
 
 
@@ -143,7 +180,7 @@ public class Utility {
 
     public static boolean isContained(String s1, String s2) {
         //split string by whitespace
-        for (String word : s1.split("\\s+")) {
+        for (String word : s1.split(",")) {
             if (word.equals(s2))
                 return true;
         }
@@ -217,7 +254,59 @@ public class Utility {
                         e2.printStackTrace();
                     }
 
-                  /*  //second try
+
+                }
+            }
+
+            //devo ottenere i nodi in più Es. il famoso 260
+            ArrayList<String> sqlQuery;
+            for (String table : info.getTableList()) {
+
+                sqlQuery = sqlKey.get(table);
+                //ciclo solo se ci sono query disponibili
+                if (sqlQuery != null && !sqlQuery.isEmpty()) {
+                    for (String s : sqlQuery) {
+
+                        try {
+                            s += " WHERE t2.__search_id = '" + n.getSearchID() + "';";
+
+                            statement1 = conn.createStatement();
+                            resultSet1 = statement1.executeQuery(s);
+
+                            Node connected;
+                            Edge edge;
+                            Edge bedge;
+
+                            while(resultSet1.next()) {
+
+                                //TODO: ADD THE NODE ONLY IF NECESSARY
+                                connected = nodeList.get(resultSet1.getInt(1));
+                                System.out.println(connected.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
+                                System.out.println("ciao");
+                                connected.addAdjacentNode(n);
+                                edge = new Edge(connected,n,1);
+                                edges.add(edge);
+                                bedge = new Edge(n,connected,0);
+                                backedges.add(bedge);
+                                n.incrementScore();
+                                n.addAdjacentNode(connected);
+                            }
+
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+
+
+
+                    }
+                }
+            }
+
+
+
+            /*
+
+            //second try
                     try {
                         tmpQ += " WHERE t2.__search_id = '" + n.getSearchID() + "';";
 
@@ -250,9 +339,10 @@ public class Utility {
                         }
                     } catch (SQLException e2) {
                         e2.printStackTrace();
-                    }*/
-                }
-            }
+                    }
+
+            */
+
 
             tbl = n.getTableName();
             String key;
@@ -353,6 +443,8 @@ public class Utility {
         ArrayList<String> colName2 = new ArrayList<>();
         String fromTable = null, toTable = null;
 
+        //cycle all the table name
+        //necessary when the keyword is a table name
         for (String s : matchList) {
 
 
@@ -505,7 +597,7 @@ public class Utility {
             //and conrelid (The table this constraint is on; 0 if not a table constraint)
             rs = stm.executeQuery("SELECT c1.relname AS src_table, c3.conrelid, c3.conkey AS foreign_key, c2.relname " +
                     "AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 " +
-                    "ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0;\n");
+                    "ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid;\n");
             String fromTable, toTable;
             Integer[] fk,pk;
             Array a;

@@ -326,10 +326,10 @@ public class Utility {
 
             try {
                 stm = conn.createStatement();
-                rs = stm.executeQuery("SELECT c1.relname AS src_table, c3.conrelid, c3.conkey AS foreign_key, c2.relname " +
-                        "AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 " +
-                        "ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0" +
-                        " AND c1.relname = '" + s + "' ;");
+                    rs = stm.executeQuery("SELECT c1.relname AS src_table, c3.conrelid, c3.conkey AS foreign_key, c2.relname " +
+                            "AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 " +
+                            "ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0" +
+                            " AND c1.relname = '" + s + "' ;");
 
                 Integer[] fk, pk;
                 Array a;

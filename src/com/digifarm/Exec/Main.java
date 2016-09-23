@@ -131,7 +131,7 @@ public class Main {
                 connected = entry.getKey();
                 nodeList = entry.getValue();
 
-                if (!globalNodeList.containsKey(connected)) {
+                if (!globalNodeList.containsKey(connected.getSearchID())) {
 
                     if (nodeList.size() > 1) {
 
@@ -159,10 +159,18 @@ public class Main {
             max = Utility.maxNodeScore(globalNodeList, max);
             min = Utility.minEdgeWeight(globalEdgeList, min);
 
+            //assign point to the backedge
+            Utility.backEdgePoint(globalBEdgeList);
+            //
+            // normalize edge weight
+            //only logarithmic scale
+            Utility.eWeightNorm(globalEdgeList,min);
+
+
 
             //TODO: END REWRITING
 
-            HashMap<Integer, Node> interest = new HashMap<>();
+         /*  /* HashMap<Integer, Node> interest = new HashMap<>();
 
             ArrayList<ArrayList<Edge>> list = new ArrayList<>();
 
@@ -170,8 +178,8 @@ public class Main {
 
             ArrayList<Edge> edgeList = new ArrayList<>();
 
-  /*          double max = 0;
-            double min = Integer.MAX_VALUE;*/
+            double max = 0;
+            double min = Integer.MAX_VALUE;
 
             ArrayList<String> matchList = new ArrayList<>();
 
@@ -183,7 +191,7 @@ public class Main {
 
                 for (String t : info.getTableList()) {
 
-                    if /*(s.toLowerCase().compareTo(t.toLowerCase()) == 0)*/ (Utility.isContained(s.toLowerCase(),t.toLowerCase())) {
+                    if (s.toLowerCase().compareTo(t.toLowerCase()) == 0) (Utility.isContained(s.toLowerCase(),t.toLowerCase())) {
                         matchList.add(t);
                         isMatched = true;
                     }
@@ -202,7 +210,7 @@ public class Main {
                 //interest set connection
                // list = Utility.connectNodes(conn, interest, info.getNodes(),info,matchList,term);
 
-              /*  Node n = new Node(260,"borders");
+                Node n = new Node(260,"borders");
                 n.addKeyword(term);
 
 
@@ -228,7 +236,7 @@ public class Main {
                     globalEdgeList.add(e2);
 
                     globalBEdgeList.add(be2);
-                }*/
+                }
 
 
                 //extract edges and backedge list
@@ -259,27 +267,26 @@ public class Main {
             }
 
 
-/*
+
             globalNodeList.get(260).addKeyword("slovakia");
             globalNodeList.get(260).addAdjacentNode(globalNodeList.get(3445));
             globalNodeList.get(3556).setScore(1);
-*/
 
-            //assign point to the backedge
-            Utility.backEdgePoint(globalBEdgeList);
 
-            /*//debug print
+
+
+            /*//*//**//*debug print
             for (Edge e : globalEdgeList)
                 System.out.println("Edges after globalList: \n" + e.toString());
             for (Edge b : globalBEdgeList)
                 System.out.println("Backedges after  globaList: \n" + b.toString());
             System.out.println("max score: " + max );
-            System.out.println("min weight: " + min + "\n");*/
+            System.out.println("min weight: " + min + "\n");
 
             //normalize edge weight
             //only logarithmic scale
             Utility.eWeightNorm(globalEdgeList,min);
-           /* for (Edge ed : globalEdgeList)
+            for (Edge ed : globalEdgeList)
                 System.out.println("Edges with normalized weight: \n" + ed.toString());*/
 
             //normalize node score
@@ -419,7 +426,7 @@ public class Main {
 
                 }
 
-                System.out.println("hello it's me");
+                //System.out.println("hello it's me");
 
             } //[C] while
 
@@ -428,7 +435,7 @@ public class Main {
             }
 
 
-            System.out.println("ciao");
+           // System.out.println("ciao");
 
             int i=0;
             double lastScore = 0;

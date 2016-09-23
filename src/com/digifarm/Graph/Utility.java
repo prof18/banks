@@ -508,6 +508,7 @@ public class Utility {
             System.out.println("fine");
 
 
+            //query for the keyword that is table
             Node node2;
             Statement statement2;
             ResultSet resultSet2, resultSet3;

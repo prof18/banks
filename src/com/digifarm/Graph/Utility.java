@@ -198,7 +198,9 @@ public class Utility {
      * @return                  An ArrayList of edge and backedge
      */
 
-    public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, HashMap<Integer, Node> nodeList, dbInfo info, ArrayList<String> matchList,String keyW) {
+    public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet,
+                                        HashMap<Integer, Node> nodeList, dbInfo info, ArrayList<String> matchList,
+                                        HashMap<Node, ArrayList<Node>> commonNodes) {
 
         long before = System.currentTimeMillis();
 
@@ -215,6 +217,7 @@ public class Utility {
         ResultSet resultSet, resultSet1, resultSet4, resultSet5;
 
         String tbl;
+
 
         for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
             n = e.getValue();
@@ -281,15 +284,23 @@ public class Utility {
 
                                 //TODO: ADD THE NODE ONLY IF NECESSARY
                                 connected = nodeList.get(resultSet1.getInt(1));
-                                System.out.println(connected.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
-                                System.out.println("ciao");
+                                if (commonNodes.get(connected) != null) {
+                                    commonNodes.get(connected).add(n);
+                                } else {
+                                    ArrayList<Node> nodelist = new ArrayList<>();
+                                    nodelist.add(n);
+                                    commonNodes.put(connected,nodelist);
+                                }
+
+                               /* System.out.println(connected.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
+                                //System.out.println("ciao");
                                 connected.addAdjacentNode(n);
                                 edge = new Edge(connected,n,1);
                                 edges.add(edge);
                                 bedge = new Edge(n,connected,0);
                                 backedges.add(bedge);
                                 n.incrementScore();
-                                n.addAdjacentNode(connected);
+                                n.addAdjacentNode(connected);*/
                             }
 
                         } catch (SQLException ex) {
@@ -419,6 +430,8 @@ public class Utility {
 
 
         }
+
+
 
 
         for (Node node : toAdd) {

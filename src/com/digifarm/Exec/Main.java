@@ -54,6 +54,14 @@ public class Main {
             //keyword that are table
             ArrayList<String> tableMatch = new ArrayList<>();
 
+            //list of common nodes
+            HashMap<Node, ArrayList<Node>> commonNodes = new HashMap<>();
+
+            //global nodes,edges,backedges lists of interest set
+            HashMap<Integer, Node> globalNodeList = new HashMap<>();
+            ArrayList<Edge> globalEdgeList = new ArrayList<>();
+            ArrayList<Edge> globalBEdgeList = new ArrayList<>();
+
             //cycle the keyword provided
             for (String s : temp) {
 
@@ -84,8 +92,39 @@ public class Main {
                 interestSet = Utility.createInterestSet(conn,s,info);
 
                 //connects the node in the interest set
-                edgeWrapper = Utility.connectNodes(conn,interestSet,info.getNodes(),info,tableMatch,s);
+                edgeWrapper = Utility.connectNodes(conn,interestSet,info.getNodes(),info,tableMatch,commonNodes);
 
+
+            }
+
+            Node connected;
+            ArrayList<Node> nodeList = new ArrayList<>();
+            for (Map.Entry<Node,ArrayList<Node>> entry : commonNodes.entrySet()) {
+
+                connected = entry.getKey();
+                nodeList = entry.getValue();
+
+                if(nodeList.size() > 1) {
+
+
+
+                    globalNodeList.put(connected.getSearchID(),connected);
+
+                    for (Node n : nodeList) {
+
+                        System.out.println("Common node " + n.getSearchID());
+
+                        System.out.println(connected.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
+                        //System.out.println("ciao");
+                        connected.addAdjacentNode(n);
+                        Edge edge = new Edge(connected,n,1);
+                        globalEdgeList.add(edge);
+                        Edge bedge = new Edge(n,connected,0);
+                        globalBEdgeList.add(bedge);
+                        n.incrementScore();
+                        n.addAdjacentNode(connected);
+                    }
+                }
 
             }
 
@@ -95,10 +134,7 @@ public class Main {
 
             ArrayList<ArrayList<Edge>> list = new ArrayList<>();
 
-            //global nodes,edges,backedges lists of interest set
-            HashMap<Integer, Node> globalNodeList = new HashMap<>();
-            ArrayList<Edge> globalEdgeList = new ArrayList<>();
-            ArrayList<Edge> globalBEdgeList = new ArrayList<>();
+
 
             ArrayList<Edge> edgeList = new ArrayList<>();
 
@@ -132,7 +168,7 @@ public class Main {
 
 
                 //interest set connection
-                list = Utility.connectNodes(conn, interest, info.getNodes(),info,matchList,term);
+               // list = Utility.connectNodes(conn, interest, info.getNodes(),info,matchList,term);
 
               /*  Node n = new Node(260,"borders");
                 n.addKeyword(term);

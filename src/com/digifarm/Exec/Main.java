@@ -62,6 +62,9 @@ public class Main {
             ArrayList<Edge> globalEdgeList = new ArrayList<>();
             ArrayList<Edge> globalBEdgeList = new ArrayList<>();
 
+            double max = 0;
+            double min = Integer.MAX_VALUE;
+
             //cycle the keyword provided
             for (String s : temp) {
 
@@ -94,6 +97,30 @@ public class Main {
                 //connects the node in the interest set
                 edgeWrapper = Utility.connectNodes(conn,interestSet,info.getNodes(),info,tableMatch,commonNodes);
 
+                ArrayList<Edge> edges = edgeWrapper.get(0);
+                ArrayList<Edge> backedges = edgeWrapper.get(1);
+               // edgeList = edges;
+
+
+
+                //add node to global list
+                Node node;
+                for (Map.Entry<Integer,Node> e : interestSet.entrySet()) {
+                    node = e.getValue();
+                    //needs to check if the node is already in the global list to avoid duplicates
+                    if (globalNodeList.containsKey(node.getSearchID())) {
+                        //if the node is already int he global list we need to update the adjacent list
+                        (globalNodeList.get(node.getSearchID())).mergeNode(node.getAdjacentNodes(),s);
+                    } else
+                        globalNodeList.put(node.getSearchID(),node);
+                }
+                //add edge to global list
+                for (Edge edge : edges)
+                    globalEdgeList.add(edge);
+                //add backedge to global list
+                for (Edge bedge : backedges)
+                    globalBEdgeList.add(bedge);
+
 
             }
 
@@ -104,29 +131,34 @@ public class Main {
                 connected = entry.getKey();
                 nodeList = entry.getValue();
 
-                if(nodeList.size() > 1) {
+                if (!globalNodeList.containsKey(connected)) {
 
+                    if (nodeList.size() > 1) {
 
+                        globalNodeList.put(connected.getSearchID(), connected);
 
-                    globalNodeList.put(connected.getSearchID(),connected);
+                        for (Node n : nodeList) {
 
-                    for (Node n : nodeList) {
+                            System.out.println("Common node " + n.getSearchID());
 
-                        System.out.println("Common node " + n.getSearchID());
-
-                        System.out.println(connected.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
-                        //System.out.println("ciao");
-                        connected.addAdjacentNode(n);
-                        Edge edge = new Edge(connected,n,1);
-                        globalEdgeList.add(edge);
-                        Edge bedge = new Edge(n,connected,0);
-                        globalBEdgeList.add(bedge);
-                        n.incrementScore();
-                        n.addAdjacentNode(connected);
+                            System.out.println(connected.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
+                            //System.out.println("ciao");
+                            connected.addAdjacentNode(n);
+                            Edge edge = new Edge(connected, n, 1);
+                            globalEdgeList.add(edge);
+                            Edge bedge = new Edge(n, connected, 0);
+                            globalBEdgeList.add(bedge);
+                            n.incrementScore();
+                            n.addAdjacentNode(connected);
+                        }
                     }
                 }
 
             }
+
+            max = Utility.maxNodeScore(globalNodeList, max);
+            min = Utility.minEdgeWeight(globalEdgeList, min);
+
 
             //TODO: END REWRITING
 
@@ -138,8 +170,8 @@ public class Main {
 
             ArrayList<Edge> edgeList = new ArrayList<>();
 
-            double max = 0;
-            double min = Integer.MAX_VALUE;
+  /*          double max = 0;
+            double min = Integer.MAX_VALUE;*/
 
             ArrayList<String> matchList = new ArrayList<>();
 

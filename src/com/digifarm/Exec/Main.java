@@ -37,6 +37,7 @@ public class Main {
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
 
+            //container of some db information, like table, columns and tuples
             dbInfo info = new dbInfo();
 
             //create a graph from all the database
@@ -62,18 +63,19 @@ public class Main {
             ArrayList<Edge> globalEdgeList = new ArrayList<>();
             ArrayList<Edge> globalBEdgeList = new ArrayList<>();
 
+            //max and min value for normalization
             double max = 0;
             double min = Integer.MAX_VALUE;
 
-            //cycle the keyword provided
+            //cycle the keyword provided by the user
             for (String s : temp) {
 
                 boolean isMatched = false;
 
-                //cycle the table
+                //cycle al the table
                 for (String table : info.getTableList()) {
 
-                    //the input was a name of a table --> save all the tuple of the table
+                    //if the input was a name of a table --> save all the tuple of the table
                     if (s.toLowerCase().compareTo(table.toLowerCase()) == 0 ) {
 
                         tableTuple.put(table,Utility.getTableTuple(table,conn));
@@ -99,9 +101,6 @@ public class Main {
 
                 ArrayList<Edge> edges = edgeWrapper.get(0);
                 ArrayList<Edge> backedges = edgeWrapper.get(1);
-               // edgeList = edges;
-
-
 
                 //add node to global list
                 Node node;
@@ -120,12 +119,12 @@ public class Main {
                 //add backedge to global list
                 for (Edge bedge : backedges)
                     globalBEdgeList.add(bedge);
-
-
             }
 
+            //if a node is common to two keyword, add this node to the globalNodeList
             Node connected;
-            ArrayList<Node> nodeList = new ArrayList<>();
+            ArrayList<Node> nodeList;
+
             for (Map.Entry<Node,ArrayList<Node>> entry : commonNodes.entrySet()) {
 
                 connected = entry.getKey();
@@ -133,16 +132,14 @@ public class Main {
 
                 if (!globalNodeList.containsKey(connected.getSearchID())) {
 
+                    //if size > 1 there is a node in common
                     if (nodeList.size() > 1) {
 
                         globalNodeList.put(connected.getSearchID(), connected);
 
                         for (Node n : nodeList) {
 
-                            System.out.println("Common node " + n.getSearchID());
-
                             System.out.println(connected.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
-                            //System.out.println("ciao");
                             connected.addAdjacentNode(n);
                             Edge edge = new Edge(connected, n, 1);
                             globalEdgeList.add(edge);
@@ -153,7 +150,6 @@ public class Main {
                         }
                     }
                 }
-
             }
 
             max = Utility.maxNodeScore(globalNodeList, max);
@@ -161,146 +157,14 @@ public class Main {
 
             //assign point to the backedge
             Utility.backEdgePoint(globalBEdgeList);
-            //
+
             // normalize edge weight
             //only logarithmic scale
             Utility.eWeightNorm(globalEdgeList,min);
 
-
-
-            //TODO: END REWRITING
-
-         /*  /* HashMap<Integer, Node> interest = new HashMap<>();
-
-            ArrayList<ArrayList<Edge>> list = new ArrayList<>();
-
-
-
-            ArrayList<Edge> edgeList = new ArrayList<>();
-
-            double max = 0;
-            double min = Integer.MAX_VALUE;
-
-            ArrayList<String> matchList = new ArrayList<>();
-
-           // ArrayList<String> notTable = new ArrayList<>();
-
-            for (String s : temp ) {
-
-                boolean isMatched = false;
-
-                for (String t : info.getTableList()) {
-
-                    if (s.toLowerCase().compareTo(t.toLowerCase()) == 0) (Utility.isContained(s.toLowerCase(),t.toLowerCase())) {
-                        matchList.add(t);
-                        isMatched = true;
-                    }
-
-                }
-                if(!isMatched)
-                    notTable.add(s);
-            }
-
-            for (String term: notTable) {
-
-                //interest set creation
-                interest = Utility.createInterestSet(conn, term, info);
-
-
-                //interest set connection
-               // list = Utility.connectNodes(conn, interest, info.getNodes(),info,matchList,term);
-
-                Node n = new Node(260,"borders");
-                n.addKeyword(term);
-
-
-                if (term.compareTo("hungary") == 0) {
-                    interest.get(3556).addAdjacentNode(n);
-                    n.addAdjacentNode(interest.get(3556));
-                } else {
-                    interest.get(3445).addAdjacentNode(n);
-                    n.addAdjacentNode(interest.get(3445));
-                }
-                n.setKeywordNode(true);
-                interest.put(260,n);
-                globalNodeList.put(260,n);
-                if (term.compareTo("hungary") == 0) {
-                    Edge e1 = new Edge(n,interest.get(3556),1);
-                    Edge be1 = new Edge(interest.get(3556),n,0);
-                    globalEdgeList.add(e1);
-                    globalBEdgeList.add(be1);
-                } else {
-                    Edge e2 = new Edge(n, interest.get(3445), 1);
-                    Edge be2 = new Edge(interest.get(3445), n, 0);
-
-                    globalEdgeList.add(e2);
-
-                    globalBEdgeList.add(be2);
-                }
-
-
-                //extract edges and backedge list
-                ArrayList<Edge> edges = list.get(0);
-                ArrayList<Edge> backedges = list.get(1);
-                edgeList = edges;
-
-                max = Utility.maxNodeScore(interest, max);
-                min = Utility.minEdgeWeight(edges, min);
-
-                //add node to global list
-                Node node;
-                for (Map.Entry<Integer,Node> e : interest.entrySet()) {
-                    node = e.getValue();
-                    //needs to check if the node is already in the global list to avoid duplicates
-                    if (globalNodeList.containsKey(node.getSearchID())) {
-                        //if the node is already int he global list we need to update the adjacent list
-                        (globalNodeList.get(node.getSearchID())).mergeNode(node.getAdjacentNodes(),term);
-                    } else
-                        globalNodeList.put(node.getSearchID(),node);
-                }
-                //add edge to global list
-                for (Edge edge : edges)
-                    globalEdgeList.add(edge);
-                //add backedge to global list
-                for (Edge bedge : backedges)
-                    globalBEdgeList.add(bedge);
-            }
-
-
-
-            globalNodeList.get(260).addKeyword("slovakia");
-            globalNodeList.get(260).addAdjacentNode(globalNodeList.get(3445));
-            globalNodeList.get(3556).setScore(1);
-
-
-
-
-            /*//*//**//*debug print
-            for (Edge e : globalEdgeList)
-                System.out.println("Edges after globalList: \n" + e.toString());
-            for (Edge b : globalBEdgeList)
-                System.out.println("Backedges after  globaList: \n" + b.toString());
-            System.out.println("max score: " + max );
-            System.out.println("min weight: " + min + "\n");
-
-            //normalize edge weight
-            //only logarithmic scale
-            Utility.eWeightNorm(globalEdgeList,min);
-            for (Edge ed : globalEdgeList)
-                System.out.println("Edges with normalized weight: \n" + ed.toString());*/
-
             //normalize node score
             //TODO scegliere qui scala lineare (fraction) o logaritmica(logarithm)
             Utility.nScoreNorm(globalNodeList, "logarithm", max);
-
-            /*//debug print: nodes with score
-            System.out.println("\n");
-            Node nd;
-            for (Map.Entry<Integer, Node> e : globalNodeList.entrySet()) {
-                nd = e.getValue();
-                System.out.println("Node with normalized score: " + nd.getSearchID() + " weight: " + nd.getScore());
-
-            }*/
 
             Graph graph = new Graph(globalNodeList,globalEdgeList,globalBEdgeList);
 
@@ -317,17 +181,12 @@ public class Main {
 
                     Dijkstra dijkstra = new Dijkstra(graph,node,it);
                     path.put(node,it.getPreviousList());
-                    //System.out.println("------------------------------");
                     dijkstra.visit();
                     iteratorHeap.add(it);
-                    //System.out.println("dada");
                 }
             }
 
             Node v;
-            // ArrayList<Tree> treess = new ArrayList<>();
-
-
 
             //tree heap
             int HEAP_SIZE = 500;
@@ -336,6 +195,7 @@ public class Main {
 
 
             while (!iteratorHeap.isEmpty()) {
+
                 //remove first iterator from heap
                 SPIterator spIterator = iteratorHeap.poll();
                 ListIterator<Node> iterator = spIterator.createIterator();
@@ -367,12 +227,10 @@ public class Main {
                     }
                 }
 
-
                 //cycle on the tuple
                 for (ArrayList<Node> tuple : crossProduct ) {
 
                     Tree tree = new Tree();
-
 
                     //v is the root of the tree
                     tree.setRoot(v);
@@ -388,14 +246,10 @@ public class Main {
 
                             Node tmp = previous;
                             previous = previousPath.get(previous);
-                            // System.out.println("esigrwhjieasjkld");
                             tree.addSon(tmp,previous);
                             tree.addFather(tmp,previous);
-                           // System.out.println("hsrs");
                         }
-                       // System.out.println("Fine while");
                     }
-              //      System.out.println("fine for");
 
                     ArrayList<Edge> overallEdges = new ArrayList<>();
                     for (Edge e : globalEdgeList) {
@@ -425,17 +279,11 @@ public class Main {
                         addTree(tree,outputHeap,outputBuffer,HEAP_SIZE);
 
                 }
-
-                //System.out.println("hello it's me");
-
             } //[C] while
 
             while (outputHeap.size() != 0) {
                 outputBuffer.add(outputHeap.poll());
             }
-
-
-           // System.out.println("ciao");
 
             int i=0;
             double lastScore = 0;
@@ -451,11 +299,11 @@ public class Main {
             if(!outputBuffer.isEmpty())
                 Ttemp = outputBuffer.poll();
 
+            //if the score is the same, we output also the node in position greater than 10
             while( Double.compare(lastScore , Ttemp.getGlobalScore() ) == 0 && !outputBuffer.isEmpty()) {
 
                 System.out.println(Ttemp.toString());
                 Ttemp = outputBuffer.poll();
-
             }
 
         } catch (SQLException sqle) {
@@ -466,7 +314,14 @@ public class Main {
         }
     }
 
-    public static ArrayList<ArrayList<Node>> generateCrossProduct(Node origin, Node v) {
+    /**
+     *  Calculate cross product
+     *
+     * @param origin
+     * @param v
+     * @return
+     */
+    private static ArrayList<ArrayList<Node>> generateCrossProduct(Node origin, Node v) {
 
         //crossProduct wrapper
         ArrayList<ArrayList<Node>> crossProduct = new ArrayList();
@@ -494,9 +349,7 @@ public class Main {
                             if (n.getSearchID() != origin.getSearchID())
                                 tuple.add(n);
                         }
-
                         crossProduct.add(tuple);
-
                     }
 
                 }  else if (vLiMap.entrySet().size()==1 ){
@@ -504,18 +357,19 @@ public class Main {
                     tuple.add(origin);
                     crossProduct.add(tuple);
                 }
-
-
             }
-
         }
-
         return crossProduct;
-
     }
 
-
-    public static void addTree(Tree tree, PriorityQueue<Tree> outputHeap, PriorityQueue<Tree> outputBuffer, int maxHeapSize) {
+    /**
+     * 
+     * @param tree
+     * @param outputHeap
+     * @param outputBuffer
+     * @param maxHeapSize
+     */
+    private static void addTree(Tree tree, PriorityQueue<Tree> outputHeap, PriorityQueue<Tree> outputBuffer, int maxHeapSize) {
 
         if (outputHeap.size() == maxHeapSize ) {
             outputBuffer.add(outputHeap.poll());

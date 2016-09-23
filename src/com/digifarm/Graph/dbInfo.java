@@ -15,8 +15,6 @@ public class dbInfo {
     //column map of the nodes set
     //key is the table, value is the list of column
     private HashMap<String, ArrayList<String>> columnList = new HashMap<>();
-    //list of found table
-    private ArrayList<String> matchedTable = new ArrayList<>();
 
     public void setNodes(HashMap<Integer, Node> nodes) {
         this.nodes = nodes;
@@ -36,14 +34,6 @@ public class dbInfo {
 
     public ArrayList<String> getTableList() {
         return tableList;
-    }
-
-    public void setMatchedTable(ArrayList<String> matchedTable) {
-        this.matchedTable = matchedTable;
-    }
-
-    public ArrayList<String> getMatchedTable() {
-        return matchedTable;
     }
 
     public HashMap<String, ArrayList<String>> getColumnList() {

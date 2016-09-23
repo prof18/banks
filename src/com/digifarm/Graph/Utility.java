@@ -54,7 +54,6 @@ public class Utility {
                     //insert table name
                     while(tuple.next()) {
                         //creating and adding a new Node to the set
-                        //set.add(new Node(tuple.getInt(1), tableName));
                         id = tuple.getInt(1);
                         set.put(id, new Node(id,tableName));
                     }
@@ -96,7 +95,6 @@ public class Utility {
         Statement stm = null;
         ResultSet rs = null;
         int id = -1;
-        //HashMap<String,ArrayList<Node>> tableTuple = new HashMap<>();
         ArrayList<Node> list = new ArrayList<>();
 
         try {
@@ -108,8 +106,6 @@ public class Utility {
                 id = rs.getInt(1);
                 list.add(new Node(id,table));
             }
-
-
         } catch (SQLException e) {
 
             e.printStackTrace();
@@ -291,148 +287,15 @@ public class Utility {
                                     nodelist.add(n);
                                     commonNodes.put(connected,nodelist);
                                 }
-
-                               /* System.out.println(connected.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
-                                //System.out.println("ciao");
-                                connected.addAdjacentNode(n);
-                                edge = new Edge(connected,n,1);
-                                edges.add(edge);
-                                bedge = new Edge(n,connected,0);
-                                backedges.add(bedge);
-                                n.incrementScore();
-                                n.addAdjacentNode(connected);*/
                             }
 
                         } catch (SQLException ex) {
                             ex.printStackTrace();
                         }
-
-
-
                     }
                 }
             }
-
-
-
-            /*
-
-            //second try
-                    try {
-                        tmpQ += " WHERE t2.__search_id = '" + n.getSearchID() + "';";
-
-                        statement1 = conn.createStatement();
-                        resultSet1 = statement1.executeQuery(tmpQ);
-
-                        //extract the list of adjacent nodes
-                        Node connected;
-                        Edge edge;
-                        Edge backedge;
-
-                        while(resultSet1.next()) {
-
-                            //now is the source
-                            connected = nodeList.get(resultSet1.getInt(1));
-                            System.out.println(n.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + connected.getSearchID());
-                            //n.addAdjacentNode(connected);
-                            connected.addAdjacentNode(n);
-                            edge = new Edge(connected,n,1);
-                            edges.add(edge);
-                            backedge = new Edge(n,connected,0);
-                            backedges.add(backedge);
-                            //assign score to the node --> indegree of the node
-                            n.incrementScore();
-                            //the destination node could not be in the interest set. It isn't a keyword node
-                            if (!interestSet.containsKey(resultSet1.getInt(1))) {
-                                toAdd.add(connected);
-                            }
-                            n.addAdjacentNode(connected);
-                        }
-                    } catch (SQLException e2) {
-                        e2.printStackTrace();
-                    }
-
-            */
-
-
-            tbl = n.getTableName();
-            String key;
-            String pointTable;
-            String fk;
-            String currentTable;
-
-
-            /*try {
-
-                statement1 = conn.createStatement();
-                resultSet1 = statement1.executeQuery("SELECT tc.table_name, kcu.column_name, ccu.table_name\n" +
-                        "AS foreign_table_name, ccu.column_name AS foreign_column_name\n" +
-                        "FROM information_schema.table_constraints tc\n" +
-                        "JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name\n" +
-                        "JOIN information_schema.constraint_column_usage ccu ON ccu.constraint_name = tc.constraint_name\n" +
-                        "WHERE constraint_type = 'FOREIGN KEY'\n" +
-                        "AND ccu.table_name= '" + tbl + "';");
-                while (resultSet1.next()) {
-
-                    pointTable = resultSet1.getString(1);
-                    key = resultSet1.getString(2);
-                    currentTable = resultSet1.getString(3);
-                    fk = resultSet1.getString(4);
-
-                    //for (Map.Entry<String,ArrayList<String>> entry : info.getColumnList().entrySet()) {
-*//*
-                    HashMap<String, ArrayList<String>> columnMap = info.getColumnList();
-
-                    ArrayList<String> columns = columnMap.get(currentTable);
-                        for(String cl : columns) {
-
-                            statement5 = conn.createStatement();
-                            resultSet5 = statement5.executeQuery("SELECT " + cl + " from " + currentTable + " where " +
-                                    " __search_id = '" + n.getSearchID() + "';" );
-                            while (resultSet5.next()) {
-                                String keyComp = resultSet5.getString(1);
-                                if(keyComp != null && keyComp.toLowerCase().compareTo(keyW) == 0) {*//*
-                                    statement4 = conn.createStatement();
-                                    resultSet4 = statement4.executeQuery("SELECT t1.__search_id FROM " + pointTable + " AS t1 INNER JOIN " +
-                                            currentTable + " as t2 on t1." + key + " = t2." + fk + " where t2.__search_id = '"
-                                            + n.getSearchID() + "'; ");
-                                    while (resultSet4.next()) {
-
-                                        int id = resultSet4.getInt(1);
-                                        Node nd = new Node(id,pointTable);
-                                        nd.addKeyword(keyW);
-                                        nd.setKeywordNode(true);
-                                        System.out.println(nd.getTableName() + "->" + nd.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
-                                        nd.addAdjacentNode(n);
-                                        Edge edge = new Edge(nd,n,1);
-                                        edges.add(edge);
-                                        Edge bedge = new Edge(n,nd,0);
-                                        backedges.add(bedge);
-                                        n.incrementScore();
-                                        toAdd.add(nd);
-                                        n.addAdjacentNode(nd);
-                                  //  }
-                               // }
-                            //}
-                        }
-
-
-
-
-
-
-                }
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-*/
-
-
         }
-
-
-
 
         for (Node node : toAdd) {
             if (interestSet.containsKey(node)) {
@@ -555,9 +418,7 @@ public class Utility {
                                 //TODO: uncomment
                                 term.addKeyword(s);
                                 temp.put(id, term);
-
                                 // interestSet.put(id, term);
-
                                 term.addAdjacentNode(node2);
                                 Edge edge = new Edge(term, node2, 1);
                                 edges.add(edge);
@@ -566,18 +427,13 @@ public class Utility {
                                 node2.incrementScore();
 
                             }
-
                         }
                     }
-
-
                 }
 
                 for (Map.Entry<Integer, Node> entry : temp.entrySet()) {
                     interestSet.put(entry.getKey(), entry.getValue());
                 }
-
-
             } catch (SQLException ex2) {
                 ex2.printStackTrace();
             }
@@ -696,13 +552,6 @@ public class Utility {
             }
         }
     }
-
-    /**
-     *
-     *
-     * @param nodes
-     * @return
-     */
 
     /**
      * This method calculate the maximus value of the node score

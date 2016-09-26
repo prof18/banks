@@ -29,10 +29,10 @@ public class Main {
             Scanner in = new Scanner(System.in);
             //ask database username
             System.out.print("Enter Username: ");
-            String username = in.nextLine();
+            String username = /*in.nextLine();*/ "marco";
             //ask database name
             System.out.print("Enter database name: ");
-            String database = in.nextLine();
+            String database = /*in.nextLine();*/ "imdb";
             //connect to database
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
@@ -44,7 +44,7 @@ public class Main {
             Utility.createGraph(conn,database,info);
 
             //ask for keyword
-            System.out.print("Enter keyword (Enter to insert another, \"q\" to exit):\n ");
+            System.out.print("Enter keyword (Enter to insert another, \"q\" to exit):\n");
 
             ArrayList<String> temp = new ArrayList<>();
             while (in.hasNext()) {

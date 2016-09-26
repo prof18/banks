@@ -146,7 +146,7 @@ public class Utility {
                     int max = meta.getColumnCount();
                     for (int i = 1; i < max; i++) {
                         String str = columns.getString(i);
-                        if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
+                        if (str != null && str.toLowerCase().contains(match.toLowerCase()) /*isContained(str.toLowerCase(), match.toLowerCase())*/) {
                             System.out.println("Matched: " + str);
                             n.setKeywordNode(true);
                             n.addKeyword(match);
@@ -176,7 +176,8 @@ public class Utility {
 
     public static boolean isContained(String s1, String s2) {
         //split string by whitespace
-        for (String word : s1.split(",")) {
+
+        for (String word : s1.split("\\b+")) {
             if (word.equals(s2))
                 return true;
         }

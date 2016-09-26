@@ -44,10 +44,20 @@ public class Main {
             Utility.createGraph(conn,database,info);
 
             //ask for keyword
-            System.out.print("Enter keyword (use comma as separator): ");
+            System.out.print("Enter keyword (Enter to insert another, \"q\" to exit):\n ");
 
-            String keyword = in.nextLine();
-            String[] temp = keyword.split(",");
+            ArrayList<String> temp = new ArrayList<>();
+            while (in.hasNext()) {
+                //System.out.print("Enter keyword (one for line, q to exit): ");
+                String keyword = in.nextLine();
+                if (keyword.toLowerCase().compareTo("q") == 0) {
+                    break;
+                } else
+                    temp.add(keyword);
+            }
+
+            long start = System.currentTimeMillis();
+
 
             HashMap<String, ArrayList<Node>> tableTuple = new HashMap<>();
             //keyword that aren't table
@@ -305,6 +315,10 @@ public class Main {
                 System.out.println(Ttemp.toString());
                 Ttemp = outputBuffer.poll();
             }
+
+            long finish = System.currentTimeMillis();
+            long execTime = (finish - start)/1000;
+            System.out.println("Global Time: " + execTime + " seconds");
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();

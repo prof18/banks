@@ -124,7 +124,8 @@ public class Utility {
      * @return  interestSet     The interest set of node
      */
 
-    public static HashMap<Integer, Node> createInterestSet(ConnectionDB dbConn, String match, dbInfo info) {
+    public static HashMap<Integer, Node> createInterestSet(ConnectionDB dbConn, String match, dbInfo info,
+                                                           ArrayList<String> tableMatch) {
         long before1 = System.currentTimeMillis();
         HashMap<Integer, Node> interestSet = new HashMap<>();
         Connection conn = dbConn.getDBConnection();
@@ -141,22 +142,37 @@ public class Utility {
                 //extract all columns from this tuple
                 columns = stmn.executeQuery("SELECT * FROM " + n.getTableName() + " WHERE __search_id = " + n.getSearchID());
                 //check if a match occurs
-                while(columns.next()) {
+                while (columns.next()) {
                     meta = columns.getMetaData();
                     int max = meta.getColumnCount();
                     for (int i = 1; i < max; i++) {
                         String str = columns.getString(i);
                         String[] splited = match.split("\\b+");
-                        if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
-                            System.out.println("Matched: " + str);
-                            n.setKeywordNode(true);
-                            n.addKeyword(match);
-                            interestSet.put(n.getSearchID(), n);
-                            break;
+                        if (tableMatch == null) {
+                            if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
+                                System.out.println("Matched: " + str);
+                                n.setKeywordNode(true);
+                                n.addKeyword(match);
+                                interestSet.put(n.getSearchID(), n);
+                                break;
+                            }
+                        } else {
+
+                           for (String s : tableMatch) {
+                               if (str != null && isContained(str.toLowerCase(), match.toLowerCase())
+                                       && n.getTableName().toLowerCase().compareTo(s.toLowerCase()) == 0) {
+                                   System.out.println("Matched: " + str);
+                                   n.setKeywordNode(true);
+                                   n.addKeyword(match);
+                                   //n.addKeyword(s);
+                                   interestSet.put(n.getSearchID(), n);
+                                   break;
+                               }
+                           }
                         }
                     }
-                }
 
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -341,7 +357,7 @@ public class Utility {
 
         //cycle all the table name
         //necessary when the keyword is a table name
-        for (String s : matchList) {
+/*        for (String s : matchList) {
 
 
             try {
@@ -457,7 +473,7 @@ public class Utility {
             } catch (SQLException ex2) {
                 ex2.printStackTrace();
             }
-        }
+        }*/
 
         long after = System.currentTimeMillis();
 

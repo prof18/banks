@@ -104,7 +104,7 @@ public class Main {
             for (String s : notTable) {
 
                 //create the interest set for the current keyword
-                interestSet = Utility.createInterestSet(conn,s,info);
+                interestSet = Utility.createInterestSet(conn,s,info,tableMatch);
 
                 //connects the node in the interest set
                 edgeWrapper = Utility.connectNodes(conn,interestSet,info.getNodes(),info,tableMatch,commonNodes);
@@ -218,7 +218,7 @@ public class Main {
                     iteratorHeap.add(spIterator);
                 //the init of the nodelist v.Li
                 if (!v.isVisited()) {
-                    for (String term: temp)
+                    for (String term: notTable)
                         v.createVLi(term);
                     v.setVisited(true);
                 }

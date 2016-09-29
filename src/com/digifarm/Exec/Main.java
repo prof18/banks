@@ -32,7 +32,7 @@ public class Main {
             String username = /*in.nextLine();*/ "marco";
             //ask database name
             System.out.print("Enter database name: ");
-            String database = /*in.nextLine();*/ "imdb";
+            String database = /*in.nextLine();*/ "mondial";
             //connect to database
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
@@ -107,7 +107,7 @@ public class Main {
                 interestSet = Utility.createInterestSet(conn,s,info,tableMatch);
 
                 //connects the node in the interest set
-                edgeWrapper = Utility.connectNodes(conn,interestSet,info.getNodes(),info,tableMatch,commonNodes);
+                edgeWrapper = Utility.connectNodes(conn,interestSet,info.getNodes(),info,commonNodes);
 
                 ArrayList<Edge> edges = edgeWrapper.get(0);
                 ArrayList<Edge> backedges = edgeWrapper.get(1);

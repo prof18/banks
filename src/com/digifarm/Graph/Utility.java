@@ -148,7 +148,7 @@ public class Utility {
                     for (int i = 1; i < max; i++) {
                         String str = columns.getString(i);
                         String[] splited = match.split("\\b+");
-                        if (tableMatch == null) {
+                        if (tableMatch.size() == 0) {
                             if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
                                 System.out.println("Matched: " + str);
                                 n.setKeywordNode(true);
@@ -231,8 +231,7 @@ public class Utility {
      */
 
     public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet,
-                                        HashMap<Integer, Node> nodeList, dbInfo info, ArrayList<String> matchList,
-                                        HashMap<Node, ArrayList<Node>> commonNodes) {
+                                        HashMap<Integer, Node> nodeList, dbInfo info, HashMap<Node, ArrayList<Node>> commonNodes) {
 
         long before = System.currentTimeMillis();
 
@@ -249,6 +248,8 @@ public class Utility {
         ResultSet resultSet, resultSet1, resultSet4, resultSet5;
 
         String tbl;
+        int counter = 0;
+        String table2;
 
 
         for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {

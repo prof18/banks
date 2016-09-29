@@ -219,6 +219,210 @@ public class Utility {
         return false;
     }
 
+    public static HashMap<Node,ArrayList<Node>> findForward(ConnectionDB dBconn ,int depth, HashMap<Integer,Node> interestSet, HashMap<Integer,Node> set,
+                                                            HashMap<Node,ArrayList<Node>> startList) {
+
+        HashMap<Node,ArrayList<Node>> forwardMap = new HashMap<>();
+
+        HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
+        ArrayList<String> queries;
+
+        Connection conn = dBconn.getDBConnection();
+        Statement statement;
+        ResultSet resultSet;
+
+        Node n;
+        ArrayList<Node> nodeList = new ArrayList<>();
+
+        //se e' il primo livello devo ciclare sull'interest set, se i llivello e' maggiore ciclo sulla lista di nodi
+        //precedentemente trovata.
+        if (depth == 1 ) {
+
+            for (Map.Entry<Integer,Node> entry : interestSet.entrySet()) {
+
+                n = entry.getValue();
+                queries = sqlKey.get(n.getTableName());
+                if (queries != null && !queries.isEmpty()) {
+
+                    for (String q : queries) {
+
+                        try {
+
+                            q += " WHERE t1.__search_id = " + n.getSearchID();
+
+                            statement = conn.createStatement();
+                            resultSet = statement.executeQuery(q);
+
+                            while (resultSet.next()) {
+
+                                Node connected = set.get(resultSet.getInt(2));
+                                if (forwardMap.containsKey(n)) {
+                                    forwardMap.get(n).add(connected);
+                                } else {
+
+                                    ArrayList<Node> list = new ArrayList<>();
+                                    list.add(connected);
+                                    forwardMap.put(n,list);
+                                }
+                            }
+
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+        } else {
+
+            for (Map.Entry<Node,ArrayList<Node>> entry : startList.entrySet()) {
+
+                nodeList = entry.getValue();
+
+                for (Node node: nodeList) {
+
+                    queries = sqlKey.get(node.getTableName());
+                    if (queries != null && !queries.isEmpty()) {
+
+                        for (String q: queries) {
+
+                            try {
+
+                                q += " WHERE t1.__search_id = " + node.getSearchID();
+
+                                statement = conn.createStatement();
+                                resultSet = statement.executeQuery(q);
+
+                                while (resultSet.next()) {
+
+                                    Node connected = set.get(resultSet.getInt(2));
+                                    if (forwardMap.containsKey(node)) {
+                                        forwardMap.get(node).add(connected);
+                                    } else {
+
+                                        ArrayList<Node> list = new ArrayList<>();
+                                        list.add(connected);
+                                        forwardMap.put(node, list);
+                                    }
+                                }
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        return forwardMap;
+    }
+
+    public static HashMap<Node,ArrayList<Node>> findBackward(ConnectionDB dBconn,int depth, HashMap<Integer,Node> interestSet, HashMap<Integer,Node> set,
+                                                            HashMap<Node,ArrayList<Node>> startList, dbInfo info) {
+
+        HashMap<Node,ArrayList<Node>> backwardMap = new HashMap<>();
+
+        HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
+        ArrayList<String> queries;
+
+        Connection conn = dBconn.getDBConnection();
+        Statement statement;
+        ResultSet resultSet;
+
+        Node n;
+        ArrayList<Node> nodeList = new ArrayList<>();
+
+        //se e' il primo livello devo ciclare sull'interest set, se i llivello e' maggiore ciclo sulla lista di nodi
+        //precedentemente trovata.
+        if (depth == 1) {
+
+            for (Map.Entry<Integer,Node> entry : interestSet.entrySet()) {
+
+                n = entry.getValue();
+
+                for(String table : info.getTableList()) {
+
+                    queries = sqlKey.get(table);
+                    if (queries != null && !queries.isEmpty()) {
+                        //ciclo solo se ci sono query disponibili
+                        for (String s : queries) {
+
+                            try {
+                                s += " WHERE t2.__search_id = '" + n.getSearchID() + "'";
+
+                                statement = conn.createStatement();
+                                resultSet = statement.executeQuery(s);
+
+                                while (resultSet.next()) {
+
+                                    Node connected = set.get(resultSet.getInt(1));
+
+                                    if (backwardMap.containsKey(connected)) {
+                                        backwardMap.get(connected).add(n);
+                                    } else {
+                                        ArrayList<Node> list = new ArrayList<>();
+                                        list.add(n);
+                                        backwardMap.put(connected, list);
+                                    }
+                                }
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+
+            for (Map.Entry<Node,ArrayList<Node>> entry : startList.entrySet()) {
+
+                nodeList = entry.getValue();
+
+                for (Node node : nodeList) {
+
+                    for(String table : info.getTableList()) {
+
+                        queries = sqlKey.get(table);
+
+                        if (queries != null && !queries.isEmpty()) {
+                            //ciclo solo se ci sono query disponibili
+                            for (String s : queries) {
+
+                                try {
+                                    s += " WHERE t2.__search_id = '" + node.getSearchID() + "'";
+
+                                    statement = conn.createStatement();
+                                    resultSet = statement.executeQuery(s);
+
+                                    while (resultSet.next()) {
+
+                                        Node connected = set.get(resultSet.getInt(1));
+
+                                        if (backwardMap.containsKey(connected)) {
+                                            backwardMap.get(connected).add(node);
+                                        } else {
+                                            ArrayList<Node> list = new ArrayList<>();
+                                            list.add(node);
+                                            backwardMap.put(connected, list);
+                                        }
+                                    }
+
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        return backwardMap;
+    }
 
     /**
      *  This method connect the nodes of the set provided by input
@@ -228,7 +432,7 @@ public class Utility {
      * @param interestSet       The interest set that has to be connected
      * @param nodeList          The "global" node list
      * @return                  An ArrayList of edge and backedge
-     */
+     *//*
 
     public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet,
                                         HashMap<Integer, Node> nodeList, dbInfo info, HashMap<Node, ArrayList<Node>> commonNodes) {
@@ -317,6 +521,8 @@ public class Utility {
 
                                 //TODO: ADD THE NODE ONLY IF NECESSARY
                                 connected = nodeList.get(resultSet1.getInt(1));
+
+
                                 if (commonNodes.get(connected) != null) {
                                     commonNodes.get(connected).add(n);
                                 } else {
@@ -346,135 +552,6 @@ public class Utility {
 
         }
 
-        Node node;
-        String table;
-
-        Statement stm, stm1;
-        ResultSet rs, rs1;
-
-        ArrayList<String> colName1 = new ArrayList<>();
-        ArrayList<String> colName2 = new ArrayList<>();
-        String fromTable = null, toTable = null;
-
-        //cycle all the table name
-        //necessary when the keyword is a table name
-/*        for (String s : matchList) {
-
-
-            try {
-                stm = conn.createStatement();
-                    rs = stm.executeQuery("SELECT c1.relname AS src_table, c3.conrelid, c3.conkey AS foreign_key, c2.relname " +
-                            "AS dst_table, c3.confrelid, c3.confkey AS primary_key FROM pg_constraint AS c3 INNER JOIN pg_class AS c1 " +
-                            "ON c3.conrelid = c1.oid INNER JOIN pg_class AS c2 ON c3.confrelid = c2.oid WHERE confrelid <> 0" +
-                            " AND c1.relname = '" + s + "' ;");
-
-                Integer[] fk, pk;
-                Array a;
-
-
-                while (rs.next()) {
-                    fromTable = rs.getString(1);
-                    toTable = rs.getString(4);
-                    a = rs.getArray(3);
-                    fk = (Integer[]) a.getArray();
-                    a = rs.getArray(6);
-                    pk = (Integer[]) a.getArray();
-
-
-                    stm1 = conn.createStatement();
-                    for (Integer i : fk) {
-                        rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i +
-                                " AND a1.attrelid = " + rs.getString(2));
-                        while (rs1.next()) {
-                            colName1.add(rs1.getString(1));
-                        }
-                    }
-
-                    stm1 = conn.createStatement();
-                    for (Integer i : pk) {
-                        rs1 = stm1.executeQuery("SELECT a1.attname FROM pg_attribute AS a1  WHERE a1.attnum = " + i +
-                                " AND a1.attrelid = " + rs.getString(5));
-                        while (rs1.next()) {
-                            colName2.add(rs1.getString(1));
-                        }
-                    }
-                }
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-
-
-            System.out.println("fine");
-
-
-            //query for the keyword that is table
-            Node node2;
-            Statement statement2;
-            ResultSet resultSet2, resultSet3;
-            String key = null;
-            ArrayList<Integer> searchIdList = new ArrayList<>();
-
-            try {
-
-                statement2 = conn.createStatement();
-
-                ArrayList<HashMap<Integer, Node>> adding = new ArrayList<>();
-                HashMap<Integer, Node> temp = new HashMap<>();
-
-                for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
-
-                    node2 = e.getValue();
-
-                    for (String t : colName2) {
-
-                        //found a tuple that is a destination tuple from the search term
-                        if (toTable.compareTo(node2.getTableName()) == 0) {
-
-                            //find two same value of the key
-                            for (String t1 : colName1) {
-
-                                resultSet2 = statement2.executeQuery("SELECT " + t + " FROM " + toTable + " WHERE __search_id = '"
-                                        + node2.getSearchID() + "';");
-                                while (resultSet2.next())
-                                    key = resultSet2.getString(1);
-
-                                resultSet3 = statement2.executeQuery("SELECT __search_id FROM " + fromTable + " WHERE " + t1 +
-                                        " = '" + key + "';");
-                                while (resultSet3.next()) {
-                                    int searchId = resultSet3.getInt(1);
-                                    searchIdList.add(searchId);
-                                }
-                            }
-
-
-                            for (Integer id : searchIdList) {
-
-                                Node term = new Node(id, fromTable);
-                                term.setKeywordNode(true);
-                                //TODO: uncomment
-                                term.addKeyword(s);
-                                temp.put(id, term);
-                                // interestSet.put(id, term);
-                                term.addAdjacentNode(node2);
-                                Edge edge = new Edge(term, node2, 1);
-                                edges.add(edge);
-                                Edge backedge = new Edge(node2, term, 0);
-                                backedges.add(backedge);
-                                node2.incrementScore();
-
-                            }
-                        }
-                    }
-                }
-
-                for (Map.Entry<Integer, Node> entry : temp.entrySet()) {
-                    interestSet.put(entry.getKey(), entry.getValue());
-                }
-            } catch (SQLException ex2) {
-                ex2.printStackTrace();
-            }
-        }*/
 
         long after = System.currentTimeMillis();
 
@@ -484,7 +561,7 @@ public class Utility {
         list.add(edges);
         list.add(backedges);
         return list;
-    }
+    }*/
 
     /**
      *

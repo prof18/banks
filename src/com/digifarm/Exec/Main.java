@@ -101,13 +101,47 @@ public class Main {
             HashMap<Integer, Node> interestSet = new HashMap<>();
             ArrayList<ArrayList<Edge>> edgeWrapper = new ArrayList<>();
 
+            //key --> partenza, value --> list of arrivals
+            HashMap<Node,ArrayList<Node>> xLevel = new HashMap<>();
+            //wrapper. chiave numero livello, valore un merdaio di robe
+            HashMap<Integer, ArrayList<HashMap<Node,ArrayList<Node>>>> levelWrapper = new HashMap<>();
+
+
+
             for (String s : notTable) {
+
+                //depth
+                int i = 1;
+                //TODO: CHANGE THE DEPTH OF NAVIGATION
+                int maxDepth = 3;
 
                 //create the interest set for the current keyword
                 interestSet = Utility.createInterestSet(conn,s,info,tableMatch);
 
                 //connects the node in the interest set
-                edgeWrapper = Utility.connectNodes(conn,interestSet,info.getNodes(),info,commonNodes);
+                //edgeWrapper = Utility.connectNodes(conn,interestSet,info.getNodes(),info,commonNodes);
+
+                HashMap<Node,ArrayList<Node>> backward = new HashMap<>();
+                HashMap<Node,ArrayList<Node>> forward = new HashMap<>();
+
+                long before = System.currentTimeMillis();
+
+                while (i<=maxDepth) {
+
+                    //TODO: con la seconda parola chiave ora come ora non si agisce sugli stessi livelli
+                    backward = Utility.findBackward(conn,i,interestSet,info.getNodes(),backward,info);
+                    forward = Utility.findForward(conn,i,interestSet,info.getNodes(),forward);
+                    ArrayList<HashMap<Node,ArrayList<Node>>> levelX = new ArrayList<>();
+                    levelX.add(backward);
+                    levelX.add(forward);
+                    levelWrapper.put(i,levelX);
+                    i++;
+
+                }
+
+                long after = System.currentTimeMillis();
+
+                System.out.println("Navigation in " + (after-before)/1000 + " seconds");
 
                 ArrayList<Edge> edges = edgeWrapper.get(0);
                 ArrayList<Edge> backedges = edgeWrapper.get(1);
@@ -135,7 +169,7 @@ public class Main {
             Node connected;
             ArrayList<Node> nodeList;
 
-            for (Map.Entry<Node,ArrayList<Node>> entry : commonNodes.entrySet()) {
+           /* for (Map.Entry<Node,ArrayList<Node>> entry : commonNodes.entrySet()) {
 
                 connected = entry.getKey();
                 nodeList = entry.getValue();
@@ -160,7 +194,7 @@ public class Main {
                         }
                     }
                 }
-            }
+            }*/
 
             max = Utility.maxNodeScore(globalNodeList, max);
             min = Utility.minEdgeWeight(globalEdgeList, min);

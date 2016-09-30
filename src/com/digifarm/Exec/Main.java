@@ -6,10 +6,7 @@ import com.digifarm.DBConnection.ConnectionDB;
 import com.digifarm.Graph.*;
 import com.digifarm.Graph.Utility;
 import com.digifarm.Tree.Tree;
-import com.sun.org.apache.xml.internal.serializer.ElemDesc;
-import com.sun.org.apache.xpath.internal.axes.HasPositionalPredChecker;
 
-import java.sql.Array;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -104,16 +101,22 @@ public class Main {
             //key --> partenza, value --> list of arrivals
             HashMap<Node,ArrayList<Node>> xLevel = new HashMap<>();
             //wrapper. chiave numero livello, valore un merdaio di robe
-            HashMap<Integer, ArrayList<HashMap<Node,ArrayList<Node>>>> levelWrapper = new HashMap<>();
 
+
+            HashMap<Integer,Levels> levelWrapper = new HashMap<>();
+
+            //TODO: CHANGE THE DEPTH OF NAVIGATION
+            int maxDepth = 3;
+
+            for (int j = 1; j <= maxDepth; j++)
+                levelWrapper.put(j,new Levels());
 
 
             for (String s : notTable) {
 
                 //depth
                 int i = 1;
-                //TODO: CHANGE THE DEPTH OF NAVIGATION
-                int maxDepth = 3;
+
 
                 //create the interest set for the current keyword
                 interestSet = Utility.createInterestSet(conn,s,info,tableMatch);
@@ -128,15 +131,20 @@ public class Main {
 
                 while (i<=maxDepth) {
 
-                    //TODO: con la seconda parola chiave ora come ora non si agisce sugli stessi livelli
-                    backward = Utility.findBackward(conn,i,interestSet,info.getNodes(),backward,info);
-                    forward = Utility.findForward(conn,i,interestSet,info.getNodes(),forward);
-                    ArrayList<HashMap<Node,ArrayList<Node>>> levelX = new ArrayList<>();
-                    levelX.add(backward);
-                    levelX.add(forward);
-                    levelWrapper.put(i,levelX);
-                    i++;
+                    Levels l = levelWrapper.get(i);
+                    if (i==1) {
+                        Utility.findBackwardInterest(conn, interestSet, info.getNodes(), info, l);
+                        Utility.findForwardInterest(conn, interestSet, info.getNodes(), l);
+                    } else {
 
+                        //findBackwardOfBackward
+                        Utility.bFindBackward(conn,info.getNodes(),levelWrapper.get(i-1).getBackward(),l,info);
+                        //findBackwardOfForward
+                        System.out.println("Wjgjs");
+                        //findForwardOfBackward
+                        //findForwardOfForward
+                    }
+                    i++;
                 }
 
                 long after = System.currentTimeMillis();

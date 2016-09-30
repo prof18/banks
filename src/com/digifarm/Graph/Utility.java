@@ -240,7 +240,6 @@ public class Utility {
         ResultSet resultSet;
 
         Node n;
-        ArrayList<Node> nodeList = new ArrayList<>();
 
         for (Map.Entry<Integer,Node> entry : interestSet.entrySet()) {
 
@@ -261,7 +260,8 @@ public class Utility {
 
                             Node connected = set.get(resultSet.getInt(2));
                             if (forwardMap.containsKey(n)) {
-                                forwardMap.get(n).add(connected);
+                                if (forwardMap.get(n) != null && !forwardMap.get(n).contains(connected))
+                                    forwardMap.get(n).add(connected);
                             } else {
 
                                 ArrayList<Node> list = new ArrayList<>();
@@ -323,7 +323,8 @@ public class Utility {
                                 Node connected = set.get(resultSet.getInt(1));
 
                                 if (backwardMap.containsKey(connected)) {
-                                    backwardMap.get(connected).add(n);
+                                    if (backwardMap.get(connected) != null && !backwardMap.get(connected).contains(n))
+                                         backwardMap.get(connected).add(n);
                                 } else {
                                     ArrayList<Node> list = new ArrayList<>();
                                     list.add(n);
@@ -341,6 +342,16 @@ public class Utility {
 
     }
 
+    /**
+     *
+     *  serve per trovare i backward di altri backward
+     *
+     * @param dBconn
+     * @param set
+     * @param backwards
+     * @param level
+     * @param info
+     */
     public static void bFindBackward(ConnectionDB dBconn, HashMap<Integer, Node> set, HashMap<Node,ArrayList<Node>> backwards,
                               Levels level, dbInfo info) {
 
@@ -377,7 +388,8 @@ public class Utility {
                                 Node connected = set.get(resultSet.getInt(1));
 
                                 if (backwardMap.containsKey(connected)) {
-                                    backwardMap.get(connected).add(n);
+                                    if (backwardMap.get(connected) != null && !backwardMap.get(connected).contains(n))
+                                        backwardMap.get(connected).add(n);
                                 } else {
                                     ArrayList<Node> list = new ArrayList<>();
                                     list.add(n);
@@ -392,6 +404,176 @@ public class Utility {
                 }
             }
 
+        }
+    }
+
+    //bacckward of foward
+    public static void fFindBackward(ConnectionDB dBconn, HashMap<Integer,Node> set, HashMap<Node,ArrayList<Node>> forward,
+                                     Levels level, dbInfo info) {
+
+        HashMap<Node,ArrayList<Node>> backwardMap = level.getBackward();
+
+        HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
+        ArrayList<String> queries;
+
+        Connection conn = dBconn.getDBConnection();
+        Statement statement;
+        ResultSet resultSet;
+
+        Node n;
+        ArrayList<Node> nodeList = new ArrayList<>();
+
+        for (Map.Entry<Node,ArrayList<Node>> entry : forward.entrySet()) {
+
+            nodeList = entry.getValue();
+
+            for (Node node : nodeList) {
+
+                for(String table : info.getTableList()) {
+
+                    queries = sqlKey.get(table);
+                    if (queries != null && !queries.isEmpty()) {
+                        //ciclo solo se ci sono query disponibili
+                        for (String s : queries) {
+
+                            try {
+                                s += " WHERE t2.__search_id = '" + node.getSearchID() + "'";
+
+                                statement = conn.createStatement();
+                                resultSet = statement.executeQuery(s);
+
+                                while (resultSet.next()) {
+
+                                    Node connected = set.get(resultSet.getInt(1));
+
+                                    if (backwardMap.containsKey(connected)) {
+                                        if (backwardMap.get(connected) != null && !backwardMap.get(connected).contains(node))
+                                            backwardMap.get(connected).add(node);
+                                    } else {
+                                        ArrayList<Node> list = new ArrayList<>();
+                                        list.add(node);
+                                        backwardMap.put(connected, list);
+                                    }
+                                }
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //trova i forward dei backward
+    public static void bFindForward(ConnectionDB dBconn, HashMap<Integer,Node> set, HashMap<Node,ArrayList<Node>> backward,
+                                    Levels level) {
+
+        HashMap<Node,ArrayList<Node>> forwardMap = level.getForward();
+
+        HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
+        ArrayList<String> queries;
+
+        Connection conn = dBconn.getDBConnection();
+        Statement statement;
+        ResultSet resultSet;
+
+        Node n;
+
+        for (Map.Entry<Node,ArrayList<Node>> entry : backward.entrySet()) {
+
+            n = entry.getKey();
+
+            queries = sqlKey.get(n.getTableName());
+            if (queries != null && !queries.isEmpty()) {
+
+                for (String q : queries) {
+
+                    try {
+
+                        q += " WHERE t1.__search_id = " + n.getSearchID();
+
+                        statement = conn.createStatement();
+                        resultSet = statement.executeQuery(q);
+
+                        while (resultSet.next()) {
+
+                            Node connected = set.get(resultSet.getInt(2));
+                            if (forwardMap.containsKey(n)) {
+                                if (forwardMap.get(n) != null && !forwardMap.get(n).contains(connected))
+                                    forwardMap.get(n).add(connected);
+                            } else {
+
+                                ArrayList<Node> list = new ArrayList<>();
+                                list.add(connected);
+                                forwardMap.put(n,list);
+                            }
+                        }
+
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    //trova i forward dei forward
+    public static void fFindForward(ConnectionDB dBconn, HashMap<Integer,Node> set, HashMap<Node,ArrayList<Node>> forward,
+                                    Levels level) {
+
+        HashMap<Node, ArrayList<Node>> forwardMap = level.getForward();
+
+        HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
+        ArrayList<String> queries;
+
+        Connection conn = dBconn.getDBConnection();
+        Statement statement;
+        ResultSet resultSet;
+
+        Node n;
+        ArrayList<Node> nodeList = new ArrayList<>();
+
+        for (Map.Entry<Node,ArrayList<Node>> entry : forward.entrySet()) {
+
+            nodeList = entry.getValue();
+
+            for (Node node : nodeList) {
+
+                queries = sqlKey.get(node.getTableName());
+                if (queries != null && !queries.isEmpty()) {
+
+                    for (String q : queries) {
+
+                        try {
+
+                            q += " WHERE t1.__search_id = " + node.getSearchID();
+
+                            statement = conn.createStatement();
+                            resultSet = statement.executeQuery(q);
+
+                            while (resultSet.next()) {
+
+                                Node connected = set.get(resultSet.getInt(2));
+                                if (forwardMap.containsKey(node)) {
+                                    if (forwardMap.get(node) != null && !forwardMap.get(node).contains(connected))
+                                        forwardMap.get(node).add(connected);
+                                } else {
+
+                                    ArrayList<Node> list = new ArrayList<>();
+                                    list.add(connected);
+                                    forwardMap.put(node,list);
+                                }
+                            }
+
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+            }
         }
     }
 

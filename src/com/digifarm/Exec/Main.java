@@ -140,9 +140,12 @@ public class Main {
                         //findBackwardOfBackward
                         Utility.bFindBackward(conn,info.getNodes(),levelWrapper.get(i-1).getBackward(),l,info);
                         //findBackwardOfForward
-                        System.out.println("Wjgjs");
+                        Utility.fFindBackward(conn,info.getNodes(),levelWrapper.get(i-1).getForward(),l,info);
                         //findForwardOfBackward
+                        Utility.bFindForward(conn,info.getNodes(),levelWrapper.get(i-1).getBackward(),l);
                         //findForwardOfForward
+                        Utility.fFindForward(conn,info.getNodes(),levelWrapper.get(i-1).getForward(),l);
+                        System.out.println("Wjgjs");
                     }
                     i++;
                 }
@@ -151,7 +154,8 @@ public class Main {
 
                 System.out.println("Navigation in " + (after-before)/1000 + " seconds");
 
-                ArrayList<Edge> edges = edgeWrapper.get(0);
+
+              /*  ArrayList<Edge> edges = edgeWrapper.get(0);
                 ArrayList<Edge> backedges = edgeWrapper.get(1);
 
                 //add node to global list
@@ -170,8 +174,12 @@ public class Main {
                     globalEdgeList.add(edge);
                 //add backedge to global list
                 for (Edge bedge : backedges)
-                    globalBEdgeList.add(bedge);
+                    globalBEdgeList.add(bedge);*/
             }
+
+            
+
+
 
             //if a node is common to two keyword, add this node to the globalNodeList
             Node connected;

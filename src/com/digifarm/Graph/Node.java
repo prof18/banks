@@ -95,9 +95,9 @@ public class Node implements Comparable<Node> {
      * This method merge the adjacent list and the keyword list of two nodes (that they'll be the same btw)
      *
      * @param adjacent2
-     * @param keyword
+     * @param list
      */
-    public void mergeNode(ArrayList<Node> adjacent2, String keyword) {
+    public void mergeNode(ArrayList<Node> adjacent2, ArrayList<String> list) {
         ArrayList<Node> adjacent1 = this.getAdjacentNodes();
         ArrayList<String> keyword1 = this.getKeywordList();
         //update adjacent list of the current node
@@ -108,8 +108,10 @@ public class Node implements Comparable<Node> {
 
         //update the keyword list of the current node
         //TODO: CONTROLLARE NEL MAIN CHE LE PAROLE CHIAVE SIANO UNICHE. Ad esempio scrivi milan milan
-        if (!keyword1.contains(keyword))
-            keyword1.add(keyword);
+        for (String s : list) {
+            if (!keyword1.contains(s))
+                keyword1.add(s);
+        }
     }
 
     public void addKeyword(String keyword) {

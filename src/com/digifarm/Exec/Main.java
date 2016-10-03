@@ -145,7 +145,6 @@ public class Main {
                         Utility.bFindForward(conn,info.getNodes(),levelWrapper.get(i-1).getBackward(),l);
                         //findForwardOfForward
                         Utility.fFindForward(conn,info.getNodes(),levelWrapper.get(i-1).getForward(),l);
-                        System.out.println("Wjgjs");
                     }
                     i++;
                 }
@@ -222,9 +221,14 @@ public class Main {
                                                 globalNodeList.put(from.getSearchID(),from);
                                             }
                                             Edge edge = new Edge(from,tempNode,1);
-                                            globalEdgeList.add(edge);
-                                            Edge bedge = new Edge(tempNode,from,0);
-                                            globalBEdgeList.add(bedge);
+                                            //TODO: va bene o i nodi in piu' sono un errore?
+                                            if (!globalEdgeList.contains(edge)) {
+                                                globalEdgeList.add(edge);
+                                                tempNode.incrementScore();
+                                                Edge bedge = new Edge(tempNode,from,0);
+                                                globalBEdgeList.add(bedge);
+                                            }
+
 
                                             if (depth > 1) {
 
@@ -239,16 +243,20 @@ public class Main {
 
                                                             newTo.addAdjacentNode(tempNode);
                                                             tempNode.addAdjacentNode(newTo);
-                                                            newTo.incrementScore();
+
                                                             if (globalNodeList.containsKey(tempNode.getSearchID())) {
                                                                 globalNodeList.get(tempNode.getSearchID()).mergeNode(tempNode.getAdjacentNodes(),tempNode.getKeywordList());
                                                             } else {
                                                                 globalNodeList.put(tempNode.getSearchID(),tempNode);
                                                             }
                                                             Edge edge1 = new Edge(tempNode,newTo,1);
-                                                            globalEdgeList.add(edge1);
-                                                            Edge bedge1 = new Edge(newTo,tempNode,0);
-                                                            globalBEdgeList.add(bedge1);
+                                                            if (!globalEdgeList.contains(edge1)) {
+                                                                newTo.incrementScore();
+                                                                globalEdgeList.add(edge1);
+                                                                Edge bedge1 = new Edge(newTo,tempNode,0);
+                                                                globalBEdgeList.add(bedge1);
+                                                            }
+
                                                         }
                                                     }
 
@@ -261,16 +269,19 @@ public class Main {
 
                                         from.addAdjacentNode(n);
                                         n.addAdjacentNode(from);
-                                        n.incrementScore();
+
                                         if (globalNodeList.containsKey(from.getSearchID())) {
                                             globalNodeList.get(from.getSearchID()).mergeNode(from.getAdjacentNodes(),from.getKeywordList());
                                         } else {
                                             globalNodeList.put(from.getSearchID(),from);
                                         }
                                         Edge edge = new Edge(from,n,1);
-                                        globalEdgeList.add(edge);
-                                        Edge bedge = new Edge(n,from,0);
-                                        globalBEdgeList.add(bedge);
+                                        if (!globalEdgeList.contains(edge)) {
+                                            n.incrementScore();
+                                            globalEdgeList.add(edge);
+                                            Edge bedge = new Edge(n, from, 0);
+                                            globalBEdgeList.add(bedge);
+                                        }
 
                                         if (depth > 1) {
 
@@ -285,16 +296,19 @@ public class Main {
 
                                                         newTo.addAdjacentNode(n);
                                                         n.addAdjacentNode(newTo);
-                                                        newTo.incrementScore();
+
                                                         if (globalNodeList.containsKey(tempNode.getSearchID())) {
                                                             globalNodeList.get(n.getSearchID()).mergeNode(n.getAdjacentNodes(),n.getKeywordList());
                                                         } else {
                                                             globalNodeList.put(n.getSearchID(),n);
                                                         }
                                                         Edge edge1 = new Edge(n,newTo,1);
-                                                        globalEdgeList.add(edge1);
-                                                        Edge bedge1 = new Edge(newTo,n,0);
-                                                        globalBEdgeList.add(bedge1);
+                                                        if (!globalEdgeList.contains(edge1)) {
+                                                            newTo.incrementScore();
+                                                            globalEdgeList.add(edge1);
+                                                            Edge bedge1 = new Edge(newTo, n, 0);
+                                                            globalBEdgeList.add(bedge1);
+                                                        }
                                                     }
                                                 }
 
@@ -339,15 +353,18 @@ public class Main {
 
                                             from.addAdjacentNode(tempNode);
                                             tempNode.addAdjacentNode(from);
-                                            tempNode.incrementScore();
+
                                             if (globalNodeList.containsKey(tempNode.getSearchID()))
                                                 globalNodeList.get(tempNode.getSearchID()).mergeNode(tempNode.getAdjacentNodes(),tempNode.getKeywordList());
                                             else
                                                 globalNodeList.put(tempNode.getSearchID(),tempNode);
                                             Edge e = new Edge(from,tempNode,1);
-                                            globalEdgeList.add(e);
-                                            Edge bedge = new Edge(tempNode,from,0);
-                                            globalBEdgeList.add(bedge);
+                                            if (!globalEdgeList.contains(e)) {
+                                                tempNode.incrementScore();
+                                                globalEdgeList.add(e);
+                                                Edge bedge = new Edge(tempNode, from, 0);
+                                                globalBEdgeList.add(bedge);
+                                            }
 
                                             if (depth > 1) {
 
@@ -366,15 +383,18 @@ public class Main {
 
                                                             tempNode.addAdjacentNode(fromKey);
                                                             fromKey.addAdjacentNode(tempNode);
-                                                            tempNode.incrementScore();
+
                                                             if (globalNodeList.containsKey(tempNode.getSearchID()))
                                                                 globalNodeList.get(tempNode.getSearchID()).mergeNode(tempNode.getAdjacentNodes(),tempNode.getKeywordList());
                                                             else
                                                                 globalNodeList.put(tempNode.getSearchID(),tempNode);
                                                             Edge edge = new Edge(fromKey,tempNode,1);
-                                                            globalEdgeList.add(edge);
-                                                            Edge bedge1 = new Edge(tempNode,fromKey,0);
-                                                            globalBEdgeList.add(bedge1);
+                                                            if (!globalEdgeList.contains(edge)) {
+                                                                tempNode.incrementScore();
+                                                                globalEdgeList.add(edge);
+                                                                Edge bedge1 = new Edge(tempNode, fromKey, 0);
+                                                                globalBEdgeList.add(bedge1);
+                                                            }
                                                             break;
                                                         }
                                                     }
@@ -387,15 +407,18 @@ public class Main {
 
                                         from.addAdjacentNode(n);
                                         n.addAdjacentNode(from);
-                                        n.incrementScore();
+
                                         if (globalNodeList.containsKey(n.getSearchID()))
                                             globalNodeList.get(n.getSearchID()).mergeNode(n.getAdjacentNodes(),n.getKeywordList());
                                         else
                                             globalNodeList.put(n.getSearchID(),n);
                                         Edge e = new Edge(from,n,1);
-                                        globalEdgeList.add(e);
-                                        Edge bedge = new Edge(n,from,0);
-                                        globalBEdgeList.add(bedge);
+                                        if (!globalEdgeList.contains(e)) {
+                                            n.incrementScore();
+                                            globalEdgeList.add(e);
+                                            Edge bedge = new Edge(n, from, 0);
+                                            globalBEdgeList.add(bedge);
+                                        }
 
                                         if (depth > 1) {
 
@@ -414,15 +437,18 @@ public class Main {
 
                                                         n.addAdjacentNode(fromKey);
                                                         fromKey.addAdjacentNode(n);
-                                                        n.incrementScore();
+
                                                         if (globalNodeList.containsKey(n.getSearchID()))
                                                             globalNodeList.get(n.getSearchID()).mergeNode(n.getAdjacentNodes(),n.getKeywordList());
                                                         else
                                                             globalNodeList.put(n.getSearchID(),n);
                                                         Edge edge = new Edge(fromKey,n,1);
-                                                        globalEdgeList.add(edge);
-                                                        Edge bedge1 = new Edge(n,fromKey,0);
-                                                        globalBEdgeList.add(bedge1);
+                                                        if (!globalEdgeList.contains(edge)) {
+                                                            n.incrementScore();
+                                                            globalEdgeList.add(edge);
+                                                            Edge bedge1 = new Edge(n, fromKey, 0);
+                                                            globalBEdgeList.add(bedge1);
+                                                        }
                                                         break;
                                                     }
                                                 }
@@ -473,6 +499,10 @@ public class Main {
                     }
                 }
             }*/
+
+            System.out.println("jfhusjgf");
+
+            Utility.connectInterestNodes(conn,interestSet,globalEdgeList,globalBEdgeList);
 
             max = Utility.maxNodeScore(globalNodeList, max);
             min = Utility.minEdgeWeight(globalEdgeList, min);

@@ -577,6 +577,61 @@ public class Utility {
         }
     }
 
+    public static void connectInterestNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, ArrayList<Edge> globalEdges,
+                                            ArrayList<Edge> globalBedge) {
+
+
+        ArrayList<String> queries;
+
+        HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
+        Node n;
+
+        Connection conn = dBconn.getDBConnection();
+        Statement stm;
+        ResultSet rs;
+
+        for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
+            n = e.getValue();
+            queries = sqlKey.get(n.getTableName());
+            if(queries != null && !queries.isEmpty()) {
+                for (String q : queries) {
+                    try {
+                        q += " WHERE t1.__search_id = " + n.getSearchID();
+
+                        stm = conn.createStatement();
+                        rs = stm.executeQuery(q);
+
+                        //extract the list of adjacent nodes
+                        Node connected;
+                        Edge edge;
+                        Edge backedge;
+
+                        while(rs.next()) {
+
+                            connected = interestSet.get(rs.getInt(2));
+                            if (connected != null) {
+                                System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
+                                n.addAdjacentNode(connected);
+                                //assign score to the node --> indegree of the node
+                                edge = new Edge(n, connected, 1);
+                                if (!globalEdges.contains(edge)) {
+                                    globalEdges.add(edge);
+                                    connected.incrementScore();
+                                    backedge = new Edge(connected, n, 0);
+                                    globalBedge.add(backedge);
+                                }
+                            }
+                        }
+                    } catch (SQLException e2) {
+                        e2.printStackTrace();
+                    }
+                }
+            }
+        }
+
+
+    }
+
    /*
 
     public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet,

@@ -229,7 +229,7 @@ public class Main {
                                             if (depth > 1) {
 
                                                 int tempD = depth;
-                                                while(tempD==1) {
+                                                while(tempD > 1) {
 
                                                     Levels l = levelWrapper.get(tempD-1);
                                                     HashMap<Node,ArrayList<Node>> listMinusLevel = l.getBackward();
@@ -306,6 +306,132 @@ public class Main {
                                 }
                             }
 
+                            i++;
+                        }
+                    }
+                }
+
+                for (Map.Entry<Node,ArrayList<Node>> e1 : forward.entrySet()) {
+
+                    Node from = e1.getKey();
+                    ArrayList<Node> listTo = e1.getValue();
+
+                    //ho un cazzo di nodo in comune
+                    if (listTo.size() > 1) {
+
+                        int i = 0;
+                        ArrayList<String> keyList = new ArrayList<>();
+                        Node tempNode = null;
+
+                        for (Node n : listTo) {
+
+                            if (i==0) {
+
+                                keyList = n.getKeywordList();
+                                tempNode = n;
+                            } else {
+
+                                for (String s : keyList) {
+
+                                    if (!n.getKeywordList().contains(s)) {
+
+                                        if (tempNode != null) {
+
+                                            from.addAdjacentNode(tempNode);
+                                            tempNode.addAdjacentNode(from);
+                                            tempNode.incrementScore();
+                                            if (globalNodeList.containsKey(tempNode.getSearchID()))
+                                                globalNodeList.get(tempNode.getSearchID()).mergeNode(tempNode.getAdjacentNodes(),tempNode.getKeywordList());
+                                            else
+                                                globalNodeList.put(tempNode.getSearchID(),tempNode);
+                                            Edge e = new Edge(from,tempNode,1);
+                                            globalEdgeList.add(e);
+                                            Edge bedge = new Edge(tempNode,from,0);
+                                            globalBEdgeList.add(bedge);
+
+                                            if (depth > 1) {
+
+                                                int tempD = depth;
+                                                while (tempD > 1) {
+
+                                                    Levels l = levelWrapper.get(tempD-1);
+                                                    HashMap<Node,ArrayList<Node>> listMaxLevel = l.getForward();
+                                                    ArrayList<Node> valueList = new ArrayList<>();
+                                                    Node fromKey;
+                                                    for (Map.Entry<Node,ArrayList<Node>> e3 : listMaxLevel.entrySet()) {
+
+                                                        fromKey = e3.getKey();
+                                                        valueList = e3.getValue();
+                                                        if (valueList.contains(tempNode)) {
+
+                                                            tempNode.addAdjacentNode(fromKey);
+                                                            fromKey.addAdjacentNode(tempNode);
+                                                            tempNode.incrementScore();
+                                                            if (globalNodeList.containsKey(tempNode.getSearchID()))
+                                                                globalNodeList.get(tempNode.getSearchID()).mergeNode(tempNode.getAdjacentNodes(),tempNode.getKeywordList());
+                                                            else
+                                                                globalNodeList.put(tempNode.getSearchID(),tempNode);
+                                                            Edge edge = new Edge(fromKey,tempNode,1);
+                                                            globalEdgeList.add(edge);
+                                                            Edge bedge1 = new Edge(tempNode,fromKey,0);
+                                                            globalBEdgeList.add(bedge1);
+                                                            break;
+                                                        }
+                                                    }
+                                                    tempD--;
+                                                }
+                                            }
+
+                                            tempNode = null;
+                                        }
+
+                                        from.addAdjacentNode(n);
+                                        n.addAdjacentNode(from);
+                                        n.incrementScore();
+                                        if (globalNodeList.containsKey(n.getSearchID()))
+                                            globalNodeList.get(n.getSearchID()).mergeNode(n.getAdjacentNodes(),n.getKeywordList());
+                                        else
+                                            globalNodeList.put(n.getSearchID(),n);
+                                        Edge e = new Edge(from,n,1);
+                                        globalEdgeList.add(e);
+                                        Edge bedge = new Edge(n,from,0);
+                                        globalBEdgeList.add(bedge);
+
+                                        if (depth > 1) {
+
+                                            int tempD = depth;
+                                            while (tempD > 1) {
+
+                                                Levels l = levelWrapper.get(tempD-1);
+                                                HashMap<Node,ArrayList<Node>> listMaxLevel = l.getForward();
+                                                ArrayList<Node> valueList = new ArrayList<>();
+                                                Node fromKey;
+                                                for (Map.Entry<Node,ArrayList<Node>> e3 : listMaxLevel.entrySet()) {
+
+                                                    fromKey = e3.getKey();
+                                                    valueList = e3.getValue();
+                                                    if (valueList.contains(n)) {
+
+                                                        n.addAdjacentNode(fromKey);
+                                                        fromKey.addAdjacentNode(n);
+                                                        n.incrementScore();
+                                                        if (globalNodeList.containsKey(n.getSearchID()))
+                                                            globalNodeList.get(n.getSearchID()).mergeNode(n.getAdjacentNodes(),n.getKeywordList());
+                                                        else
+                                                            globalNodeList.put(n.getSearchID(),n);
+                                                        Edge edge = new Edge(fromKey,n,1);
+                                                        globalEdgeList.add(edge);
+                                                        Edge bedge1 = new Edge(n,fromKey,0);
+                                                        globalBEdgeList.add(bedge1);
+                                                        break;
+                                                    }
+                                                }
+                                                tempD--;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             i++;
                         }
                     }

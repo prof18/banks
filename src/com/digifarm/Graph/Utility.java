@@ -148,7 +148,7 @@ public class Utility {
                     for (int i = 1; i < max; i++) {
                         String str = columns.getString(i);
                         String[] splited = match.split("\\b+");
-                        if (tableMatch.size() == 0) {
+                        /*if (tableMatch.size() == 0) {*/
                             if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
                                 System.out.println("Matched: " + str);
                                 n.setKeywordNode(true);
@@ -156,7 +156,8 @@ public class Utility {
                                 interestSet.put(n.getSearchID(), n);
                                 break;
                             }
-                        } else {
+                       //
+                        /*} else {
 
                            for (String s : tableMatch) {
                                if (str != null && isContained(str.toLowerCase(), match.toLowerCase())
@@ -169,7 +170,7 @@ public class Utility {
                                    break;
                                }
                            }
-                        }
+                        }*/
                     }
 
                 }

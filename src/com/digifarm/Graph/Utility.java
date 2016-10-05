@@ -617,7 +617,7 @@ public class Utility {
 
                             connected = interestSet.get(rs.getInt(2));
                             if (connected != null) {
-                                System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
+                                //System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
                                 n.addAdjacentNode(connected);
                                 //assign score to the node --> indegree of the node
                                 edge = new Edge(n, connected, 1);

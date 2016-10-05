@@ -29,7 +29,7 @@ public class Main {
             String username = /*in.nextLine();*/ "marco";
             //ask database name
             System.out.print("Enter database name: ");
-            String database = /*in.nextLine();*/ "mondial";
+            String database = /*in.nextLine();*/ "imdb";
             //connect to database
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
@@ -96,6 +96,7 @@ public class Main {
             }
 
             HashMap<Integer, Node> interestSet = new HashMap<>();
+
             ArrayList<ArrayList<Edge>> edgeWrapper = new ArrayList<>();
 
             //key --> partenza, value --> list of arrivals
@@ -127,7 +128,7 @@ public class Main {
                 HashMap<Node,ArrayList<Node>> backward = new HashMap<>();
                 HashMap<Node,ArrayList<Node>> forward = new HashMap<>();
 
-                long before = System.currentTimeMillis();
+
 
                 while (i<=maxDepth) {
 
@@ -149,9 +150,7 @@ public class Main {
                     i++;
                 }
 
-                long after = System.currentTimeMillis();
 
-                System.out.println("Navigation in " + (after-before)/1000 + " seconds");
 
 
               /*  ArrayList<Edge> edges = edgeWrapper.get(0);
@@ -174,6 +173,17 @@ public class Main {
                 //add backedge to global list
                 for (Edge bedge : backedges)
                     globalBEdgeList.add(bedge);*/
+
+            } //end for keyword
+
+
+            //add all node to interest set
+            for (Map.Entry<Integer,Node> e : interestSet.entrySet()) {
+
+                Node n = e.getValue();
+                int index = e.getKey();
+                globalNodeList.put(index,n);
+
             }
 
             Levels level;
@@ -500,9 +510,15 @@ public class Main {
                 }
             }*/
 
-            System.out.println("jfhusjgf");
+            System.out.println("fine level");
 
             Utility.connectInterestNodes(conn,interestSet,globalEdgeList,globalBEdgeList);
+
+            interestSet = new HashMap<>();
+            info = new dbInfo();
+            levelWrapper = new HashMap<>();
+
+
 
             max = Utility.maxNodeScore(globalNodeList, max);
             min = Utility.minEdgeWeight(globalEdgeList, min);

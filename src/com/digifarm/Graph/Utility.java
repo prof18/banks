@@ -203,12 +203,18 @@ public class Utility {
         String[] splited2 = s2.split("\\W+");
         //String[] splited2 =
         int i = 0;
+        String prec = null;
         for (String string : splited2) {
 
             for(String string1 : splited) {
 
                 if (string.toLowerCase().compareTo(string1.toLowerCase()) == 0) {
-                    i++;
+                    if ((prec == null) || (string.toLowerCase().compareTo(prec.toLowerCase()) != 0)) {
+                        //System.out.println(prec);
+                        i++;
+                        prec = string;
+                        //System.out.println(prec);
+                    }
                     //System.out.println("Matched");
                 }
             }
@@ -1029,4 +1035,5 @@ public class Utility {
         tree.setGlobalScore(globalScore);
 
     }
+
 }

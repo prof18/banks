@@ -29,7 +29,7 @@ public class Main {
             String username = /*in.nextLine();*/ "marco";
             //ask database name
             System.out.print("Enter database name: ");
-            String database = /*in.nextLine();*/ "imdb";
+            String database = /*in.nextLine();*/ "mondial";
             //connect to database
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
@@ -186,10 +186,12 @@ public class Main {
 
             }
 
-            Levels level;
-            int depth;
+
 
             if (tableMatch.isEmpty()) {
+
+                Levels level;
+                int depth;
 
                 for (Map.Entry<Integer, Levels> entry : levelWrapper.entrySet()) {
 
@@ -232,10 +234,11 @@ public class Main {
                                                     globalNodeList.put(from.getSearchID(), from);
                                                 }
                                                 Edge edge = new Edge(from, tempNode, 1);
+                                                tempNode.incrementScore();
                                                 //TODO: va bene o i nodi in piu' sono un errore?
                                                 if (!globalEdgeList.contains(edge)) {
                                                     globalEdgeList.add(edge);
-                                                    tempNode.incrementScore();
+
                                                     Edge bedge = new Edge(tempNode, from, 0);
                                                     globalBEdgeList.add(bedge);
                                                 }
@@ -261,8 +264,9 @@ public class Main {
                                                                     globalNodeList.put(tempNode.getSearchID(), tempNode);
                                                                 }
                                                                 Edge edge1 = new Edge(tempNode, newTo, 1);
+                                                                newTo.incrementScore();
                                                                 if (!globalEdgeList.contains(edge1)) {
-                                                                    newTo.incrementScore();
+
                                                                     globalEdgeList.add(edge1);
                                                                     Edge bedge1 = new Edge(newTo, tempNode, 0);
                                                                     globalBEdgeList.add(bedge1);
@@ -287,8 +291,9 @@ public class Main {
                                                 globalNodeList.put(from.getSearchID(), from);
                                             }
                                             Edge edge = new Edge(from, n, 1);
+                                            n.incrementScore();
                                             if (!globalEdgeList.contains(edge)) {
-                                                n.incrementScore();
+
                                                 globalEdgeList.add(edge);
                                                 Edge bedge = new Edge(n, from, 0);
                                                 globalBEdgeList.add(bedge);
@@ -314,8 +319,9 @@ public class Main {
                                                                 globalNodeList.put(n.getSearchID(), n);
                                                             }
                                                             Edge edge1 = new Edge(n, newTo, 1);
+                                                            newTo.incrementScore();
                                                             if (!globalEdgeList.contains(edge1)) {
-                                                                newTo.incrementScore();
+
                                                                 globalEdgeList.add(edge1);
                                                                 Edge bedge1 = new Edge(newTo, n, 0);
                                                                 globalBEdgeList.add(bedge1);
@@ -370,8 +376,9 @@ public class Main {
                                                 else
                                                     globalNodeList.put(tempNode.getSearchID(), tempNode);
                                                 Edge e = new Edge(from, tempNode, 1);
+                                                tempNode.incrementScore();
                                                 if (!globalEdgeList.contains(e)) {
-                                                    tempNode.incrementScore();
+
                                                     globalEdgeList.add(e);
                                                     Edge bedge = new Edge(tempNode, from, 0);
                                                     globalBEdgeList.add(bedge);
@@ -400,8 +407,9 @@ public class Main {
                                                                 else
                                                                     globalNodeList.put(tempNode.getSearchID(), tempNode);
                                                                 Edge edge = new Edge(fromKey, tempNode, 1);
+                                                                tempNode.incrementScore();
                                                                 if (!globalEdgeList.contains(edge)) {
-                                                                    tempNode.incrementScore();
+
                                                                     globalEdgeList.add(edge);
                                                                     Edge bedge1 = new Edge(tempNode, fromKey, 0);
                                                                     globalBEdgeList.add(bedge1);
@@ -424,8 +432,9 @@ public class Main {
                                             else
                                                 globalNodeList.put(n.getSearchID(), n);
                                             Edge e = new Edge(from, n, 1);
+                                            n.incrementScore();
                                             if (!globalEdgeList.contains(e)) {
-                                                n.incrementScore();
+
                                                 globalEdgeList.add(e);
                                                 Edge bedge = new Edge(n, from, 0);
                                                 globalBEdgeList.add(bedge);
@@ -454,8 +463,9 @@ public class Main {
                                                             else
                                                                 globalNodeList.put(n.getSearchID(), n);
                                                             Edge edge = new Edge(fromKey, n, 1);
+                                                            n.incrementScore();
                                                             if (!globalEdgeList.contains(edge)) {
-                                                                n.incrementScore();
+
                                                                 globalEdgeList.add(edge);
                                                                 Edge bedge1 = new Edge(n, fromKey, 0);
                                                                 globalBEdgeList.add(bedge1);
@@ -479,151 +489,216 @@ public class Main {
                 }
             } else {
 
+                System.out.println("entrato nell'else");
 
-                Levels level1;
-                int d;
+                Levels level;
+                int depth;
 
-                for (Map.Entry<Integer,Levels> entry : levelWrapper.entrySet()) {
+                    for (Map.Entry<Integer, Levels> entry : levelWrapper.entrySet()) {
 
-                    d = entry.getKey();
-                    level1 = entry.getValue();
-                    HashMap<Node, ArrayList<Node>> backwards = level1.getBackward();
-                    HashMap<Node, ArrayList<Node>> forward = level1.getForward();
+                        depth = entry.getKey();
+                        level = entry.getValue();
+                        HashMap<Node, ArrayList<Node>> backwards = level.getBackward();
+                        HashMap<Node, ArrayList<Node>> forward = level.getForward();
 
-                    for (String s1 : tableMatch) {
+                        for (Map.Entry<Node, ArrayList<Node>> e : backwards.entrySet()) {
 
-                        for (Map.Entry<Node, ArrayList<Node>> e1 : backwards.entrySet()) {
+                            Node from = e.getKey();
+                            ArrayList<Node> listTo = e.getValue();
 
-                            Node from = e1.getKey();
-                            ArrayList<Node> toList = e1.getValue();
 
-                            //un backward ha il nome di tabella desiderato
-                            if (from.getTableName().toLowerCase().compareTo(s1.toLowerCase()) == 0) {
 
-                                for (Node nd : toList) {
+                                int i = 0;
+                                ArrayList<String> keyList = new ArrayList<>();
+                                Node tempNode = null;
 
-                                    from.addAdjacentNode(nd);
-                                    nd.addAdjacentNode(from);
+                                for (Node n : listTo) {
 
-                                    if (globalNodeList.containsKey(from.getSearchID()))
-                                        globalNodeList.get(from.getSearchID()).mergeNode(from.getAdjacentNodes(),from.getKeywordList());
-                                    else
-                                        globalNodeList.put(from.getSearchID(),from);
-                                    Edge e = new Edge(from,nd,1);
 
-                                    if(!globalEdgeList.contains(e)) {
-                                        nd.incrementScore();
-                                        globalEdgeList.add(e);
-                                        Edge bedge = new Edge(nd,from,0);
-                                        globalBEdgeList.add(bedge);
-                                    }
 
-                                    if (d > 1) {
 
-                                        int tempD = d;
-                                        while (tempD >= 1) {
 
-                                            Levels l = levelWrapper.get(tempD - 1);
-                                            HashMap<Node, ArrayList<Node>> listMinusLevel = l.getBackward();
-                                            if (listMinusLevel.containsKey(nd)) {
-                                                ArrayList<Node> toListLevelMinus = listMinusLevel.get(nd);
-                                                for (Node newTo : toListLevelMinus) {
 
-                                                    newTo.addAdjacentNode(nd);
-                                                    nd.addAdjacentNode(newTo);
 
-                                                    if (globalNodeList.containsKey(from.getSearchID())) {
-                                                        globalNodeList.get(nd.getSearchID()).mergeNode(nd.getAdjacentNodes(), nd.getKeywordList());
-                                                    } else {
-                                                        globalNodeList.put(nd.getSearchID(), nd);
-                                                    }
-                                                    Edge edge1 = new Edge(nd, newTo, 1);
-                                                    if (!globalEdgeList.contains(edge1)) {
-                                                        newTo.incrementScore();
-                                                        globalEdgeList.add(edge1);
-                                                        Edge bedge1 = new Edge(newTo, nd, 0);
-                                                        globalBEdgeList.add(bedge1);
-                                                    }
+
+
+                                                from.addAdjacentNode(n);
+                                                n.addAdjacentNode(from);
+
+                                                if (globalNodeList.containsKey(from.getSearchID())) {
+                                                    globalNodeList.get(from.getSearchID()).mergeNode(from.getAdjacentNodes(), from.getKeywordList());
+                                                } else {
+                                                    globalNodeList.put(from.getSearchID(), from);
                                                 }
-                                            }
-
-                                            tempD--;
-                                        }
-                                    }
-
-                                }
-                            }
-
-                        }//chiusura backward
-                        System.out.println("fine backward primo livello");
-
-                        for (Map.Entry<Node,ArrayList<Node>> e1 : forward.entrySet()) {
-
-                            Node from = e1.getKey();
-                            ArrayList<Node> toList = e1.getValue();
-
-                            for (Node nd : toList) {
-
-                                if (nd.getTableName().toLowerCase().compareTo(s1.toLowerCase()) == 0) {
-
-                                    from.addAdjacentNode(nd);
-                                    nd.addAdjacentNode(from);
-                                    if (globalNodeList.containsKey(nd.getSearchID()))
-                                        globalNodeList.get(nd.getSearchID()).mergeNode(nd.getAdjacentNodes(),nd.getKeywordList());
-                                    else
-                                        globalNodeList.put(nd.getSearchID(),nd);
-                                    Edge e = new Edge (from,nd,1);
-                                    if(!globalEdgeList.contains(e)) {
-                                        nd.incrementScore();
-                                        globalEdgeList.add(e);
-                                        Edge bedge = new Edge(nd,from,0);
-                                        globalBEdgeList.add(bedge);
-                                    }
-                                }
-
-                                if (d > 1) {
-
-                                    int tempD = d;
-                                    while (tempD > 1) {
-
-                                        Levels l = levelWrapper.get(tempD - 1);
-                                        HashMap<Node, ArrayList<Node>> listMaxLevel = l.getForward();
-                                        ArrayList<Node> valueList = new ArrayList<>();
-                                        Node fromKey;
-                                        for (Map.Entry<Node, ArrayList<Node>> e3 : listMaxLevel.entrySet()) {
-
-                                            fromKey = e3.getKey();
-                                            valueList = e3.getValue();
-                                            if (valueList.contains(nd)) {
-
-                                                nd.addAdjacentNode(fromKey);
-                                                fromKey.addAdjacentNode(nd);
-
-                                                if (globalNodeList.containsKey(nd.getSearchID()))
-                                                    globalNodeList.get(nd.getSearchID()).mergeNode(nd.getAdjacentNodes(), nd.getKeywordList());
-                                                else
-                                                    globalNodeList.put(nd.getSearchID(), nd);
-                                                Edge edge = new Edge(fromKey, nd, 1);
+                                                Edge edge = new Edge(from, n, 1);
+                                    n.incrementScore();
                                                 if (!globalEdgeList.contains(edge)) {
-                                                    nd.incrementScore();
+
                                                     globalEdgeList.add(edge);
-                                                    Edge bedge1 = new Edge(nd, fromKey, 0);
-                                                    globalBEdgeList.add(bedge1);
+                                                    Edge bedge = new Edge(n, from, 0);
+                                                    globalBEdgeList.add(bedge);
                                                 }
-                                                break;
-                                            }
-                                        }
-                                        tempD--;
-                                    }
+
+                                                if (depth > 1) {
+
+                                                    int tempD = depth;
+                                                    while (tempD == 1) {
+
+                                                        Levels l = levelWrapper.get(tempD - 1);
+                                                        HashMap<Node, ArrayList<Node>> listMinusLevel = l.getBackward();
+                                                        if (listMinusLevel.containsKey(n)) {
+                                                            ArrayList<Node> toListLevelMinus = listMinusLevel.get(n);
+                                                            for (Node newTo : toListLevelMinus) {
+
+                                                                newTo.addAdjacentNode(n);
+                                                                n.addAdjacentNode(newTo);
+
+                                                                if (globalNodeList.containsKey(tempNode.getSearchID())) {
+                                                                    globalNodeList.get(n.getSearchID()).mergeNode(n.getAdjacentNodes(), n.getKeywordList());
+                                                                } else {
+                                                                    globalNodeList.put(n.getSearchID(), n);
+                                                                }
+                                                                Edge edge1 = new Edge(n, newTo, 1);
+                                                                newTo.incrementScore();
+                                                                if (!globalEdgeList.contains(edge1)) {
+
+                                                                    globalEdgeList.add(edge1);
+                                                                    Edge bedge1 = new Edge(newTo, n, 0);
+                                                                    globalBEdgeList.add(bedge1);
+                                                                }
+                                                            }
+                                                        }
+
+                                                        tempD--;
+                                                    }
+                                                }
+
+
+
+
+
+                                    i++;
                                 }
+
+                        }
+
+                        for (Map.Entry<Node, ArrayList<Node>> e1 : forward.entrySet()) {
+
+                            Node from = e1.getKey();
+                            ArrayList<Node> listTo = e1.getValue();
+
+
+
+                                int i = 0;
+                                ArrayList<String> keyList = new ArrayList<>();
+                                Node tempNode = null;
+
+                                for (Node n : listTo) {
+
+
+
+
+
+
+
+                                                from.addAdjacentNode(n);
+                                                n.addAdjacentNode(from);
+
+                                                if (globalNodeList.containsKey(n.getSearchID()))
+                                                    globalNodeList.get(n.getSearchID()).mergeNode(n.getAdjacentNodes(), n.getKeywordList());
+                                                else
+                                                    globalNodeList.put(n.getSearchID(), n);
+                                                Edge e = new Edge(from, n, 1);
+                                    n.incrementScore();
+                                                if (!globalEdgeList.contains(e)) {
+
+                                                    globalEdgeList.add(e);
+                                                    Edge bedge = new Edge(n, from, 0);
+                                                    globalBEdgeList.add(bedge);
+                                                }
+
+                                                if (depth > 1) {
+
+                                                    int tempD = depth;
+                                                    while (tempD > 1) {
+
+                                                        Levels l = levelWrapper.get(tempD - 1);
+                                                        HashMap<Node, ArrayList<Node>> listMaxLevel = l.getForward();
+                                                        ArrayList<Node> valueList = new ArrayList<>();
+                                                        Node fromKey;
+                                                        for (Map.Entry<Node, ArrayList<Node>> e3 : listMaxLevel.entrySet()) {
+
+                                                            fromKey = e3.getKey();
+                                                            valueList = e3.getValue();
+                                                            if (valueList.contains(n)) {
+
+                                                                n.addAdjacentNode(fromKey);
+                                                                fromKey.addAdjacentNode(n);
+
+                                                                if (globalNodeList.containsKey(n.getSearchID()))
+                                                                    globalNodeList.get(n.getSearchID()).mergeNode(n.getAdjacentNodes(), n.getKeywordList());
+                                                                else
+                                                                    globalNodeList.put(n.getSearchID(), n);
+                                                                Edge edge = new Edge(fromKey, n, 1);
+                                                                n.incrementScore();
+                                                                if (!globalEdgeList.contains(edge)) {
+
+                                                                    globalEdgeList.add(edge);
+                                                                    Edge bedge1 = new Edge(n, fromKey, 0);
+                                                                    globalBEdgeList.add(bedge1);
+                                                                }
+                                                                break;
+                                                            }
+                                                        }
+                                                        tempD--;
+                                                    }
+                                                }
+
+
+
+                                    i++;
+                                }
+
+                        }
+
+
+                        System.out.println("isjgks");
+                    }
+            }
+
+/*
+            if (!tableMatch.isEmpty()) {
+
+                HashMap<Integer,Node> newGlobalNodeList = new HashMap<>();
+                ArrayList<Edge> newGlobalEdgeList = new ArrayList<>();
+                ArrayList<Edge> newGlobalBedgeList = new ArrayList<>();
+
+                for (Map.Entry<Integer,Node> e2 : globalNodeList.entrySet()) {
+
+                    Node n = e2.getValue();
+
+                    for (String s : tableMatch) {
+
+                        if (n.getTableName().toLowerCase().compareTo(s.toLowerCase()) == 0) {
+
+                            newGlobalNodeList.put(n.getSearchID(),n);
+
+                            //scorro tra gli adiacenti
+                            for (Node nd : n.getAdjacentNodes()) {
+
+                                Edge eDir = new Edge(n,nd,1);
+                                Edge eIndir = new Edge(nd,n,1);
+                                if (globalEdgeList.contains(eDir)) {
+
+                                } else if (globalEdgeList.contains(eIndir)) {
+
+                                }
+
                             }
-
-                        } //chiusura for forward
-
-                    } //chiusura for tabelle
+                        }
+                    }
                 }
-            } //chiusura else
-
+            }*/
 
 
             //if a node is common to two keyword, add this node to the globalNodeList
@@ -786,12 +861,12 @@ public class Main {
 
                     HashMap<Node, ArrayList<Node>> sons = tree.getSons();
                     if (sons.get(tree.getRoot()) == null ) {
-                        addTree(tree,outputHeap,outputBuffer,HEAP_SIZE);
+                        addTree(tree,outputHeap,outputBuffer,HEAP_SIZE,tableMatch);
                     }
                     else if (sons.get(tree.getRoot()).size() == 1 && sons.get(sons.get(tree.getRoot()).get(0)).size() == 0)
                         break;
                     else
-                        addTree(tree,outputHeap,outputBuffer,HEAP_SIZE);
+                        addTree(tree,outputHeap,outputBuffer,HEAP_SIZE,tableMatch);
 
                 }
             } //[C] while
@@ -800,12 +875,13 @@ public class Main {
                 outputBuffer.add(outputHeap.poll());
             }
 
-            int i=0;
+            int i=1;
             double lastScore = 0;
-            while(i < 10 && !outputBuffer.isEmpty()) {
+            while(i < 11 && !outputBuffer.isEmpty()) {
 
                 Tree Ttemp = outputBuffer.poll();
                 lastScore = Ttemp.getGlobalScore();
+                System.out.println(i);
                 System.out.println(Ttemp.toString());
                 i++;
             }
@@ -817,6 +893,7 @@ public class Main {
             //if the score is the same, we output also the node in position greater than 10
             while( Double.compare(lastScore , Ttemp.getGlobalScore() ) == 0 && !outputBuffer.isEmpty()) {
 
+                System.out.println(10);
                 System.out.println(Ttemp.toString());
                 Ttemp = outputBuffer.poll();
             }
@@ -888,13 +965,58 @@ public class Main {
      * @param outputBuffer
      * @param maxHeapSize
      */
-    private static void addTree(Tree tree, PriorityQueue<Tree> outputHeap, PriorityQueue<Tree> outputBuffer, int maxHeapSize) {
+    private static void addTree(Tree tree, PriorityQueue<Tree> outputHeap, PriorityQueue<Tree> outputBuffer,
+                                int maxHeapSize, ArrayList<String> tableMatch) {
 
-        if (outputHeap.size() == maxHeapSize ) {
-            outputBuffer.add(outputHeap.poll());
-            outputHeap.add(tree);
+        boolean cond = false;
+
+       /* if (tree.getRoot().getSearchID() == 3538) {
+            System.out.println("fag");
+            for (fa)
+        }*/
+
+
+        if (!tableMatch.isEmpty()) {
+            for (String s : tableMatch) {
+
+                if (tree.getRoot().getTableName().toLowerCase().compareTo(s.toLowerCase()) == 0) {
+                    cond = true;
+                }
+
+
+                //controllo i padri
+                for (Map.Entry<Node, ArrayList<Node>> entry : tree.getSons().entrySet()) {
+                    for (Node nd : entry.getValue()) {
+                        if (nd != null && nd.getTableName().toLowerCase().compareTo(s.toLowerCase()) == 0){
+                            cond = true;
+                        }
+                    }
+                }
+
+                //controllo i figli
+
+            }
+
+
+            if (cond) {
+                if (outputHeap.size() == maxHeapSize) {
+                    outputBuffer.add(outputHeap.poll());
+                    outputHeap.add(tree);
+                    cond = false;
+                } else {
+                    outputHeap.add(tree);
+                    cond = false;
+                }
+            }
         } else {
-            outputHeap.add(tree);
+            if (outputHeap.size() == maxHeapSize) {
+                outputBuffer.add(outputHeap.poll());
+                outputHeap.add(tree);
+
+            } else {
+                outputHeap.add(tree);
+
+            }
         }
     }
 }

@@ -118,6 +118,9 @@ public class Tree implements Comparable<Tree> {
     public String toString() {
 
         double score = getGlobalScore();
+        if (Double.isNaN(score)) {
+            score = 0;
+        }
         String nodeId = "Root " + getRoot().getSearchID();
         String FatherAndSons = " ";
 

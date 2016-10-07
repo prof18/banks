@@ -174,17 +174,21 @@ public class Main {
                 for (Edge bedge : backedges)
                     globalBEdgeList.add(bedge);*/
 
+                //add all node to interest set
+                for (Map.Entry<Integer,Node> e : interestSet.entrySet()) {
+
+                    Node n = e.getValue();
+                    int index = e.getKey();
+                    globalNodeList.put(index,n);
+
+                }
+
+                Utility.connectInterestNodes(conn,interestSet,globalEdgeList,globalBEdgeList);
+
             } //end for keyword
 
 
-            //add all node to interest set
-            for (Map.Entry<Integer,Node> e : interestSet.entrySet()) {
 
-                Node n = e.getValue();
-                int index = e.getKey();
-                globalNodeList.put(index,n);
-
-            }
 
 
 
@@ -734,7 +738,7 @@ public class Main {
 
             System.out.println("fine level");
 
-            Utility.connectInterestNodes(conn,interestSet,globalEdgeList,globalBEdgeList);
+
 
             interestSet = new HashMap<>();
             info = new dbInfo();
@@ -870,6 +874,8 @@ public class Main {
 
                 }
             } //[C] while
+
+            
 
             while (outputHeap.size() != 0) {
                 outputBuffer.add(outputHeap.poll());

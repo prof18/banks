@@ -13,11 +13,13 @@ public class Node implements Comparable<Node> {
     private String tableName;
     private ArrayList<Node> adjacent;
     private double score;
-    //weight for Dijstra
+
+    //Weight for Dijstra
     private double weight;
     private Node previousNode;
     private boolean isKeywordNode = false;
-    //lista di keyword
+
+    //Keyword list
     private ArrayList<String> keywordList = new ArrayList<>();
     //v.Li node list for each keyword
     private HashMap<String, ArrayList<Node>> vLi = new HashMap<>();
@@ -67,10 +69,6 @@ public class Node implements Comparable<Node> {
         this.weight = weight;
     }
 
-    public Node getPreviousNode() {
-        return previousNode;
-    }
-
     public void setPreviousNode(Node previousNode) {
         this.previousNode = previousNode;
     }
@@ -91,35 +89,40 @@ public class Node implements Comparable<Node> {
         return isVisited;
     }
 
-    /**
-     * This method merge the adjacent list and the keyword list of two nodes (that they'll be the same btw)
-     *
-     * @param adjacent2
-     * @param list
-     */
-    public void mergeNode(ArrayList<Node> adjacent2, ArrayList<String> list) {
-        ArrayList<Node> adjacent1 = this.getAdjacentNodes();
-        ArrayList<String> keyword1 = this.getKeywordList();
-        //update adjacent list of the current node
-        for (Node n : adjacent2) {
-            if (!adjacent1.contains(n))
-                adjacent1.add(n);
-        }
-
-        //update the keyword list of the current node
-        //TODO: CONTROLLARE NEL MAIN CHE LE PAROLE CHIAVE SIANO UNICHE. Ad esempio scrivi milan milan
-        for (String s : list) {
-            if (!keyword1.contains(s))
-                keyword1.add(s);
-        }
-    }
-
     public void addKeyword(String keyword) {
         keywordList.add(keyword);
     }
 
     public ArrayList<String> getKeywordList() {
         return keywordList;
+    }
+
+    public HashMap<String, ArrayList<Node>> getvLi() {
+        return vLi;
+    }
+
+    /**
+     * This method merge the adjacent list and the keyword list of two nodes (that they'll be the same btw)
+     *
+     * @param adjacent2     List of adjacent node that is going to be added
+     * @param list          List of the keyword that is going to be added
+     */
+    public void mergeNode(ArrayList<Node> adjacent2, ArrayList<String> list) {
+
+        ArrayList<Node> adjacent1 = this.getAdjacentNodes();
+        ArrayList<String> keyword1 = this.getKeywordList();
+
+        //Update adjacent list of the current node
+        for (Node n : adjacent2) {
+            if (!adjacent1.contains(n))
+                adjacent1.add(n);
+        }
+
+        //Update the keyword list of the current node
+        for (String s : list) {
+            if (!keyword1.contains(s))
+                keyword1.add(s);
+        }
     }
 
     /**
@@ -130,10 +133,6 @@ public class Node implements Comparable<Node> {
     public void createVLi(String keyword) {
         ArrayList<Node> nodes = new ArrayList<>();
         vLi.put(keyword,nodes);
-    }
-
-    public HashMap<String, ArrayList<Node>> getvLi() {
-        return vLi;
     }
 
     @Override

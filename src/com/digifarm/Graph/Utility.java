@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
+//TODO CLOSE DB CONNECTION
 /**
  * Created by digifarmer on 07/07/16.
  **/
@@ -72,7 +73,7 @@ public class Utility {
             //set the table list
             info.setTableList(tableList);
             //set the column map
-            info.setColumnList(columnMap);
+            //info.setColumnList(columnMap);
             long after = System.currentTimeMillis();
             long time = (after - before);
             System.out.println("Database Created in: " + time + " millis\n-----------------");
@@ -1013,10 +1014,11 @@ public class Utility {
         tree.setEdgeScore(score);
     }
 
-    /***
+    /**
+     *  Compute the global score of a tree
      *
-     * @param tree
-     * @param lambda
+     * @param tree          Input tree
+     * @param lambda        Variable needed to compute the score
      * @param type          The type of computing. "multiplication" or "addition"
      */
     public static void globalScore(Tree tree, double lambda, String type) {
@@ -1034,7 +1036,5 @@ public class Utility {
         }
 
         tree.setGlobalScore(globalScore);
-
     }
-
 }

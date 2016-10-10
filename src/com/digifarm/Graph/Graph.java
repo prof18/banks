@@ -15,9 +15,9 @@ public class Graph {
     /**
      *  Create new Graph, a wrapper for Node map, edge list and backedge list
      *
-     * @param nodeSet
-     * @param edge
-     * @param bedge
+     * @param nodeSet   Map of nodes
+     * @param edge      List of Edge
+     * @param bedge     List of Backedge
      */
     public Graph(HashMap<Integer, Node> nodeSet, ArrayList<Edge> edge, ArrayList<Edge> bedge) {
         this.nodeSet = nodeSet;

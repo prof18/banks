@@ -14,10 +14,8 @@ import java.util.*;
  * Created by digifarmer on 7/6/16.
  **/
 
-
+//TODO: CLOSE DB CONNECTION
 public class Main {
-
-
 
     public static void main(String[] args) {
 
@@ -29,12 +27,12 @@ public class Main {
             String username = /*in.nextLine();*/ "marco";
             //ask database name
             System.out.print("Enter database name: ");
-            String database = /*in.nextLine();*/ "mondial";
+            String database = /*in.nextLine();*/ "imdb";
             //connect to database
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
 
-            //container of some db information, like table, columns and tuples
+            //container of some db information, like tables and tuples
             dbInfo info = new dbInfo();
 
             //create a graph from all the database
@@ -42,10 +40,8 @@ public class Main {
 
             //ask for keyword
             System.out.print("Enter keyword (Enter to insert another, \"q\" to exit):\n");
-
             ArrayList<String> temp = new ArrayList<>();
             while (in.hasNext()) {
-                //System.out.print("Enter keyword (one for line, q to exit): ");
                 String keyword = in.nextLine();
                 if (keyword.toLowerCase().compareTo("q") == 0) {
                     break;
@@ -55,17 +51,11 @@ public class Main {
 
             long start = System.currentTimeMillis();
 
-
-            HashMap<String, ArrayList<Node>> tableTuple = new HashMap<>();
-            //keyword that aren't table
+            //keywords that aren't table
             ArrayList<String> notTable = new ArrayList<>();
-            //keyword that are table
+            //keywords that are table
             ArrayList<String> tableMatch = new ArrayList<>();
-
-            //list of common nodes
-            HashMap<Node, ArrayList<Node>> commonNodes = new HashMap<>();
-
-            //global nodes,edges,backedges lists of interest set
+            //global node's,edge's,backedge's lists of interest set
             HashMap<Integer, Node> globalNodeList = new HashMap<>();
             ArrayList<Edge> globalEdgeList = new ArrayList<>();
             ArrayList<Edge> globalBEdgeList = new ArrayList<>();
@@ -74,107 +64,77 @@ public class Main {
             double max = 0;
             double min = Integer.MAX_VALUE;
 
-            //cycle the keyword provided by the user
+            //cycle the keyword provided by the user to filter between table and "classic" keyword
             for (String s : temp) {
 
                 boolean isMatched = false;
-
-                //cycle al the table
+                //cycle all the table
                 for (String table : info.getTableList()) {
 
-                    //if the input was a name of a table --> save all the tuple of the table
+                    //if the input was a name of a table --> add to another list
                     if (s.toLowerCase().compareTo(table.toLowerCase()) == 0 ) {
 
-                        tableTuple.put(table,Utility.getTableTuple(table,conn));
                         tableMatch.add(table);
                         isMatched = true;
                     }
                 }
-
+                //add the "classic" keywords to another table
                 if (!isMatched)
                     notTable.add(s);
             }
 
-            HashMap<Integer, Node> interestSet = new HashMap<>();
+            //map of nodes that contains a match of the keyword
+            HashMap<Integer, Node> interestSet;
 
-            ArrayList<ArrayList<Edge>> edgeWrapper = new ArrayList<>();
-
-            //key --> partenza, value --> list of arrivals
-            HashMap<Node,ArrayList<Node>> xLevel = new HashMap<>();
-            //wrapper. chiave numero livello, valore un merdaio di robe
-
-
+            /*
+            *   Key   --> Actual level of depth.
+            *   Value --> A container of backwards and fowards nodes of all the nodes
+            *             in the actual level
+            */
             HashMap<Integer,Levels> levelWrapper = new HashMap<>();
 
-            //TODO: CHANGE THE DEPTH OF NAVIGATION
+            //TODO: Max depth of navigation
             int maxDepth = 3;
 
+            //create containers for every level
             for (int j = 1; j <= maxDepth; j++)
                 levelWrapper.put(j,new Levels());
 
-
+            //cycle for every keyword
             for (String s : notTable) {
 
-                //depth
+                //actual depth
                 int i = 1;
-
-
                 //create the interest set for the current keyword
                 interestSet = Utility.createInterestSet(conn,s,info,tableMatch);
 
-                //connects the node in the interest set
-                //edgeWrapper = Utility.connectNodes(conn,interestSet,info.getNodes(),info,commonNodes);
-
-                HashMap<Node,ArrayList<Node>> backward = new HashMap<>();
-                HashMap<Node,ArrayList<Node>> forward = new HashMap<>();
-
-
-
-                while (i<=maxDepth) {
+                while (i <= maxDepth) {
 
                     Levels l = levelWrapper.get(i);
+
+                    //When we are in the first level, we need to navigate from the nodes in the interest set
+                    //otherwise we need to navigate from the previous level
                     if (i==1) {
+
                         Utility.findBackwardInterest(conn, interestSet, info.getNodes(), info, l);
                         Utility.findForwardInterest(conn, interestSet, info.getNodes(), l);
+
                     } else {
 
-                        //findBackwardOfBackward
+                        //find Backward Of Backward
                         Utility.bFindBackward(conn,info.getNodes(),levelWrapper.get(i-1).getBackward(),l,info);
-                        //findBackwardOfForward
+                        //find Backward Of Forward
                         Utility.fFindBackward(conn,info.getNodes(),levelWrapper.get(i-1).getForward(),l,info);
-                        //findForwardOfBackward
+                        //find Forward Of Backward
                         Utility.bFindForward(conn,info.getNodes(),levelWrapper.get(i-1).getBackward(),l);
-                        //findForwardOfForward
+                        //find Forward Of Forward
                         Utility.fFindForward(conn,info.getNodes(),levelWrapper.get(i-1).getForward(),l);
                     }
+
                     i++;
                 }
 
-
-
-
-              /*  ArrayList<Edge> edges = edgeWrapper.get(0);
-                ArrayList<Edge> backedges = edgeWrapper.get(1);
-
-                //add node to global list
-                Node node;
-                for (Map.Entry<Integer,Node> e : interestSet.entrySet()) {
-                    node = e.getValue();
-                    //needs to check if the node is already in the global list to avoid duplicates
-                    if (globalNodeList.containsKey(node.getSearchID())) {
-                        //if the node is already int he global list we need to update the adjacent list
-                        (globalNodeList.get(node.getSearchID())).mergeNode(node.getAdjacentNodes(),s);
-                    } else
-                        globalNodeList.put(node.getSearchID(),node);
-                }
-                //add edge to global list
-                for (Edge edge : edges)
-                    globalEdgeList.add(edge);
-                //add backedge to global list
-                for (Edge bedge : backedges)
-                    globalBEdgeList.add(bedge);*/
-
-                //add all node to interest set
+                //add all the node from the interest set to the
                 for (Map.Entry<Integer,Node> e : interestSet.entrySet()) {
 
                     Node n = e.getValue();
@@ -182,15 +142,9 @@ public class Main {
                     globalNodeList.put(index,n);
 
                 }
-
+                //connect nodes of the interest set to each other
                 Utility.connectInterestNodes(conn,interestSet,globalEdgeList,globalBEdgeList);
-
-            } //end for keyword
-
-
-
-
-
+            }
 
             if (tableMatch.isEmpty()) {
 

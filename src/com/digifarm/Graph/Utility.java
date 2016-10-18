@@ -15,8 +15,6 @@ import java.util.StringJoiner;
  **/
 public class Utility {
 
-
-
     /**
      *  This method will create the Graph to be used by the algorithm; it will query the database for
      *  all tables and it will extract all the known tuples (saving in the Node objects the search_id).
@@ -27,12 +25,11 @@ public class Utility {
      *
      **/
     public static void createGraph(ConnectionDB dbConn, String DBName, dbInfo info) {
-        HashMap<Integer, Node> set = new HashMap<Integer, Node>();
-        //query the database to know tables names
+
+        HashMap<Integer, Node> set = new HashMap<>();
         Connection conn = dbConn.getDBConnection();
-        Statement stmn = null, stmn2 = null, stm3 = null;
+        Statement stmn, stmn2, stm3;
         ArrayList<String> tableList = new ArrayList<>();
-        HashMap<String, ArrayList<String>> columnMap = new HashMap<>();
 
         try {
 
@@ -40,40 +37,31 @@ public class Utility {
             stmn2 = conn.createStatement();
             stm3 = conn.createStatement();
             ResultSet tuple, column;
-            ResultSet table = stmn.executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='" + DBName + "' ORDER BY TABLE_NAME;");
             String tableName;
-            System.out.println("\nCreating graph from DB. Please Wait...\n-----------------" );
             int id;
             String columnName;
             long before = System.currentTimeMillis();
+            //query the database to know tables names
+            ResultSet table = stmn.executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='" + DBName + "' ORDER BY TABLE_NAME;");
+            System.out.println("\nCreating graph from DB. Please Wait...\n-----------------" );
+
             while(table.next()) {
+
                 tableName = table.getString(1);
                 if(!tableName.startsWith("pg_") && !tableName.startsWith("sql_")) {
+                    //populate table list
                     tableList.add(tableName);
                     //now we know the table name, we need to extract the search_id for each tuple
                     tuple = stmn2.executeQuery("SELECT __search_id FROM " + tableName);
-                    //insert table name
+                    //populate set of nodes
                     while(tuple.next()) {
-                        //creating and adding a new Node to the set
                         id = tuple.getInt(1);
                         set.put(id, new Node(id,tableName));
                     }
-                    //get the column of tableName
-                    column = stm3.executeQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE" +
-                            " table_name= '" + tableName + "'");
-                    ArrayList<String> columnList = new ArrayList<>();
-                    while (column.next()) {
-                        columnName = column.getString(1);
-                        columnList.add(columnName);
-                    }
-                    columnMap.put(tableName,columnList);
                 }
-
             }
             //set the table list
             info.setTableList(tableList);
-            //set the column map
-            //info.setColumnList(columnMap);
             long after = System.currentTimeMillis();
             long time = (after - before);
             System.out.println("Database Created in: " + time + " millis\n-----------------");
@@ -82,38 +70,6 @@ public class Utility {
         }
         info.setNodes(set);
     }
-
-    /**
-     *  Get all the tuple from a table
-     *
-     * @param table
-     * @param conDB
-     * @return
-     */
-    public static ArrayList<Node> getTableTuple(String table, ConnectionDB conDB) {
-
-        Connection conn = conDB.getDBConnection();
-        Statement stm = null;
-        ResultSet rs = null;
-        int id = -1;
-        ArrayList<Node> list = new ArrayList<>();
-
-        try {
-
-            stm = conn.createStatement();
-            rs = stm.executeQuery("SELECT __search_id FROM " + table);
-            while (rs.next()) {
-
-                id = rs.getInt(1);
-                list.add(new Node(id,table));
-            }
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-        }
-        return list;
-    }
-
 
     /**
      *  This method create a set of interest nodes filtered by keywords
@@ -125,20 +81,25 @@ public class Utility {
      * @return  interestSet     The interest set of node
      */
 
-    public static HashMap<Integer, Node> createInterestSet(ConnectionDB dbConn, String match, dbInfo info,
-                                                           ArrayList<String> tableMatch) {
+    public static HashMap<Integer, Node> createInterestSet(ConnectionDB dbConn, String match, dbInfo info) {
+
         long before1 = System.currentTimeMillis();
         HashMap<Integer, Node> interestSet = new HashMap<>();
         Connection conn = dbConn.getDBConnection();
+        //get the node set
         HashMap<Integer, Node> set = info.getNodes();
+
         try {
+
             Statement stmn = conn.createStatement();
-            ResultSet columns = null;
-            ResultSetMetaData meta = null;
+            ResultSet columns;
+            ResultSetMetaData meta;
             Node n;
-            //check if a Node contains the match string
             System.out.println("\nCreating Interest Set for \"" + match + "\". Please Wait...\n-----------------" );
+
+            //check if a Node contains the match string
             for(Map.Entry<Integer, Node> e : set.entrySet()) {
+
                 n = e.getValue();
                 //extract all columns from this tuple
                 columns = stmn.executeQuery("SELECT * FROM " + n.getTableName() + " WHERE __search_id = " + n.getSearchID());
@@ -148,32 +109,14 @@ public class Utility {
                     int max = meta.getColumnCount();
                     for (int i = 1; i < max; i++) {
                         String str = columns.getString(i);
-                        String[] splited = match.split("\\b+");
-                        /*if (tableMatch.size() == 0) {*/
-                            if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
-                                System.out.println("Matched: " + str);
-                                n.setKeywordNode(true);
-                                n.addKeyword(match);
-                                interestSet.put(n.getSearchID(), n);
-                                break;
-                            }
-                       //
-                        /*} else {
-
-                           for (String s : tableMatch) {
-                               if (str != null && isContained(str.toLowerCase(), match.toLowerCase())
-                                       && n.getTableName().toLowerCase().compareTo(s.toLowerCase()) == 0) {
-                                   System.out.println("Matched: " + str);
-                                   n.setKeywordNode(true);
-                                   n.addKeyword(match);
-                                   //n.addKeyword(s);
-                                   interestSet.put(n.getSearchID(), n);
-                                   break;
-                               }
-                           }
-                        }*/
+                        if (str != null && isContained(str.toLowerCase(), match.toLowerCase())) {
+                            System.out.println("Matched: " + str);
+                            n.setKeywordNode(true);
+                            n.addKeyword(match);
+                            interestSet.put(n.getSearchID(), n);
+                            break;
+                        }
                     }
-
                 }
             }
         } catch (SQLException e) {
@@ -187,6 +130,7 @@ public class Utility {
     }
 
     /**
+     * This method check if the sentence's words is contained in another sentence
      *
      * @param s1    The main string on which s2 is searched
      * @param s2    The string to be searched inside s1
@@ -194,17 +138,13 @@ public class Utility {
      */
 
     public static boolean isContained(String s1, String s2) {
-        //split string by whitespace
 
-        /*for (String word : s1.split("\\b+")) {
-            if (word.equals(s2))
-                return true;
-        }
-        return false;*/
-        String[] splited = s1.split("\\W+"); //split on word boundries
+        //split on word boundaries
+        String[] splited = s1.split("\\W+");
         String[] splited2 = s2.split("\\W+");
-        //String[] splited2 =
+
         int i = 0;
+        //string to check if a complete word is matched. For example "the darkness" doesn't match "the [...] the"
         String prec = null;
         for (String string : splited2) {
 
@@ -212,34 +152,56 @@ public class Utility {
 
                 if (string.toLowerCase().compareTo(string1.toLowerCase()) == 0) {
                     if ((prec == null) || (string.toLowerCase().compareTo(prec.toLowerCase()) != 0)) {
-                        //System.out.println(prec);
                         i++;
                         prec = string;
-                        //System.out.println(prec);
                     }
-                    //System.out.println("Matched");
                 }
             }
         }
-        if (i == splited2.length)  {
+        if (i == splited2.length)
             return true;
-        }
+
         return false;
     }
 
+    public static void connect(Node from, Node to, HashMap<Integer, Node> globalNodeList, ArrayList<Edge> globalEdgeList,
+                        ArrayList<Edge> globalBEdgeList) {
+
+        from.addAdjacentNode(to);
+        to.addAdjacentNode(from);
+        to.incrementScore();
+        //if the node is present yet, merge
+        if (globalNodeList.containsKey(from.getSearchID())) {
+            globalNodeList.get(from.getSearchID()).mergeNode(from.getAdjacentNodes(),
+                    from.getKeywordList());
+        } else {
+            globalNodeList.put(from.getSearchID(), from);
+        }
+        Edge edge = new Edge(from, to, 1);
+        to.incrementScore();
+        //if the edge is already in the globalList, skip the adding
+        if (!globalEdgeList.contains(edge)) {
+            globalEdgeList.add(edge);
+            Edge bedge = new Edge(to, from, 0);
+            globalBEdgeList.add(bedge);
+        }
+    }
+
     /**
-     *  Serve a trovare i forward dell'interest set
+     *  this method finds the forward nodes of the nodes in the interest set
      *
-     * @param dBconn
-     * @param interestSet
-     * @param set
-     * @param level
+     * @param dBconn            An instance of ConnectionDB
+     * @see   ConnectionDB
+     * @param interestSet       The intereset set of nodes
+     * @param set               The set of nodes
+     * @param level             The wrapper of the level of navigation
      */
     public static void findForwardInterest(ConnectionDB dBconn, HashMap<Integer,Node> interestSet, HashMap<Integer,Node> set,
                                            Levels level) {
 
+        //key --> starting node, value --> destination node. In this case value is the forward node of the key
         HashMap<Node,ArrayList<Node>> forwardMap = level.getForward();
-
+        //TODO: ADD COMMENT AFTER REVIEWING FOREINGKEYTABLE
         HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
         ArrayList<String> queries;
 
@@ -259,6 +221,7 @@ public class Utility {
 
                     try {
 
+                        //check if there is a foreign key
                         q += " WHERE t1.__search_id = " + n.getSearchID();
 
                         statement = conn.createStatement();
@@ -271,7 +234,6 @@ public class Utility {
                                 if (forwardMap.get(n) != null && !forwardMap.get(n).contains(connected))
                                     forwardMap.get(n).add(connected);
                             } else {
-
                                 ArrayList<Node> list = new ArrayList<>();
                                 list.add(connected);
                                 forwardMap.put(n,list);

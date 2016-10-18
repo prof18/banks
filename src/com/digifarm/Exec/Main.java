@@ -27,7 +27,7 @@ public class Main {
             String username = /*in.nextLine();*/ "marco";
             //ask database name
             System.out.print("Enter database name: ");
-            String database = /*in.nextLine();*/ "imdb";
+            String database = /*in.nextLine();*/ "mondial";
             //connect to database
             ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
             System.out.println("Connected\n-----------------");
@@ -88,12 +88,12 @@ public class Main {
 
             /*
             *   Key   --> Actual level of depth.
-            *   Value --> A container of backwards and fowards nodes of all the nodes
+            *   Value --> A container of backwards and forwards nodes of all the nodes
             *             in the actual level
             */
             HashMap<Integer,Levels> levelWrapper = new HashMap<>();
 
-            //TODO: Max depth of navigation
+            //TODO: Here you can choose the max depth of navigation
             int maxDepth = 3;
 
             //create containers for every level
@@ -106,7 +106,7 @@ public class Main {
                 //actual depth
                 int i = 1;
                 //create the interest set for the current keyword
-                interestSet = Utility.createInterestSet(conn,s,info,tableMatch);
+                interestSet = Utility.createInterestSet(conn,s,info);
 
                 while (i <= maxDepth) {
 
@@ -146,11 +146,13 @@ public class Main {
                 Utility.connectInterestNodes(conn,interestSet,globalEdgeList,globalBEdgeList);
             }
 
+            //we do this only wehen there isn't table's name in the keyword
             if (tableMatch.isEmpty()) {
 
                 Levels level;
                 int depth;
 
+                //cycle all the levels
                 for (Map.Entry<Integer, Levels> entry : levelWrapper.entrySet()) {
 
                     depth = entry.getKey();
@@ -158,18 +160,23 @@ public class Main {
                     HashMap<Node, ArrayList<Node>> backwards = level.getBackward();
                     HashMap<Node, ArrayList<Node>> forward = level.getForward();
 
+                    //cycle all the backward nodes
                     for (Map.Entry<Node, ArrayList<Node>> e : backwards.entrySet()) {
 
                         Node from = e.getKey();
                         ArrayList<Node> listTo = e.getValue();
 
-                        //ho un cazzo di nodo in comune
+                        //the list has size greater than one, so the key node is a common ancestor. The nodes in the list
+                        //must belong to different keyword
+                        //
                         if (listTo.size() > 1) {
 
                             int i = 0;
                             ArrayList<String> keyList = new ArrayList<>();
                             Node tempNode = null;
 
+                            //in the first iteration we need to save the node and the node's keyword list to compare to
+                            //other nodes in the following iteration
                             for (Node n : listTo) {
 
                                 if (i == 0) {
@@ -179,6 +186,8 @@ public class Main {
 
                                     for (String s : keyList) {
 
+                                        //TODO: METODO & BABBA AND CAPRA --> QUESTIONE DELLE KEYWORD
+                                        //check if the Node A keyword is not a keyword of Node B
                                         if (!n.getKeywordList().contains(s)) {
 
                                             if (tempNode != null) {
@@ -186,36 +195,39 @@ public class Main {
                                                 from.addAdjacentNode(tempNode);
                                                 tempNode.addAdjacentNode(from);
                                                 tempNode.incrementScore();
+                                                //if the node is present yet, merge
                                                 if (globalNodeList.containsKey(from.getSearchID())) {
-                                                    globalNodeList.get(from.getSearchID()).mergeNode(from.getAdjacentNodes(), from.getKeywordList());
+                                                    globalNodeList.get(from.getSearchID()).mergeNode(from.getAdjacentNodes(),
+                                                            from.getKeywordList());
                                                 } else {
                                                     globalNodeList.put(from.getSearchID(), from);
                                                 }
                                                 Edge edge = new Edge(from, tempNode, 1);
                                                 tempNode.incrementScore();
-                                                //TODO: va bene o i nodi in piu' sono un errore?
+                                                //if the edge is already in the globalList, skip the adding
                                                 if (!globalEdgeList.contains(edge)) {
                                                     globalEdgeList.add(edge);
-
                                                     Edge bedge = new Edge(tempNode, from, 0);
                                                     globalBEdgeList.add(bedge);
                                                 }
 
-
+                                                //now we need to rebuild the path
                                                 if (depth > 1) {
 
                                                     int tempD = depth;
                                                     while (tempD > 1) {
 
+                                                        //previous level. We need to know for the navigation
                                                         Levels l = levelWrapper.get(tempD - 1);
+                                                        //backward of the level-1
                                                         HashMap<Node, ArrayList<Node>> listMinusLevel = l.getBackward();
                                                         if (listMinusLevel.containsKey(tempNode)) {
                                                             ArrayList<Node> toListLevelMinus = listMinusLevel.get(tempNode);
+                                                            //add the corresponding edge
                                                             for (Node newTo : toListLevelMinus) {
 
                                                                 newTo.addAdjacentNode(tempNode);
                                                                 tempNode.addAdjacentNode(newTo);
-
                                                                 if (globalNodeList.containsKey(tempNode.getSearchID())) {
                                                                     globalNodeList.get(tempNode.getSearchID()).mergeNode(tempNode.getAdjacentNodes(), tempNode.getKeywordList());
                                                                 } else {
@@ -229,10 +241,8 @@ public class Main {
                                                                     Edge bedge1 = new Edge(newTo, tempNode, 0);
                                                                     globalBEdgeList.add(bedge1);
                                                                 }
-
                                                             }
                                                         }
-
                                                         tempD--;
                                                     }
                                                 }
@@ -260,7 +270,7 @@ public class Main {
                                             if (depth > 1) {
 
                                                 int tempD = depth;
-                                                while (tempD == 1) {
+                                                while (tempD > 1) {
 
                                                     Levels l = levelWrapper.get(tempD - 1);
                                                     HashMap<Node, ArrayList<Node>> listMinusLevel = l.getBackward();
@@ -271,7 +281,7 @@ public class Main {
                                                             newTo.addAdjacentNode(n);
                                                             n.addAdjacentNode(newTo);
 
-                                                            if (globalNodeList.containsKey(tempNode.getSearchID())) {
+                                                            if (globalNodeList.containsKey(n.getSearchID())) {
                                                                 globalNodeList.get(n.getSearchID()).mergeNode(n.getAdjacentNodes(), n.getKeywordList());
                                                             } else {
                                                                 globalNodeList.put(n.getSearchID(), n);
@@ -500,7 +510,7 @@ public class Main {
                                                 if (depth > 1) {
 
                                                     int tempD = depth;
-                                                    while (tempD == 1) {
+                                                    while (tempD > 1) {
 
                                                         Levels l = levelWrapper.get(tempD - 1);
                                                         HashMap<Node, ArrayList<Node>> listMinusLevel = l.getBackward();
@@ -511,7 +521,7 @@ public class Main {
                                                                 newTo.addAdjacentNode(n);
                                                                 n.addAdjacentNode(newTo);
 
-                                                                if (globalNodeList.containsKey(tempNode.getSearchID())) {
+                                                                if (globalNodeList.containsKey(n.getSearchID())) {
                                                                     globalNodeList.get(n.getSearchID()).mergeNode(n.getAdjacentNodes(), n.getKeywordList());
                                                                 } else {
                                                                     globalNodeList.put(n.getSearchID(), n);
@@ -861,6 +871,7 @@ public class Main {
             long finish = System.currentTimeMillis();
             long execTime = (finish - start)/1000;
             System.out.println("Global Time: " + execTime + " seconds");
+            conn.closeDBConnection();
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();

@@ -164,29 +164,6 @@ public class Utility {
         return false;
     }
 
-    public static void connect(Node from, Node to, HashMap<Integer, Node> globalNodeList, ArrayList<Edge> globalEdgeList,
-                        ArrayList<Edge> globalBEdgeList) {
-
-        from.addAdjacentNode(to);
-        to.addAdjacentNode(from);
-        to.incrementScore();
-        //if the node is present yet, merge
-        if (globalNodeList.containsKey(from.getSearchID())) {
-            globalNodeList.get(from.getSearchID()).mergeNode(from.getAdjacentNodes(),
-                    from.getKeywordList());
-        } else {
-            globalNodeList.put(from.getSearchID(), from);
-        }
-        Edge edge = new Edge(from, to, 1);
-        to.incrementScore();
-        //if the edge is already in the globalList, skip the adding
-        if (!globalEdgeList.contains(edge)) {
-            globalEdgeList.add(edge);
-            Edge bedge = new Edge(to, from, 0);
-            globalBEdgeList.add(bedge);
-        }
-    }
-
     /**
      *  this method finds the forward nodes of the nodes in the interest set
      *

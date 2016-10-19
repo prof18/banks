@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 /**
  * Created by digifarme on 9/17/16.
+ *
+ * It's a class that contains some db information, like tables and tuples
  **/
 public class dbInfo {
 

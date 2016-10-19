@@ -39,18 +39,15 @@ public class Dijkstra {
         spIt.setOrigin(start);
 
         //edges will contain the edge and also the backedge
-        for (Edge e : edges) {
+        for (Edge e : edges)
             edgeList.add(e);
-        }
 
-        for (Edge be : bedges) {
+        for (Edge be : bedges)
             edgeList.add(be);
-        }
 
         start.setWeight(0);
 
         //starting node has zero weight, the others infinite
-        //TODO : bisogna renderlo efficente?
         Node n;
         for (Map.Entry<Integer, Node> e : nodes.entrySet()) {
                 n = e.getValue();
@@ -75,9 +72,6 @@ public class Dijkstra {
             nodeMap.put(minimum.getSearchID(),minimum);
             double startWeight = minimum.getWeight();
 
-            //System.out.println("Starting node: " + minimum.toString());
-            //System.out.println("Start weight: " + startWeight);
-
             //necessary check to avoid nodes revisiting.
             //the father has as adjacent the son and vice versa
             for (Node n : minimum.getAdjacentNodes()) {
@@ -87,23 +81,18 @@ public class Dijkstra {
             }
 
             for (Node to : adjacent) {
-                //System.out.println("To node: " + to.toString());
                 for (Edge edge : edgeList) {
                     //we traverse the graph in reverse direction
                     if (edge.getTo().getSearchID() == minimum.getSearchID() && edge.getFrom().getSearchID() == to.getSearchID()) {
                         finalWeight = startWeight + edge.getScore();
                         if (finalWeight < to.getWeight()) {
-                            //System.out.println("Final weigh: " + finalWeight);
                             nodesQueue.remove(to);
                             to.setWeight(finalWeight);
                             to.setPreviousNode(minimum);
-                            //TODO: non bisogna farlo qua, ma con l'iteratore. Vedi prospettive.txt
-                            //to.addNodeToVLi(start);
                             spIt.add(to);
                             spIt.addPrevious(to,minimum);
                             spIt.setDistance(finalWeight);
                             nodesQueue.add(to);
-                            //System.out.println("To previous node " + to.getPreviousNode().toString());
                         }
                     }
                 }

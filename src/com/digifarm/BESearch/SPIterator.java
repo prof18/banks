@@ -31,20 +31,6 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
         list.add(n);
     }
 
-    /*
-    public Node getNode() {
-        //distance.remove(0);
-        return list.get(0);
-    }*/
-
-    /*public void removeNode(int index) {
-        list.remove(index);
-    }*/
-
-    public int getSize() {
-        return list.size();
-    }
-
     public void setDistance(double dist) {
         distance.add(dist);
     }
@@ -76,14 +62,9 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
     }
 
     //create an iterator on the list.
-    //TODO: reimplement the iterator
     public ListIterator<Node> createIterator(){
         ListIterator<Node> iterator = list.listIterator();
-        //save the starting node
-        //TODO: se non serve, togliamolo
-        //origin = list.get(0);
         return iterator;
-
     }
 
     @Override
@@ -94,14 +75,11 @@ public class SPIterator<Node> implements Comparable<SPIterator> {
         int minL = Math.min(l1,l2);
 
         for (int i = 0; i < minL; i++) {
-            //TODO: fix double comparison
             if( Double.compare(this.getDistance(i), spIterator.getDistance(i)) < 0)
                return -1;
             else if( Double.compare(this.getDistance(i), spIterator.getDistance(i)) > 0)
                 return 1;
         }
-
         return 0;
-
     }
 }

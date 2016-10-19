@@ -21,25 +21,23 @@ public class Utility {
      *
      *  @param  dbConn          An instance of ConnectionDB.
      *  @see    ConnectionDB
-     *  @return set             A set of Nodes
      *
      **/
     public static void createGraph(ConnectionDB dbConn, String DBName, dbInfo info) {
 
         HashMap<Integer, Node> set = new HashMap<>();
         Connection conn = dbConn.getDBConnection();
-        Statement stmn, stmn2, stm3;
+        Statement stmn, stmn2;
         ArrayList<String> tableList = new ArrayList<>();
 
         try {
 
             stmn = conn.createStatement();
             stmn2 = conn.createStatement();
-            stm3 = conn.createStatement();
-            ResultSet tuple, column;
+            ResultSet tuple;
+
             String tableName;
             int id;
-            String columnName;
             long before = System.currentTimeMillis();
             //query the database to know tables names
             ResultSet table = stmn.executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='" + DBName + "' ORDER BY TABLE_NAME;");
@@ -165,7 +163,7 @@ public class Utility {
     }
 
     /**
-     *  this method finds the forward nodes of the nodes in the interest set
+     *  This method finds the forward nodes of the nodes in the interest set
      *
      * @param dBconn            An instance of ConnectionDB
      * @see   ConnectionDB
@@ -178,7 +176,6 @@ public class Utility {
 
         //key --> starting node, value --> destination node. In this case value is the forward node of the key
         HashMap<Node,ArrayList<Node>> forwardMap = level.getForward();
-        //TODO: ADD COMMENT AFTER REVIEWING FOREINGKEYTABLE
         HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
         ArrayList<String> queries;
 
@@ -226,13 +223,14 @@ public class Utility {
     }
 
     /**
-     *  serve a trovare i backward dell'interestset
+     *  This method finds the backward nodes of the nodes in the interest set
      *
-     * @param dBconn
-     * @param interestSet
-     * @param set
-     * @param info
-     * @param level
+     * @param dBconn            An instance of ConnectionDB
+     * @see   ConnectionDB
+     * @param interestSet       The interest set
+     * @param set               All the nodes from the database
+     * @param info              An instance of dbInfo
+     * @param level             The level wrapper
      */
     public static void findBackwardInterest(ConnectionDB dBconn, HashMap<Integer,Node> interestSet, HashMap<Integer,Node> set,
                                             dbInfo info, Levels level) {
@@ -256,7 +254,7 @@ public class Utility {
 
                 queries = sqlKey.get(table);
                 if (queries != null && !queries.isEmpty()) {
-                    //ciclo solo se ci sono query disponibili
+
                     for (String s : queries) {
 
                         try {
@@ -290,14 +288,14 @@ public class Utility {
     }
 
     /**
+     *  This method finds the backward nodes of the backward nodes
      *
-     *  serve per trovare i backward di altri backward
-     *
-     * @param dBconn
-     * @param set
-     * @param backwards
-     * @param level
-     * @param info
+     * @param dBconn            An instance of ConnectionDB
+     * @see   ConnectionDB
+     * @param set               All the nodes from the database
+     * @param info              An instance of dbInfo
+     * @param level             The level wrapper
+     * @param backwards         The list of backward
      */
     public static void bFindBackward(ConnectionDB dBconn, HashMap<Integer, Node> set, HashMap<Node,ArrayList<Node>> backwards,
                               Levels level, dbInfo info) {
@@ -321,12 +319,11 @@ public class Utility {
 
                 queries = sqlKey.get(table);
                 if (queries != null && !queries.isEmpty()) {
-                    //ciclo solo se ci sono query disponibili
+
                     for (String s : queries) {
 
                         try {
                             s += " WHERE t2.__search_id = '" + n.getSearchID() + "'";
-
                             statement = conn.createStatement();
                             resultSet = statement.executeQuery(s);
 
@@ -354,7 +351,16 @@ public class Utility {
         }
     }
 
-    //bacckward of foward
+    /**
+     *  This method finds the backward nodes of the forward nodes
+     *
+     * @param dBconn            An instance of ConnectionDB
+     * @see   ConnectionDB
+     * @param set               All the nodes from the database
+     * @param info              An instance of dbInfo
+     * @param level             The level wrapper
+     * @param forward         The list of forward
+     */
     public static void fFindBackward(ConnectionDB dBconn, HashMap<Integer,Node> set, HashMap<Node,ArrayList<Node>> forward,
                                      Levels level, dbInfo info) {
 
@@ -368,19 +374,18 @@ public class Utility {
         ResultSet resultSet;
 
         Node n;
-        ArrayList<Node> nodeList = new ArrayList<>();
+        ArrayList<Node> nodeList;
 
         for (Map.Entry<Node,ArrayList<Node>> entry : forward.entrySet()) {
 
             nodeList = entry.getValue();
-
             for (Node node : nodeList) {
 
                 for(String table : info.getTableList()) {
 
                     queries = sqlKey.get(table);
                     if (queries != null && !queries.isEmpty()) {
-                        //ciclo solo se ci sono query disponibili
+
                         for (String s : queries) {
 
                             try {
@@ -413,7 +418,15 @@ public class Utility {
         }
     }
 
-    //trova i forward dei backward
+    /**
+     *  This method finds the forward nodes of the backward nodes
+     *
+     * @param dBconn            An instance of ConnectionDB
+     * @see   ConnectionDB
+     * @param set               All the nodes from the database
+     * @param level             The level wrapper
+     * @param backward          The list of backward
+     */
     public static void bFindForward(ConnectionDB dBconn, HashMap<Integer,Node> set, HashMap<Node,ArrayList<Node>> backward,
                                     Levels level) {
 
@@ -466,7 +479,15 @@ public class Utility {
         }
     }
 
-    //trova i forward dei forward
+    /**
+     *  This method finds the forward nodes of the forward nodes
+     *
+     * @param dBconn            An instance of ConnectionDB
+     * @see   ConnectionDB
+     * @param set               All the nodes from the database
+     * @param level             The level wrapper
+     * @param forward           The list of forward
+     */
     public static void fFindForward(ConnectionDB dBconn, HashMap<Integer,Node> set, HashMap<Node,ArrayList<Node>> forward,
                                     Levels level) {
 
@@ -480,7 +501,7 @@ public class Utility {
         ResultSet resultSet;
 
         Node n;
-        ArrayList<Node> nodeList = new ArrayList<>();
+        ArrayList<Node> nodeList;
 
         for (Map.Entry<Node,ArrayList<Node>> entry : forward.entrySet()) {
 
@@ -524,9 +545,17 @@ public class Utility {
         }
     }
 
+    /**
+     *  This method connects all the nodes in the interest set
+     *
+     * @param dBconn        An instance of ConnectionDB
+     * @see   ConnectionDB
+     * @param interestSet   The interest set
+     * @param globalEdges   The global list of Edges
+     * @param globalBedge   The glogbl list of the backedges
+     */
     public static void connectInterestNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet, ArrayList<Edge> globalEdges,
                                             ArrayList<Edge> globalBedge) {
-
 
         ArrayList<String> queries;
 
@@ -557,9 +586,7 @@ public class Utility {
 
                             connected = interestSet.get(rs.getInt(2));
                             if (connected != null) {
-                                //System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
                                 n.addAdjacentNode(connected);
-                                //assign score to the node --> indegree of the node
                                 edge = new Edge(n, connected, 1);
                                 if (!globalEdges.contains(edge)) {
                                     globalEdges.add(edge);
@@ -575,143 +602,10 @@ public class Utility {
                 }
             }
         }
-
-
     }
 
-   /*
-
-    public static ArrayList<ArrayList<Edge>> connectNodes(ConnectionDB dBconn, HashMap<Integer, Node> interestSet,
-                                        HashMap<Integer, Node> nodeList, dbInfo info, HashMap<Node, ArrayList<Node>> commonNodes) {
-
-        long before = System.currentTimeMillis();
-
-        ArrayList<String> queries;
-        ArrayList<Edge> edges = new ArrayList<>();
-        ArrayList<Edge> backedges = new ArrayList<>();
-        ArrayList<Node> toAdd = new ArrayList<>();
-
-        HashMap <String, ArrayList<String>> sqlKey = foreignKeyTable(dBconn);
-        Node n;
-
-        Connection conn = dBconn.getDBConnection();
-        Statement statement, statement1, statement4, statement5;
-        ResultSet resultSet, resultSet1, resultSet4, resultSet5;
-
-        String tbl;
-        int counter = 0;
-        String table2;
-
-
-        for (Map.Entry<Integer, Node> e : interestSet.entrySet()) {
-            n = e.getValue();
-            queries = sqlKey.get(n.getTableName());
-            if(queries != null && !queries.isEmpty()) {
-                for (String q : queries) {
-                    String tmpQ = q;
-                    try {
-                        q += " WHERE t1.__search_id = " + n.getSearchID();
-
-                        statement = conn.createStatement();
-                        resultSet = statement.executeQuery(q);
-
-                        //extract the list of adjacent nodes
-                        Node connected;
-                        Edge edge;
-                        Edge backedge;
-
-                        while(resultSet.next()) {
-
-                            connected = nodeList.get(resultSet.getInt(2));
-                            System.out.println(n.getTableName() + "->" + n.getSearchID() + " : " + connected.getTableName() + "->" + connected.getSearchID());
-                            n.addAdjacentNode(connected);
-                            edge = new Edge(n,connected,1);
-                            edges.add(edge);
-                            backedge = new Edge(connected,n,0);
-                            backedges.add(backedge);
-                            //assign score to the node --> indegree of the node
-                            connected.incrementScore();
-                            //the destination node could not be in the interest set. It isn't a keyword node
-                            if (!interestSet.containsKey(resultSet.getInt(2))) {
-                                toAdd.add(connected);
-                            }
-                            connected.addAdjacentNode(n);
-                        }
-                    } catch (SQLException e2) {
-                        e2.printStackTrace();
-                    }
-
-
-                }
-            }
-
-            //devo ottenere i nodi in più Es. il famoso 260
-            ArrayList<String> sqlQuery;
-            for (String table : info.getTableList()) {
-
-                sqlQuery = sqlKey.get(table);
-                //ciclo solo se ci sono query disponibili
-                if (sqlQuery != null && !sqlQuery.isEmpty()) {
-                    for (String s : sqlQuery) {
-
-                        try {
-                            s += " WHERE t2.__search_id = '" + n.getSearchID() + "';";
-
-                            statement1 = conn.createStatement();
-                            resultSet1 = statement1.executeQuery(s);
-
-                            Node connected;
-                            Edge edge;
-                            Edge bedge;
-
-                            while(resultSet1.next()) {
-
-                                //TODO: ADD THE NODE ONLY IF NECESSARY
-                                connected = nodeList.get(resultSet1.getInt(1));
-
-
-                                if (commonNodes.get(connected) != null) {
-                                    commonNodes.get(connected).add(n);
-                                } else {
-                                    ArrayList<Node> nodelist = new ArrayList<>();
-                                    nodelist.add(n);
-                                    commonNodes.put(connected,nodelist);
-                                }
-                            }
-
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-
-        for (Node node : toAdd) {
-            if (interestSet.containsKey(node)) {
-
-                for(String s : node.getKeywordList())
-
-                    interestSet.get(node).mergeNode(node.getAdjacentNodes(), s);
-
-            } else
-                interestSet.put(node.getSearchID(), node);
-
-        }
-
-
-        long after = System.currentTimeMillis();
-
-        System.out.println("Nodes connected in: " + (after - before) / 1000 + " seconds\n");
-
-        ArrayList<ArrayList<Edge>> list = new ArrayList<>();
-        list.add(edges);
-        list.add(backedges);
-        return list;
-    }*/
-
     /**
-     *
+     *  This method retrieves the query that connects a table to the others
      *
      * @param connDB            An instance of ConnectionDB
      * @see   ConnectionDB
@@ -782,25 +676,25 @@ public class Utility {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return keyTable;
     }
 
     /**
      * This method calculates the weight of the backedges
      *
+     * @param bedge List of backedge
      */
 
     public static void backEdgePoint(ArrayList<Edge> bedge) {
         //the point of an backedge is proportional to number of link to v from nodes of the same type as u
         Node to, from;
-        ArrayList<Node> adjacent = new ArrayList<>();
+        ArrayList<Node> adjacent;
         String table;
 
         for (Edge be : bedge) {
 
-            to = be.getFrom();   //finish       --> v
-            from = be.getTo();   //start     --> u
+            to = be.getFrom();   //finish
+            from = be.getTo();   //start
 
             table = from.getTableName();
             adjacent = to.getAdjacentNodes();
@@ -815,7 +709,7 @@ public class Utility {
     }
 
     /**
-     * This method calculate the maximus value of the node score
+     * This method calculate the maximum value of the node score
      *
      * @param nodes     Hash Map of nodes
      * @param max       The actual max value
@@ -904,7 +798,7 @@ public class Utility {
     /**
      *  The overall score is computed considering the root and the leaves
      *
-     * @param tree
+     * @param tree  Tree
      */
     public static void overallNodeScore(Tree tree) {
 
@@ -930,8 +824,8 @@ public class Utility {
     /**
      *  The overall edge score is  1/(1+"sum of"escore
      *
-     * @param edges
-     * @param tree
+     * @param edges     List of edges
+     * @param tree      Tree
      */
     public static void overallEdgeScore(ArrayList<Edge> edges, Tree tree) {
 

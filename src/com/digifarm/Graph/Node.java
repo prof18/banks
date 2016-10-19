@@ -126,7 +126,7 @@ public class Node implements Comparable<Node> {
     }
 
     /**
-     *  Craete the nodelist v.Li, one for each keyword
+     *  Create the nodelist v.Li, one for each keyword
      *
      * @param keyword   The current keyword
      */

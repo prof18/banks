@@ -7,20 +7,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by marco on 9/14/16.
- */
+ * Created by digifarmer on 9/14/16.
+ **/
 public class Tree implements Comparable<Tree> {
 
     private Node root;
-    //list of tree node
-    //private ArrayList<Node> nodeList;
     //key is father, value is list of sons
     private HashMap<Node, ArrayList<Node>> sons;
     //key is son, value is father
     private HashMap<Node, Node> father;
+
     private double nodeScore;
     private double edgeScore;
     private double globalScore;
+
 
     public Tree() {
         sons = new HashMap<>();
@@ -38,9 +38,6 @@ public class Tree implements Comparable<Tree> {
 
     public void addSon(Node current, Node son) {
 
-        //is the root
-        //if (current != null) {
-
         ArrayList<Node> toAdd = new ArrayList<>();
 
         if (sons.containsKey(current)) {
@@ -49,7 +46,6 @@ public class Tree implements Comparable<Tree> {
                     break;
                 } else {
                     toAdd.add(son);
-                    //sons.get(current).add(son);
                 }
             }
             for (Node n : toAdd) {
@@ -61,9 +57,6 @@ public class Tree implements Comparable<Tree> {
             sonList.add(son);
             sons.put(current, sonList);
         }
-  //  }
-
-
     }
 
     public HashMap<Node, ArrayList<Node>> getSons() {
@@ -98,14 +91,9 @@ public class Tree implements Comparable<Tree> {
         this.globalScore = globalScore;
     }
 
-    public HashMap<Node, Node> getFather() {
-        return father;
-    }
-
     @Override
     public int compareTo(Tree tree) {
 
-        //this > tree
         if (Double.compare(this.getGlobalScore(), tree.getGlobalScore()) > 0)
             return -1;
         else if (Double.compare(this.getGlobalScore(), tree.getGlobalScore()) < 0)
@@ -133,9 +121,8 @@ public class Tree implements Comparable<Tree> {
                 if (e != null)
                     FatherAndSons +=  e.getSearchID() + " ";
                 else
-                    FatherAndSons += "Non ha figli";
+                    FatherAndSons += "Hasn't sons";
             }
-
         }
 
         String Tree ="-----------------------------" + '\n' +

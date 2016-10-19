@@ -146,7 +146,7 @@ public class Main {
                 Utility.connectInterestNodes(conn, interestSet, globalEdgeList, globalBEdgeList);
             }
 
-            //we do this only wehen there isn't table's name in the keyword
+            //we do this only when there isn't table's name in the keyword.
             if (tableMatch.isEmpty()) {
 
                 Levels level;
@@ -456,9 +456,7 @@ public class Main {
                     }
                     System.out.println("Path built");
                 }
-            } else {
-
-                System.out.println("entrato nell'else");
+            } else { //if there is a table name in the keyword, we don't need to check if the keyword in the listTo are different
 
                 Levels level;
                 int depth;
@@ -475,13 +473,7 @@ public class Main {
                         Node from = e.getKey();
                         ArrayList<Node> listTo = e.getValue();
 
-
-                        int i = 0;
-                        ArrayList<String> keyList = new ArrayList<>();
-                        Node tempNode = null;
-
                         for (Node n : listTo) {
-
 
                             from.addAdjacentNode(n);
                             n.addAdjacentNode(from);
@@ -529,15 +521,10 @@ public class Main {
                                             }
                                         }
                                     }
-
                                     tempD--;
                                 }
                             }
-
-
-                            i++;
                         }
-
                     }
 
                     for (Map.Entry<Node, ArrayList<Node>> e1 : forward.entrySet()) {
@@ -545,13 +532,7 @@ public class Main {
                         Node from = e1.getKey();
                         ArrayList<Node> listTo = e1.getValue();
 
-
-                        int i = 0;
-                        ArrayList<String> keyList = new ArrayList<>();
-                        Node tempNode = null;
-
                         for (Node n : listTo) {
-
 
                             from.addAdjacentNode(n);
                             n.addAdjacentNode(from);
@@ -576,7 +557,7 @@ public class Main {
 
                                     Levels l = levelWrapper.get(tempD - 1);
                                     HashMap<Node, ArrayList<Node>> listMaxLevel = l.getForward();
-                                    ArrayList<Node> valueList = new ArrayList<>();
+                                    ArrayList<Node> valueList;
                                     Node fromKey;
                                     for (Map.Entry<Node, ArrayList<Node>> e3 : listMaxLevel.entrySet()) {
 
@@ -605,119 +586,44 @@ public class Main {
                                     tempD--;
                                 }
                             }
-
-
-                            i++;
                         }
-
                     }
 
-
-                    System.out.println("isjgks");
+                    System.out.println("Path built (table as keyword)");
                 }
             }
 
-/*
-            if (!tableMatch.isEmpty()) {
-
-                HashMap<Integer,Node> newGlobalNodeList = new HashMap<>();
-                ArrayList<Edge> newGlobalEdgeList = new ArrayList<>();
-                ArrayList<Edge> newGlobalBedgeList = new ArrayList<>();
-
-                for (Map.Entry<Integer,Node> e2 : globalNodeList.entrySet()) {
-
-                    Node n = e2.getValue();
-
-                    for (String s : tableMatch) {
-
-                        if (n.getTableName().toLowerCase().compareTo(s.toLowerCase()) == 0) {
-
-                            newGlobalNodeList.put(n.getSearchID(),n);
-
-                            //scorro tra gli adiacenti
-                            for (Node nd : n.getAdjacentNodes()) {
-
-                                Edge eDir = new Edge(n,nd,1);
-                                Edge eIndir = new Edge(nd,n,1);
-                                if (globalEdgeList.contains(eDir)) {
-
-                                } else if (globalEdgeList.contains(eIndir)) {
-
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }*/
-
-
-            //if a node is common to two keyword, add this node to the globalNodeList
-            Node connected;
-            ArrayList<Node> nodeList;
-
-           /* for (Map.Entry<Node,ArrayList<Node>> entry : commonNodes.entrySet()) {
-
-                connected = entry.getKey();
-                nodeList = entry.getValue();
-
-                if (!globalNodeList.containsKey(connected.getSearchID())) {
-
-                    //if size > 1 there is a node in common
-                    if (nodeList.size() > 1) {
-
-                        globalNodeList.put(connected.getSearchID(), connected);
-
-                        for (Node n : nodeList) {
-
-                            System.out.println(connected.getTableName() + "->" + connected.getSearchID() + " : " + n.getTableName() + "->" + n.getSearchID());
-                            connected.addAdjacentNode(n);
-                            Edge edge = new Edge(connected, n, 1);
-                            globalEdgeList.add(edge);
-                            Edge bedge = new Edge(n, connected, 0);
-                            globalBEdgeList.add(bedge);
-                            n.incrementScore();
-                            n.addAdjacentNode(connected);
-                        }
-                    }
-                }
-            }*/
-
-            System.out.println("fine level");
-
-
+            //Cleaning useless data
             interestSet = new HashMap<>();
             info = new dbInfo();
             levelWrapper = new HashMap<>();
 
-
             max = Utility.maxNodeScore(globalNodeList, max);
             min = Utility.minEdgeWeight(globalEdgeList, min);
 
-            //assign point to the backedge
+            //Assign point to the backedge
             Utility.backEdgePoint(globalBEdgeList);
 
-            // normalize edge weight
-            //only logarithmic scale
+            //Normalize edge weight. only logarithmic scale
             Utility.eWeightNorm(globalEdgeList, min);
 
-            //normalize node score
-            //TODO scegliere qui scala lineare (fraction) o logaritmica(logarithm)
+            //Normalize node score
+            //TODO choose linear scale (fraction) or logarithm(logarithm)
             Utility.nScoreNorm(globalNodeList, "logarithm", max);
 
             Graph graph = new Graph(globalNodeList, globalEdgeList, globalBEdgeList);
-
-            //TODO: creare coda(Priority QUEUE) di SPIterator ordinati in base alla distanza(IteratorHeap)
+            //Heap of iterator order by node's weight
             PriorityQueue<SPIterator> iteratorHeap = new PriorityQueue<>();
-            //we need a map to know the respective iterator of a start node.
+            //The key is the starting node of the iterator. The value is a map containing the relationship between two nodes
             HashMap<Node, HashMap<Node, Node>> path = new HashMap<>();
 
+            //Iterator Creation
             Node node;
             for (Map.Entry<Integer, Node> e : globalNodeList.entrySet()) {
                 SPIterator it = new SPIterator();
                 node = e.getValue();
+                //the iterator start only from keyword node
                 if (node.isKeywordNode()) {
-
                     Dijkstra dijkstra = new Dijkstra(graph, node, it);
                     path.put(node, it.getPreviousList());
                     dijkstra.visit();
@@ -727,11 +633,10 @@ public class Main {
 
             Node v;
 
-            //tree heap
+            //Tree heap
             int HEAP_SIZE = 500;
             PriorityQueue<Tree> outputHeap = new PriorityQueue<>();
             PriorityQueue<Tree> outputBuffer = new PriorityQueue<>();
-
 
             while (!iteratorHeap.isEmpty()) {
 
@@ -770,12 +675,13 @@ public class Main {
                 for (ArrayList<Node> tuple : crossProduct) {
 
                     Tree tree = new Tree();
-
                     //v is the root of the tree
                     tree.setRoot(v);
 
+                    //tree population
                     for (Node n : tuple) {
 
+                        //get the path of an interator
                         HashMap<Node, Node> previousPath = path.get(n);
 
                         Node previous = v;
@@ -790,14 +696,13 @@ public class Main {
                         }
                     }
 
+                    //add all edges and backedges to a global list
                     ArrayList<Edge> overallEdges = new ArrayList<>();
-                    for (Edge e : globalEdgeList) {
+                    for (Edge e : globalEdgeList)
                         overallEdges.add(e);
-                    }
 
-                    for (Edge be : globalBEdgeList) {
+                    for (Edge be : globalBEdgeList)
                         overallEdges.add(be);
-                    }
 
                     //calculate node score
                     Utility.overallNodeScore(tree);
@@ -809,23 +714,25 @@ public class Main {
                     Utility.globalScore(tree, lambda, "addition");
 
                     HashMap<Node, ArrayList<Node>> sons = tree.getSons();
+                    //if the root hasn't sons, add the tree
                     if (sons.get(tree.getRoot()) == null) {
                         addTree(tree, outputHeap, outputBuffer, HEAP_SIZE, tableMatch);
-                    } else if (sons.get(tree.getRoot()).size() == 1 && sons.get(sons.get(tree.getRoot()).get(0)).size() == 0)
+                    }
+                    //if root has only one child, continue /*duplicate result*/
+                    else if (sons.get(tree.getRoot()).size() == 1 && sons.get(sons.get(tree.getRoot()).get(0)).size() == 0)
                         break;
                     else
                         addTree(tree, outputHeap, outputBuffer, HEAP_SIZE, tableMatch);
-
                 }
             } //[C] while
 
-
-            while (outputHeap.size() != 0) {
+            while (outputHeap.size() != 0)
                 outputBuffer.add(outputHeap.poll());
-            }
 
             int i = 1;
+            //the score of the last output tree. We need it for outputting nodes with the same score but in position greater than ten
             double lastScore = 0;
+            //We need to output 10 relevant results.
             while (i < 11 && !outputBuffer.isEmpty()) {
 
                 Tree Ttemp = outputBuffer.poll();
@@ -863,18 +770,16 @@ public class Main {
     /**
      * Calculate cross product
      *
-     * @param origin
-     * @param v
-     * @return
+     * @param origin    The origin node
+     * @param v         The current node
+     * @return          The result of the cross product
      */
     private static ArrayList<ArrayList<Node>> generateCrossProduct(Node origin, Node v) {
 
         //crossProduct wrapper
         ArrayList<ArrayList<Node>> crossProduct = new ArrayList();
-
         //map of vLi
         HashMap<String, ArrayList<Node>> vLiMap = v.getvLi();
-
         //keyword list of origin
         ArrayList<String> originKeyList = origin.getKeywordList();
 
@@ -882,6 +787,8 @@ public class Main {
 
             for (Map.Entry<String, ArrayList<Node>> entry : vLiMap.entrySet()) {
 
+                //if the node has only one keyword, the crossproduct's result has only the origin node. Else if the node
+                //hasn't keyword, the crossproduct's result is null. Otherwise compute it.
                 if (oK.compareTo(entry.getKey()) != 0) {
 
                     ArrayList<Node> nodeL = entry.getValue();
@@ -909,43 +816,36 @@ public class Main {
     }
 
     /**
-     * @param tree
-     * @param outputHeap
-     * @param outputBuffer
-     * @param maxHeapSize
+     *  This method add a tree to the output heap
+     *
+     * @param tree              Tree
+     * @param outputHeap        Output Heap
+     * @param outputBuffer      Output Buffer
+     * @param maxHeapSize       Maximum size of the heap
+     * @param tableMatch        List of the table keyword
      */
     private static void addTree(Tree tree, PriorityQueue<Tree> outputHeap, PriorityQueue<Tree> outputBuffer,
                                 int maxHeapSize, ArrayList<String> tableMatch) {
 
         boolean cond = false;
 
-       /* if (tree.getRoot().getSearchID() == 3538) {
-            System.out.println("fag");
-            for (fa)
-        }*/
-
-
+        //We add the tree only if contains a node from the table requested by the user.
         if (!tableMatch.isEmpty()) {
+
             for (String s : tableMatch) {
 
-                if (tree.getRoot().getTableName().toLowerCase().compareTo(s.toLowerCase()) == 0) {
+                //check the root
+                if (tree.getRoot().getTableName().toLowerCase().compareTo(s.toLowerCase()) == 0)
                     cond = true;
-                }
 
-
-                //controllo i padri
+                //check the other nodes
                 for (Map.Entry<Node, ArrayList<Node>> entry : tree.getSons().entrySet()) {
                     for (Node nd : entry.getValue()) {
-                        if (nd != null && nd.getTableName().toLowerCase().compareTo(s.toLowerCase()) == 0) {
+                        if (nd != null && nd.getTableName().toLowerCase().compareTo(s.toLowerCase()) == 0)
                             cond = true;
-                        }
                     }
                 }
-
-                //controllo i figli
-
             }
-
 
             if (cond) {
                 if (outputHeap.size() == maxHeapSize) {
@@ -957,14 +857,15 @@ public class Main {
                     cond = false;
                 }
             }
-        } else {
+
+        } else { //if the user doesn't request table, add all the tree
+
             if (outputHeap.size() == maxHeapSize) {
                 outputBuffer.add(outputHeap.poll());
                 outputHeap.add(tree);
 
             } else {
                 outputHeap.add(tree);
-
             }
         }
     }

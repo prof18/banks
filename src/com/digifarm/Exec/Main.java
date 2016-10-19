@@ -370,7 +370,6 @@ public class Main {
                                                             valueList = e3.getValue();
                                                             if (valueList.contains(tempNode)) {
 
-
                                                                 tempNode.addAdjacentNode(fromKey);
                                                                 fromKey.addAdjacentNode(tempNode);
                                                                 if (globalNodeList.containsKey(tempNode.getSearchID()))
@@ -395,7 +394,6 @@ public class Main {
                                                 tempNode = null;
                                             }
 
-                                            //merge su n
                                             from.addAdjacentNode(n);
                                             n.addAdjacentNode(from);
 
@@ -427,7 +425,6 @@ public class Main {
                                                         valueList = e3.getValue();
                                                         if (valueList.contains(n)) {
 
-                                                            //merge su n
                                                             n.addAdjacentNode(fromKey);
                                                             fromKey.addAdjacentNode(n);
 
@@ -826,12 +823,6 @@ public class Main {
     }
 
     /**
-<<<<<<< HEAD
-     * @param tree
-     * @param outputHeap
-     * @param outputBuffer
-     * @param maxHeapSize
-=======
      *  This method add a tree to the output heap
      *
      * @param tree              Tree
@@ -839,7 +830,6 @@ public class Main {
      * @param outputBuffer      Output Buffer
      * @param maxHeapSize       Maximum size of the heap
      * @param tableMatch        List of the table keyword
->>>>>>> temp
      */
     private static void addTree(Tree tree, PriorityQueue<Tree> outputHeap, PriorityQueue<Tree> outputBuffer,
                                 int maxHeapSize, ArrayList<String> tableMatch) {

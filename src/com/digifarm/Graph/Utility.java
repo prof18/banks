@@ -7,9 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 
-//TODO CLOSE DB CONNECTION
 /**
  * Created by digifarmer on 07/07/16.
  **/

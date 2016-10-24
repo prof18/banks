@@ -59,13 +59,11 @@ public class MainUI extends JFrame implements ActionListener, WindowListener {
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         constraints.gridx = 0;
         constraints.gridy = 0;
-       // keywordLabel.setPreferredSize( search.getPreferredSize() );
         keywordLabel.setSize(search.getHeight(),40);
         add(keywordLabel, constraints);
 
         //keyword edit text placement
         constraints.insets = new Insets(20, 0, 20, 1);
-        //constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         constraints.gridx = 1;
         constraints.gridy = 0;
         keyword.setPreferredSize( search.getPreferredSize() );
@@ -73,10 +71,8 @@ public class MainUI extends JFrame implements ActionListener, WindowListener {
 
         //depth label placement
         constraints.insets = new Insets(11, 20, 20, 20);
-        //constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         constraints.gridx = 0;
         constraints.gridy = 1;
-        // keywordLabel.setPreferredSize( search.getPreferredSize() );
         keywordLabel.setSize(search.getHeight(),40);
         add(depthLabel, constraints);
 

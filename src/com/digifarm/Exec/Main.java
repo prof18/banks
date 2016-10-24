@@ -16,19 +16,19 @@ import java.util.*;
 //TODO: CLOSE DB CONNECTION
 public class Main {
 
-    public static void main (String[] args) {
+    public static void dbSearch (String[] temp, ConnectionDB conn,String database) {
 
-        try {
+        //try {
 
-            Scanner in = new Scanner(System.in);
+            /*Scanner in = new Scanner(System.in);
             //ask database username
             System.out.print("Enter Username: ");
-            String username = /*in.nextLine();*/ "marco";
+            String username = *//*in.nextLine();*//* "marco";
             //ask database name
             System.out.print("Enter database name: ");
-            String database = /*in.nextLine();*/ "mondial";
+            String database = *//*in.nextLine();*//* "mondial";
             //connectB to database
-            ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);
+            ConnectionDB conn = new ConnectionDB(username, "", "localhost", "5432", database);*/
             System.out.println("Connected\n-----------------");
 
             //container of some db information, like tables and tuples
@@ -37,7 +37,7 @@ public class Main {
             //create a graph from all the database
             Utility.createGraph(conn, database, info);
 
-            //ask for keyword
+            /*//ask for keyword
             System.out.print("Enter keyword (Enter to insert another, \"q\" to exit):\n");
             ArrayList<String> temp = new ArrayList<>();
             while (in.hasNext()) {
@@ -46,7 +46,7 @@ public class Main {
                     break;
                 } else
                     temp.add(keyword);
-            }
+            }*/
 
             long start = System.currentTimeMillis();
 
@@ -765,9 +765,9 @@ public class Main {
             long execTime = (finish - start) / 1000;
             System.out.println("Global Time: " + execTime + " seconds");
             conn.closeDBConnection();
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     /**

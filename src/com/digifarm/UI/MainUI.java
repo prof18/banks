@@ -24,14 +24,15 @@ public class MainUI extends JFrame implements ActionListener, WindowListener {
     private String dbName;
 
     private JTextArea textArea = new JTextArea();
-    private JTextField keyword;
+    private JTextField keyword,depth;
     private JButton search;
     private JScrollPane console;
+    private JLabel keywordLabel, depthLabel;
 
     public MainUI() {
         //cjFrame configuration
         setTitle("Banks by Digifarmer");
-        setSize(700, 550);
+        setSize(750, 550);
         setResizable(false);
         setVisible(false);
         //end program when click on X
@@ -42,36 +43,65 @@ public class MainUI extends JFrame implements ActionListener, WindowListener {
         System.setOut(printStream);
         System.setErr(printStream);
 
-        keyword = new JTextField("Enter keyword. Use comma as separator",40);
+        keyword = new JTextField("",29);
+        depth = new JTextField("3");
         search = new JButton("Search");
+
+        keywordLabel = new JLabel("Enter keyword. Use comma as separator:");
+        depthLabel = new JLabel("Maximum depth of navigation. Default value is 3");
 
         // creates the GUI
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-        //keyword edit text placement
-        constraints.insets = new Insets(20, 20, 20, 20);
+        //keyword label placement
+        constraints.insets = new Insets(25, 20, 20, 20);
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         constraints.gridx = 0;
+        constraints.gridy = 0;
+       // keywordLabel.setPreferredSize( search.getPreferredSize() );
+        keywordLabel.setSize(search.getHeight(),40);
+        add(keywordLabel, constraints);
+
+        //keyword edit text placement
+        constraints.insets = new Insets(20, 0, 20, 1);
+        //constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        constraints.gridx = 1;
         constraints.gridy = 0;
         keyword.setPreferredSize( search.getPreferredSize() );
         add(keyword, constraints);
 
+        //depth label placement
+        constraints.insets = new Insets(11, 20, 20, 20);
+        //constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        // keywordLabel.setPreferredSize( search.getPreferredSize() );
+        keywordLabel.setSize(search.getHeight(),40);
+        add(depthLabel, constraints);
+
+        //depth edit text placement
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        constraints.insets = new Insets(5, 0, 20, 20);
+        depth.setPreferredSize(search.getPreferredSize());
+        add(depth, constraints);
+
         //search button placement
         constraints.gridx = 1;
-        constraints.gridy = 0;
-        constraints.insets = new Insets(20, 20, 20, 20);
+        constraints.gridy = 1;
+        constraints.insets = new Insets(5, 20, 20, 27);
         constraints.anchor = GridBagConstraints.EAST;
         add(search, constraints);
 
         //console area placement
         constraints.gridx = 0;
-        constraints.gridy = 1;
+        constraints.gridy = 2;
         constraints.gridwidth = 2;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weightx = 1.0;
         constraints.weighty = 1.0;
-        textArea.setBorder(new EmptyBorder(20,20,20,20));
+        textArea.setBorder(new EmptyBorder(10,20,20,20));
         textArea.setEditable(false);
         console = new JScrollPane(textArea);
         add(console, constraints);
@@ -82,7 +112,7 @@ public class MainUI extends JFrame implements ActionListener, WindowListener {
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Main.dbSearch(keyword.getText().split(","),conn,dbName);
+                    Main.dbSearch(keyword.getText().split(","),conn,dbName,Integer.valueOf(depth.getText()));
                 }
             });
             t.start();

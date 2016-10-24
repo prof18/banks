@@ -39,7 +39,7 @@ public class Utility {
             long before = System.currentTimeMillis();
             //query the database to know tables names
             ResultSet table = stmn.executeQuery("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='" + DBName + "' ORDER BY TABLE_NAME;");
-            System.out.println("\nCreating graph from DB. Please Wait...\n-----------------" );
+            System.out.println("Creating graph from DB. Please Wait...\n-----------------" );
 
             while(table.next()) {
 

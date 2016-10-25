@@ -742,7 +742,7 @@ public class Main {
         long finish = System.currentTimeMillis();
         long execTime = (finish - start) / 1000;
         System.out.println("Global Time: " + execTime + " seconds");
-        conn.closeDBConnection();
+        Thread.currentThread().interrupt();
     }
 
     /**

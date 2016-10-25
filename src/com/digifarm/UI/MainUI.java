@@ -104,11 +104,12 @@ public class MainUI extends JFrame implements ActionListener, WindowListener {
 
         //button listener
         search.addActionListener(e -> {
-            textArea.setText(" ");
+            textArea.setText("");
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     Main.dbSearch(keyword.getText().split(","),conn,dbName,Integer.valueOf(depth.getText()));
+                    keyword.setText("");
                 }
             });
             t.start();

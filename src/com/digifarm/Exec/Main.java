@@ -7,6 +7,7 @@ import com.digifarm.Graph.*;
 import com.digifarm.Tree.Tree;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -26,6 +27,9 @@ public class Main {
         Utility.createGraph(conn, database, info);
 
         long start = System.currentTimeMillis();
+        SimpleDateFormat formatter = new SimpleDateFormat("H:mm");
+        String timeString = formatter.format(new Date(start));
+        System.out.println("Query started at: " + timeString);
 
         //keywords that aren't table
         ArrayList<String> notTable = new ArrayList<>();
@@ -68,9 +72,6 @@ public class Main {
         *             in the actual level
         */
         HashMap<Integer, Levels> levelWrapper = new HashMap<>();
-
-        //TODO: Here you can choose the max depth of navigation
-        //int maxDepth = 3;
 
         //create containers for every level
         for (int j = 1; j <= maxDepth; j++)

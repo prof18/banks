@@ -29,14 +29,11 @@ public class ConnectionDialog extends JDialog implements ActionListener, WindowL
         this.mainUI = mainUI;
         //JDialog components creation
         connectionPanel = new JPanel(new GridLayout(6, 1));
-        //TODO: change with username
-        user = new JTextField("marco");
-        //TODO: change with password
-        pass = new JPasswordField("");
+        user = new JTextField("username");
+        pass = new JPasswordField("password");
         dbaddress = new JTextField("localhost");
         dbport = new JTextField("5432");
-        //TODO: change with database name
-        dbname = new JTextField("mondial");
+        dbname = new JTextField("Database Name");
         connect = new JButton("Connect");
         user.setHorizontalAlignment(JTextField.CENTER);
         dbaddress.setHorizontalAlignment(JTextField.CENTER);

@@ -117,7 +117,6 @@ public class Main {
                 Node n = e.getValue();
                 int index = e.getKey();
                 globalNodeList.put(index, n);
-
             }
 
             //connect nodes of the interest set to each other
@@ -163,7 +162,6 @@ public class Main {
 
                                 for (String s : keyList) {
 
-                                    //TODO: METODO & BABBA AND CAPRA --> QUESTIONE DELLE KEYWORD
                                     //check if the Node A keyword is not a keyword of Node B
                                     if (!n.getKeywordList().contains(s)) {
 
@@ -663,7 +661,7 @@ public class Main {
 
                 for (Node n : tuple) {
 
-                    //get the path of an interator
+                    //get the path of an iterator
                     HashMap<Node, Node> previousPath = path.get(n);
 
                     Node previous = v;

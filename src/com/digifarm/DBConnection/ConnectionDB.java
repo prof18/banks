@@ -21,7 +21,6 @@ public class ConnectionDB {
         Class.forName(JDBC_DRV);
         //DB Connection
         conn = DriverManager.getConnection(DB_URL, user, pass);
-
     }
 
     public Connection getDBConnection() {
